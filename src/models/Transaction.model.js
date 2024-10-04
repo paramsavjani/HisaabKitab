@@ -1,7 +1,6 @@
-import { status } from "express/lib/response";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const transactioSchema = new Schema(
+const transactionSchema = new Schema(
   {
     from: {
       type: mongoose.Schema.Types.ObjectId,
@@ -34,4 +33,4 @@ const transactioSchema = new Schema(
   { timestamps: true }
 );
 
-export const Transaction = mongoose.model("Transaction", transactioSchema);
+export const Transaction = mongoose.model("Transaction", transactionSchema);
