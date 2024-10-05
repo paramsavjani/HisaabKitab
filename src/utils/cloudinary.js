@@ -25,5 +25,3 @@ const uploadOnCloudinary = async (localFilePath) => {
 };
 
 export { uploadOnCloudinary };
-
-uploadOnCloudinary("C:/Users/param/OneDrive/Pictures/linux ss/Screenshot_2024-06-27_10_53_25.png");
