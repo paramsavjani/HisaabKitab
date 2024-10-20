@@ -19,6 +19,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const exist = await User.exists({ username });
   if (exist) {
+    console.log(exist); 
     throw new ApiError(400, "Username already exists");
   }
 
@@ -28,6 +29,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const user = await User.create({ username, name, email, password });
+
   res.status(201).json(user);
 });
 
