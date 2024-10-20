@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema(
       ],
     ],
 
+    profilePicture: {
+      type: String,
+    },
+
     friendRequests: [
       {
         type: mongoose.Schema.Types.ObjectId,

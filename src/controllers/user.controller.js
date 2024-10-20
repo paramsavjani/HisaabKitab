@@ -1,6 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, name, email, password } = req.body;
@@ -19,7 +20,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
   const exist = await User.exists({ username });
   if (exist) {
-    console.log(exist); 
     throw new ApiError(400, "Username already exists");
   }
 
@@ -28,9 +28,21 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Email already exists");
   }
 
-  const user = await User.create({ username, name, email, password });
+  const profilePicture = req.file ? req.file.path : null;
+  let imageUrl = "";
+  if (profilePicture) {
+    imageUrl = await uploadOnCloudinary(profilePicture);
+  }
 
-  res.status(201).json(user);
+  const user = await User.create({
+    username,
+    name,
+    email,
+    password,
+    profilePicture: imageUrl,
+  });
+
+  res.status(200).json(user);
 });
 
 export { registerUser };
