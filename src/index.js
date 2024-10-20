@@ -18,7 +18,7 @@ const findUser = async () => {
 
 const createDummyUsers = async () => {
   const users = [];
-  for (let i = 0; i < 1000000; i++) {
+  for (let i = 0; i < 1000; i++) {
     const user = {
       username: faker.internet.userName(),
       name: faker.person.firstName(),
@@ -50,9 +50,7 @@ const findUserById = async (id) => {
 
 const run = async () => {
   // await createDummyUsers();
-  // await findUser();
-  // await findUserById("670aff23fc9f22126e907b6f");
-  deleteAllUsers();
+  await deleteAllUsers();
 };
 
 const deleteAllUsers = async () => {
