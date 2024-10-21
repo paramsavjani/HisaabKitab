@@ -27,19 +27,6 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
     },
 
-    friends: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-      [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Transaction",
-        },
-      ],
-    ],
-
     profilePicture: {
       type: String,
     },
@@ -47,13 +34,6 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
-
-    friendRequests: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Request",
-      },
-    ],
   },
   { timestamps: true }
 );
@@ -70,7 +50,6 @@ userSchema.pre("save", async function (next) {
     next(error);
   }
 });
-
 
 userSchema.methods.isCorrectPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
