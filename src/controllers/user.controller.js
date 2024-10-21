@@ -2,6 +2,18 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/User.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+
+const generateAccessAndRefreshTokens = async (id) => {
+  const user = await User.findById(id);
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+  await user.save({ validateBeforeSave: false });
+
+  return { accessToken, refreshToken };
+};
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, name, email, password } = req.body;
@@ -42,7 +54,63 @@ const registerUser = asyncHandler(async (req, res) => {
     profilePicture: imageUrl,
   });
 
-  res.status(200).json(user);
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  if (!createdUser) {
+    throw new ApiError(500, "Something went wrong while registering user");
+  }
+
+  console.log("user created", user.username);
+
+  const response = new ApiResponse(
+    201,
+    createdUser,
+    "User registered successfully"
+  );
+  res.status(response.statusCode).json(response);
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const match = await user.isCorrectPassword(password);
+
+  if (!match) {
+    throw new ApiError(401, "Invalid username or password");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id
+  );
+
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(200)
+    .cookie("refreshToken", refreshToken, option)
+    .cookie("accessToken", accessToken, option)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "User logged in successfully"
+      )
+    );
+});
+
+export { registerUser, loginUser };
