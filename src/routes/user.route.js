@@ -1,13 +1,14 @@
 import { Router } from "express";
-import { registerUser, loginUser } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logoutUser } from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
-const userRouter = Router();
+const router = Router();
 
-userRouter
-  .route("/register")
-  .post(upload.single("profilePicture"), registerUser);
+router.route("/register").post(upload.single("profilePicture"), registerUser);
 
-userRouter.route("/login").post(loginUser);
+router.route("/login").post(loginUser);
 
-export { userRouter };
+router.route("/logout").post(verifyJWT, logoutUser);
+
+export { router };

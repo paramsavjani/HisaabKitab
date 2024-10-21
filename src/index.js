@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
-import { faker } from "@faker-js/faker";
 import { User } from "./models/User.model.js";
 
 const deleteAllUsers = async () => {
