@@ -59,4 +59,36 @@ const sendRequest = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Request sent"));
 });
 
-export { sendRequest };
+const allRequests = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const requests = await Request.find({
+    receiver: user._id,
+    status: "pending",
+  }).sort({ createdAt: -1 });
+
+  let senders = requests.map((request) => request.sender);
+
+  senders = await Promise.all(
+    requests.map(async (request) => {
+      const sender = await User.findById(request.sender).select(
+        "username name profilePicture"
+      );
+
+      return {
+        ...sender.toObject(),
+        requestId: request._id,
+      };
+    })
+  );
+  
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { senders }, "Requests fetched"));
+});
+
+export { sendRequest, allRequests };
