@@ -85,10 +85,60 @@ const allRequests = asyncHandler(async (req, res) => {
       };
     })
   );
-  
+
   return res
     .status(200)
     .json(new ApiResponse(200, { senders }, "Requests fetched"));
 });
 
-export { sendRequest, allRequests };
+const acceptRequest = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "Unauthorized");
+  }
+
+  const requestId = req.params.requestId;
+
+  if (!requestId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid request ID");
+  }
+
+  const request = await Request.findById(requestId);
+
+  if (!request || request == null || request == undefined) {
+    throw new ApiError(404, "Request not found");
+  }
+
+  if (request.receiver.toString() !== user._id.toString()) {
+    throw new ApiError(403, "This request was not sent to you");
+  }
+
+  if (request.status !== "pending") {
+    throw new ApiError(400, "This request is already accepted or rejected");
+  }
+
+  const alreadyFriends = await Friend.findOne({
+    $or: [
+      { userId: user._id, friendId: request.sender },
+      { userId: request.sender, friendId: user._id },
+    ],
+  });
+
+  if (alreadyFriends) {
+    throw new ApiError(400, "You are already friends with this user");
+  }
+
+  request.status = "accepted";
+  await request.save();
+
+  const friend = new Friend({
+    userId: user._id,
+    friendId: request.sender,
+  });
+
+  await friend.save();
+
+  return res.status(200).json(new ApiResponse(200, {}, "Request accepted"));
+});
+
+export { sendRequest, allRequests, acceptRequest };
