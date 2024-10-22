@@ -1,7 +1,7 @@
 import { User } from "../models/User.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
-import { Friend } from "../models/friends.model.js";
+import { Friend } from "../models/Friend.model.js";
 import { Request } from "../models/Request.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
