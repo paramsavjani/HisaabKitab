@@ -8,7 +8,6 @@ import {
     cancelRequest,
 } from "../controllers/request.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
-import { ro } from "@faker-js/faker";
 
 const router = Router();
 

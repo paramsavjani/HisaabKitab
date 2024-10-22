@@ -15,9 +15,13 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 import userRouter from "./routes/user.route.js";
-import requestRouter from "./routes/request.route.js";
+import friendRequestRouter from "./routes/request.route.js";
+import friendRouter from "./routes/friend.route.js";
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/friendRequests", requestRouter);
+
+app.use("/api/v1/friendRequests", friendRequestRouter);
+
+app.use("/api/v1/friends", friendRouter);
 
 export { app };

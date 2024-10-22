@@ -182,4 +182,19 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+const getUser = asyncHandler(async (req, res) => {
+  const username = req.params.username;
+
+  const user = await User.findOne({ username }).select(
+    "-password -refreshToken"
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const response = new ApiResponse(200, user, "User details");
+  res.status(response.statusCode).json(response);
+});
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, getUser };
