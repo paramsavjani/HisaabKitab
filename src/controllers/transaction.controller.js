@@ -22,6 +22,18 @@ const addTransaction = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Friend not found");
   }
 
+  const friendship = await Friend.findOne({
+    $or: [
+      { userId: user._id, friendId: friend._id },
+      { userId: friend._id, friendId: user._id },
+    ],
+  });
+
+  if (!friendship) {
+    throw new ApiError(400, "You are not friends with this user");
+  }
+  
+
   const { amount } = req.body;
   const description = req.body?.description || "";
 
