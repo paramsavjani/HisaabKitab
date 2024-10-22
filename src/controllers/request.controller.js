@@ -206,14 +206,19 @@ const cancelRequest = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "Unauthorized");
   }
+
   const requestId = req.params.requestId;
+
   if (!requestId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new ApiError(400, "Invalid request ID");
   }
+
   const request = await Request.findById(requestId);
+
   if (!request || request == null || request == undefined) {
     throw new ApiError(404, "Request not found");
   }
+
   if (request.sender.toString() !== user._id.toString()) {
     throw new ApiError(403, "This request was not sent by you");
   }
@@ -233,4 +238,11 @@ const cancelRequest = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Request cancelled"));
 });
 
-export { sendRequest, receivedAll, acceptRequest, denyRequest, sendAll,cancelRequest };
+export {
+  sendRequest,
+  receivedAll,
+  acceptRequest,
+  denyRequest,
+  sendAll,
+  cancelRequest,
+};
