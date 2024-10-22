@@ -2,6 +2,7 @@ import { User } from "../models/User.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import { Friend } from "../models/friends.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import ApiError from "../utils/ApiError.js";
 
 const getAllFriends = asyncHandler(async (req, res) => {
   const username = req.user.username;
@@ -9,7 +10,7 @@ const getAllFriends = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username }).select("_id");
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    throw new ApiError(404, "User not found");
   }
 
   const friendsId = await Friend.find({
@@ -40,13 +41,13 @@ const deleteFriend = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username }).select("_id");
 
   if (!user) {
-    return res.status(404).json({ message: "User not found" });
+    throw new ApiError(404, "User not found");
   }
 
   const friend = await User.findOne({ username: friendUsername }).select("_id");
 
   if (!friend) {
-    return res.status(404).json({ message: "Friend not found" });
+    throw new ApiError(404, "Friend not found");
   }
 
   const friendShip = await Friend.findOne({
@@ -57,7 +58,7 @@ const deleteFriend = asyncHandler(async (req, res) => {
   });
 
   if (!friendShip) {
-    return res.status(404).json({ message: "Friendship not found" });
+    throw new ApiError(404, "Friendship not found");
   }
 
   await Friend.findByIdAndDelete(friendShip._id);
@@ -66,4 +67,40 @@ const deleteFriend = asyncHandler(async (req, res) => {
   res.status(response.statusCode).json(response);
 });
 
-export { getAllFriends, deleteFriend };
+const showTransactions = asyncHandler(async (req, res) => {
+  const username = req.user._id;
+  const friendUsername = req.params.username;
+
+  const user = await User.findOne({ username }).select("_id");
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  const friend = await User.findOne({ username: friendUsername }).select("_id");
+  if (!friend) {
+    throw new ApiError(404, "Friend not found");
+  }
+
+  const friendShip = await Friend.findOne({
+    $or: [
+      { userId: user._id, friendId: friend._id },
+      { userId: friend._id, friendId: user._id },
+    ],
+  });
+
+  if (!friendShip) {
+    throw new ApiError(404, "Friendship not found");
+  }
+
+  // show the all the transaction between them and in the last show the total amount
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+});
+
+export { getAllFriends, deleteFriend, showTransactions };
