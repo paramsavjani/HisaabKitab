@@ -3,6 +3,7 @@ dotenv.config({ path: "./.env" });
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
 import { User } from "./models/User.model.js";
+const PORT = process.env.PORT || 5000;
 
 const deleteAllUsers = async () => {
   try {
@@ -17,9 +18,8 @@ const deleteAllUsers = async () => {
 
 connectDB()
   .then(() => {
-    app.listen(process.env.PORT || 2422, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
-      // deleteAllUsers();
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
