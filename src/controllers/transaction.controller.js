@@ -32,7 +32,6 @@ const addTransaction = asyncHandler(async (req, res) => {
   if (!friendship) {
     throw new ApiError(400, "You are not friends with this user");
   }
-  
 
   const { amount } = req.body;
   const description = req.body?.description || "";
@@ -178,4 +177,49 @@ const denyTransaction = asyncHandler(async (req, res) => {
   res.status(200).json(response);
 });
 
-export { addTransaction, showTransactions, acceptTransaction, denyTransaction };
+const cancelTransaction = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  const user = await User.findOne({ _id: userId });
+  const transactionId = req.params.transactioinId;
+  if (!transactionId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid transaction ID");
+  }
+
+  const transaction = await Transaction.findOne({
+    _id: transactionId,
+  });
+
+  if (!transaction) {
+    throw new ApiError(404, "Transaction not found");
+  }
+
+  if (transaction.sender.toString() !== user._id.toString()) {
+    throw new ApiError(400, "You are not the sender of this transaction");
+  }
+
+  if (transaction.status !== "pending") {
+    throw new ApiError(400, "Transaction already completed or rejected");
+  }
+
+  const deleted = await Transaction.deleteOne({ _id: transactionId });
+
+  if (!deleted) {
+    throw new ApiError(500, "Transaction cancelation failed");
+  }
+
+  const response = new ApiResponse(
+    200,
+    {},
+    "Transaction canceled successfully"
+  );
+  res.status(200).json(response);
+});
+
+export {
+  addTransaction,
+  showTransactions,
+  acceptTransaction,
+  denyTransaction,
+  cancelTransaction,
+};

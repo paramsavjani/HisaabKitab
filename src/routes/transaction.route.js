@@ -5,6 +5,7 @@ import {
   showTransactions,
   acceptTransaction,
   denyTransaction,
+  cancelTransaction,
 } from "../controllers/transaction.controller.js";
 
 const router = Router();
@@ -16,5 +17,7 @@ router.route("/:username").get(verifyJWT, showTransactions);
 router.route("/:transactioinId/accept").post(verifyJWT, acceptTransaction);
 
 router.route("/:transactioinId/deny").post(verifyJWT, denyTransaction);
+
+router.route("/:transactioinId/cancel").delete(verifyJWT, cancelTransaction);
 
 export default router;
