@@ -18,6 +18,6 @@ import userRouter from "./routes/user.route.js";
 import requestRouter from "./routes/request.route.js";
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/requests", requestRouter);
+app.use("/api/v1/friendRequests", requestRouter);
 
 export { app };

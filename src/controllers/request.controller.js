@@ -59,7 +59,7 @@ const sendRequest = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Request sent"));
 });
 
-const allRequests = asyncHandler(async (req, res) => {
+const receivedAll = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (!user) {
@@ -71,9 +71,7 @@ const allRequests = asyncHandler(async (req, res) => {
     status: "pending",
   }).sort({ createdAt: -1 });
 
-  let senders = requests.map((request) => request.sender);
-
-  senders = await Promise.all(
+  const senders = await Promise.all(
     requests.map(async (request) => {
       const sender = await User.findById(request.sender).select(
         "username name profilePicture"
@@ -141,4 +139,66 @@ const acceptRequest = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Request accepted"));
 });
 
-export { sendRequest, allRequests, acceptRequest };
+const denyRequest = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "Unauthorized");
+  }
+
+  const requestId = req.params.requestId;
+
+  if (!requestId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid request ID");
+  }
+
+  const request = await Request.findById(requestId);
+
+  if (!request || request == null || request == undefined) {
+    throw new ApiError(404, "Request not found");
+  }
+
+  if (request.receiver.toString() !== user._id.toString()) {
+    throw new ApiError(403, "This request was not sent to you");
+  }
+
+  if (request.status !== "pending") {
+    throw new ApiError(400, "This request is already accepted or rejected");
+  }
+
+  request.status = "rejected";
+  await request.save();
+
+  return res.status(200).json(new ApiResponse(200, {}, "Request denied"));
+});
+
+const sendAll = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const requests = await Request.find({
+    sender: user._id,
+    status: "pending",
+  }).sort({ createdAt: -1 });
+
+  const receivers = await Promise.all(
+    requests.map(async (request) => {
+      const receiver = await User.findById(request.receiver).select(
+        "username name profilePicture"
+      );
+
+      return {
+        ...receiver.toObject(),
+        requestId: request._id,
+      };
+    })
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { receivers }, "Requests fetched"));
+});
+
+export { sendRequest, receivedAll, acceptRequest, denyRequest, sendAll };

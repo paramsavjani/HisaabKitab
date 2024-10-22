@@ -1,13 +1,24 @@
 import { Router } from "express";
-import { sendRequest, allRequests,acceptRequest } from "../controllers/request.controller.js";
+import {
+  sendRequest,
+  receivedAll,
+  acceptRequest,
+  denyRequest,
+  sendAll,
+} from "../controllers/request.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
+import { ro } from "@faker-js/faker";
 
 const router = Router();
 
 router.route("/:username/send").post(verifyJWT, sendRequest);
 
-router.route("/all").get(verifyJWT, allRequests);
+router.route("/receivedAll").get(verifyJWT, receivedAll);
 
 router.route("/:requestId/accept").post(verifyJWT, acceptRequest);
+
+router.route("/:requestId/deny").post(verifyJWT, denyRequest);
+
+router.route("/sendAll").get(verifyJWT, sendAll);
 
 export default router;
