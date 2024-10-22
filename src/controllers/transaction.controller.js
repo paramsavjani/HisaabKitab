@@ -1,6 +1,6 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
-import User from "../models/user.model.js";
+import { User } from "../models/User.model.js";
 
 const addTransaction = asyncHandler(async (req, res) => {
   const userId = req.user._id;
@@ -20,7 +20,6 @@ const addTransaction = asyncHandler(async (req, res) => {
   }
 
   
-
 
 });
 
