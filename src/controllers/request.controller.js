@@ -201,4 +201,36 @@ const sendAll = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { receivers }, "Requests fetched"));
 });
 
-export { sendRequest, receivedAll, acceptRequest, denyRequest, sendAll };
+const cancelRequest = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    throw new ApiError(404, "Unauthorized");
+  }
+  const requestId = req.params.requestId;
+  if (!requestId.match(/^[0-9a-fA-F]{24}$/)) {
+    throw new ApiError(400, "Invalid request ID");
+  }
+  const request = await Request.findById(requestId);
+  if (!request || request == null || request == undefined) {
+    throw new ApiError(404, "Request not found");
+  }
+  if (request.sender.toString() !== user._id.toString()) {
+    throw new ApiError(403, "This request was not sent by you");
+  }
+
+  if (request.status !== "pending") {
+    throw new ApiError(400, "This request is already accepted or rejected");
+  }
+
+  const deleted = await Request.deleteOne({
+    _id: requestId,
+  });
+
+  if (deleted.deletedCount === 0) {
+    throw new ApiError(500, "Could not cancel request");
+  }
+
+  return res.status(200).json(new ApiResponse(200, {}, "Request cancelled"));
+});
+
+export { sendRequest, receivedAll, acceptRequest, denyRequest, sendAll,cancelRequest };

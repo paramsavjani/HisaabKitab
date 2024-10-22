@@ -5,6 +5,7 @@ import {
   acceptRequest,
   denyRequest,
   sendAll,
+    cancelRequest,
 } from "../controllers/request.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { ro } from "@faker-js/faker";
@@ -20,5 +21,7 @@ router.route("/:requestId/accept").post(verifyJWT, acceptRequest);
 router.route("/:requestId/deny").post(verifyJWT, denyRequest);
 
 router.route("/sendAll").get(verifyJWT, sendAll);
+
+router.route("/:requestId/cancel").delete(verifyJWT, cancelRequest);
 
 export default router;
