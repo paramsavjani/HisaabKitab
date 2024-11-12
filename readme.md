@@ -1,1 +1,1 @@
-https://github.com/paramsavjani/backend-for-khatabook.git
+https://elements.getpostman.com/redirect?entityId=35326097-36ee983d-a222-46a1-b2fc-a48890bd87e2&entityType=collection
