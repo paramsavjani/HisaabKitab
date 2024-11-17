@@ -183,11 +183,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 const getUser = asyncHandler(async (req, res) => {
-  const username = req.params.username;
+  const username = req.user?.username;
 
-  const user = await User.findOne({ username }).select(
-    "-password -refreshToken"
-  );
+  const user = await User.findOne({ username }).select("username email name profilePicture");
 
   if (!user) {
     throw new ApiError(404, "User not found");
