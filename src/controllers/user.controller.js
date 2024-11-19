@@ -96,15 +96,13 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const option = {
+  const options = {
     httpOnly: true,
     secure: true,
   };
 
   res
     .status(200)
-    .cookie("refreshToken", refreshToken, option)
-    .cookie("accessToken", accessToken, option)
     .json(
       new ApiResponse(
         200,
