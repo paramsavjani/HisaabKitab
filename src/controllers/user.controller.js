@@ -79,13 +79,13 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username });
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiResponse(410, {}, "User not found");
   }
 
   const match = await user.isCorrectPassword(password);
 
   if (!match) {
-    throw new ApiError(401, "Invalid username or password");
+    throw new ApiResponse(411, {}, "Invalid username or password");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
@@ -103,6 +103,8 @@ const loginUser = asyncHandler(async (req, res) => {
 
   res
     .status(200)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
     .json(
       new ApiResponse(
         200,
@@ -183,10 +185,12 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
   const username = req.user?.username;
 
-  const user = await User.findOne({ username }).select("username email name profilePicture");
+  const user = await User.findOne({ username }).select(
+    "username email name profilePicture"
+  );
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiError(410, "User not found");
   }
 
   const response = new ApiResponse(200, user, "User details");

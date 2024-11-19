@@ -4,7 +4,11 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+  })
+);
 
 app.use(express.json({ limit: "5mb" }));
 
@@ -20,8 +24,7 @@ import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
 
 app.get("/", (req, res) => {
-
-    res.send("Welcome to the Splitwise API");
+  res.send("Welcome to the Splitwise API");
 });
 
 app.use("/api/v1/users", userRouter);
