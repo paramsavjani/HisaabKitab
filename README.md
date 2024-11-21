@@ -1,70 +1,53 @@
-# Getting Started with Create React App
+# 🧾 KhataBook - Your Digital Ledger
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to **KhataBook** - an updated version of the popular ledger app. Manage all your transactions efficiently, send requests to your contacts, and maintain detailed records between users in a simple, user-friendly interface.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Key Features
 
-### `npm start`
+- **Unique usernames** for personalized tracking of transactions
+- **Friend requests** to connect with users and manage transactions together
+- **View public profiles** to check a user's pending balances (how much they owe or are owed) and make informed decisions on whether to lend or give money
+- **Detailed transaction records** that keep track of money exchanges between users
+- **Modern UI** powered by Tailwind CSS for a clean and fast experience
+- **Real-time notifications** for pending, accepted, or rejected requests
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+<!-- ---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📸 Screenshots
 
-### `npm test`
+Here’s what KhataBook looks like in action:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![KhataBook Screenshot 1](https://via.placeholder.com/500x300?text=App+Screenshot+1)
+![KhataBook Screenshot 2](https://via.placeholder.com/500x300?text=App+Screenshot+2) -->
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🛠️ Technologies Used
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
+## 🛠️ How It Works
 
-### `npm run eject`
+1. **Unique Usernames**: Each user registers with a unique username that makes tracking transactions easy.
+2. **Send and Accept Requests**: Users can send and accept friend requests for streamlined transaction management.
+3. **View Public Profiles**: You can view the public profiles of users to see how much they owe or how much is owed to them.
+4. **Real-time Transaction History**: Users can see transaction histories with friends in real-time.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Example Code Snippet
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```javascript
+// Example of a friend request being sent
+const sendRequest = async (senderId, recipientUsername) => {
+  const recipient = await User.findOne({ username: recipientUsername });
+  if (!recipient) throw new Error('User not found');
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+  const request = new Request({ sender: senderId, recipient: recipient._id });
+  await request.save();
+  console.log('Request sent successfully');
+};
