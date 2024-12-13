@@ -1,71 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Axios from "axios";
+import Navbar from "./Components/Navbar/Navbar.jsx";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
 
-  // Function to get user
-  const getuser = async () => {
-    try {
-      const response = await Axios.get(
-        "http://localhost:7000/api/v1/users/verify",
-        { withCredentials: true }
-      );
-      const data = response;
-      console.log("User:", response);
-      setUser(data.data.data);
-    } catch (error) {
-      console.error("Error fetching user:", error);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await Axios.get(
+          "http://localhost:1000/api/v1/users/verify",
+          { withCredentials: true }
+        );
+        setUser(response.data.data.user);
+      } catch (e) {
+        console.log(e);
+      }
     }
-  };
+    fetchData();
+  }, []);
 
-  // Function to login user
-  const loginUser = async () => {
+  async function login() {
     try {
       const response = await Axios.post(
-        "http://localhost:7000/api/v1/users/login",
-        { username, password },
+        "http://localhost:1000/api/v1/users/login",
+        {
+          username: "c",
+          password: "param12",
+        },
+        { withCredentials: true }
       );
-      console.log("Login Response:", response);
       setUser(response.data.data.user);
-    } catch (error) {
-      console.log("Error:", error);
+    } catch (e) {
+      console.log(e);
     }
-  };
+  }
 
-  return (
-    <div className="App">
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={getuser}>Get User</button>
-      <button onClick={loginUser}>Login User</button>
-      <h1 style={{ color: "white" }}>{user?.username}</h1>
-      <h1 style={{ color: "white" }}>{user?.email}</h1>
-      <h1 style={{ color: "white" }}>{user?.profilePicture}</h1>
-      <h1 style={{ color: "white" }}>{user?.role}</h1>
-      <h1 style={{ color: "white" }}>{user?.createdAt}</h1>
-      <h1 style={{ color: "white" }}>{user?.updatedAt}</h1>
-      <h1 style={{ color: "white" }}>{user?.__v}</h1>
-      <h1 style={{ color: "white" }}>{user?.id}</h1>
-      <h1 style={{ color: "white" }}>{user?.password}</h1>
-      <h1 style={{ color: "white" }}>{user?.passwordChangedAt}</h1>
-      <h1 style={{ color: "white" }}>{user?.passwordResetToken}</h1>
-      <h1 style={{ color: "white" }}>{user?.passwordResetExpires}</h1>
-      <img height={600} width={600} src={user?.profilePicture} alt="avatar" />
-    </div>
-  );
+  async function logout() {
+    try {
+      await Axios.post("http://localhost:1000/api/v1/users/logout", null, {
+        withCredentials: true,
+      });
+
+      // Clear user state
+      setUser(null);
+    } catch (e) {
+      console.error("Logout failed", e);
+    }
+  }
+
+  return <h1 className="text-7xl font-bold underline text-cyan-50">Hello world!</h1>;
 }
 
 export default App;

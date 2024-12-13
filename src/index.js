@@ -1,11 +1,28 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import Layout from "./Layout";
+
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
+import Login from "./Components/Login/Login"; 
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Layout />}>
+      <Route path="" element={<App />} />
+      <Route path="login" element={<Login />} />
+    </Route>
+  )
+);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
-    <App />
-    <iframe width="836" height="560" src="https://www.youtube.com/embed/g2gZKA8E1yA" title="Lec-80: Irrecoverable Vs Recoverable Schedules in Transactions | DBMS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <RouterProvider router={router} />
   </>
 );
