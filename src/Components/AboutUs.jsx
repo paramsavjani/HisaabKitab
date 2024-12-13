@@ -44,7 +44,7 @@ function AboutUs() {
           </div>
           <div className="flex flex-col items-center max-w-xs p-6 bg-gray-800 rounded-lg shadow-lg">
             <img
-              src="https://via.placeholder.com/150"
+              src="./batak.jpg"
               alt="Team Member 3"
               className="w-32 h-32 rounded-full mb-4"
             />
