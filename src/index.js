@@ -13,18 +13,14 @@ import {
 } from "react-router-dom";
 import NotFound from "./Components/NotFound";
 import AboutUs from "./Components/AboutUs";
+import Home from "./Components/Home";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
       <Route
         path=""
-        element={
-          <div className="min-h-screen flex items-center justify-center bg-gray-900 text-cyan-50">
-            this is the home page
-          </div>
-        }
-      />
+        element={<Home/>}   />
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
       <Route path="about" element={<AboutUs/>} />
