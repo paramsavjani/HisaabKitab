@@ -12,6 +12,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import NotFound from "./Components/NotFound";
+import AboutUs from "./Components/AboutUs";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,12 +27,8 @@ const router = createBrowserRouter(
       />
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
-      <Route
-        path="*"
-        element={
-          <NotFound />
-        }
-      />
+      <Route path="about" element={<AboutUs/>} />
+      <Route path="*" element={<NotFound />} />
     </Route>
   )
 );
