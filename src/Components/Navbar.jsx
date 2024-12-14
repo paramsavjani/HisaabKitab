@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Axios from "axios";
 import { FaBars, FaTimes, FaUserCog } from "react-icons/fa";
@@ -7,31 +7,15 @@ import UserContext from "../context/UserContext";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false); // State for the profile dropdown
   const { user, setUser } = useContext(UserContext);
 
-  const dropdownRef = useRef(null); // Reference to the dropdown menu
-
-  // Close dropdown when clicking outside of it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setProfileMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
+  // Logout function
   const logout = async () => {
     try {
       await Axios.post(
         "https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/logout",
         null,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       setUser(null);
     } catch (e) {
@@ -40,107 +24,96 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-black p-4 shadow-lg fixed top-0 left-0 w-full z-50 flex items-center justify-between transition-all duration-500 ease-in-out">
-      {/* Logo */}
-      <div className="text-3xl font-extrabold text-white">
-        <Link
-          to="/"
-          className="hover:text-green-500 transition-colors duration-300"
-        >
-          Cash<span className="text-green-500">Track</span>
-        </Link>
-      </div>
-
-      {/* Hamburger Menu for Mobile */}
+    <div>
+      {/* Hamburger Menu Button */}
       <button
-        className="md:hidden text-white text-2xl focus:outline-none ml-auto"
+        className="md:hidden text-white text-2xl p-4 fixed top-0 left-0 z-50"
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label="Toggle navigation menu"
       >
         {menuOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      {/* Navigation Links */}
-      <div
-        className={`${
-          menuOpen ? "flex" : "hidden"
-        } md:flex flex-col md:flex-row items-center md:space-y-0 space-y-4 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-black md:bg-transparent p-6 md:p-0 shadow-lg md:shadow-none transition-all duration-300 ease-in-out`}
+      {/* Navbar */}
+      <nav
+        className={`bg-black p-4 shadow-xl fixed left-0 top-0 w-64 h-full z-40 flex flex-col items-start transition-all duration-500 ease-in-out ${
+          menuOpen ? "block" : "hidden"
+        } md:block`}
       >
-        {["/", "/features", "/about", "/contact", "/friends"].map(
-          (path, index) => (
-            <NavLink
-              key={index}
-              to={path}
-              className={({ isActive }) =>
-                `text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
-                  isActive ? "text-green-500 underline" : ""
-                }`
-              }
-              onClick={() => setMenuOpen(false)}
-            >
-              {path === "/" ? "Home" : path.replace("/", "")}
-            </NavLink>
-          )
-        )}
-      </div>
+        {/* Logo */}
+        <div className="text-3xl font-extrabold text-white py-6">
+          <Link
+            to="/"
+            className="hover:text-green-500 transition-colors duration-300"
+          >
+            Cash<span className="text-green-500">Track</span>
+          </Link>
+        </div>
 
-      {/* User Section */}
-      <div className="hidden md:flex items-center space-x-6">
-        {user ? (
-          <div className="relative">
-            {/* Profile Button */}
-            <button
-              onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-              className="flex items-center space-x-2"
-            >
-              <img
-                src={user.profilePicture}
-                alt="User Profile"
-                className="w-9 h-9 rounded-full border-2 border-gray-700 object-cover transform transition-transform duration-300 hover:scale-110 hover:rotate-12"
-              />
-            </button>
-
-            {/* Rock Dominion Style Profile Dropdown */}
-            {profileMenuOpen && (
-              <div
-                ref={dropdownRef}
-                className="absolute right-0 bg-gradient-to-r from-gray-900 to-black text-white shadow-xl rounded-lg w-48 mt-2 transition-all duration-500 ease-in-out transform translate-y-2 opacity-100"
+        {/* Sidebar Navigation Links */}
+        <div className="flex flex-col items-start space-y-4 bg-black p-4 w-full">
+          {["/", "/features", "/about", "/contact", "/friends"].map(
+            (path, index) => (
+              <NavLink
+                key={index}
+                to={path}
+                className={({ isActive }) =>
+                  `text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
+                    isActive ? "text-green-500 underline" : ""
+                  }`
+                }
+                onClick={() => setMenuOpen(false)} // Close menu on click
               >
-                <div className="p-4 border-b border-gray-700">
-                  <p className="font-medium text-lg">{user.username}</p>
+                {path === "/" ? "Home" : path.replace("/", "")}
+              </NavLink>
+            )
+          )}
+        </div>
+
+        {/* User Information */}
+        <div className="mt-auto p-4 flex flex-col items-start text-white">
+          {user ? (
+            <div className="w-full flex flex-col items-start space-y-4">
+              {/* User Profile Section */}
+              <div className="flex items-center space-x-4">
+                <img
+                  src={user.profilePicture}
+                  alt="User Profile"
+                  className="w-12 h-12 rounded-full border-2 border-gray-700 object-cover"
+                />
+                <div>
+                  <p className="font-medium">{user.username}</p>
                   <p className="text-sm text-gray-400">{user.email}</p>
                 </div>
-                <div className="p-2 hover:bg-gray-700 cursor-pointer flex items-center space-x-2 rounded-md transition-all duration-300 ease-in-out transform">
-                  <FaUserCog />
-                  <span>Settings</span>
-                </div>
-                <div
-                  onClick={logout}
-                  className="p-2 hover:bg-gray-700 cursor-pointer flex items-center space-x-2 rounded-md transition-all duration-300 ease-in-out transform"
-                >
-                  Logout
-                </div>
               </div>
-            )}
-          </div>
-        ) : (
-          <Link
-            to="/login"
-            className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded-lg shadow-md transition duration-300"
-          >
-            Login
-          </Link>
-        )}
-      </div>
 
-      {/* Mobile Overlay (Darkened Background for Menu) */}
-      {menuOpen && (
-        <div
-          onClick={() => setMenuOpen(false)}
-          className="fixed top-0 left-0 w-full h-full bg-black opacity-50 z-40 transition-all duration-500 ease-in-out"
-        />
-      )}
-    </nav>
+              {/* Navigation Links for User */}
+              <Link
+                to="/settings"
+                className="flex items-center space-x-2 text-gray-300 hover:text-green-500 transition-colors duration-300"
+              >
+                <FaUserCog />
+                <span>Settings</span>
+              </Link>
+
+              <button
+                onClick={logout}
+                className="bg-red-500 hover:bg-red-600 text-white py-1 px-4 rounded-lg shadow-md transition duration-300"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded-lg shadow-md transition duration-300"
+            >
+              Login
+            </Link>
+          )}
+        </div>
+      </nav>
+    </div>
   );
 }
 
