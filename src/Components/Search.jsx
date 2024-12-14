@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im"; // Loading spinner icon
+import { Link } from "react-router-dom";
 
 const Search = () => {
   const [query, setQuery] = useState(""); // State for search query (username)
@@ -108,21 +109,26 @@ const Search = () => {
                   key={user._id}
                   className="bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-lg flex items-center space-x-4 shadow-lg transform transition duration-300"
                 >
-                  {user.profilePicture ? (
-                    <img
-                      src={user.profilePicture}
-                      alt={`${user.username}'s profile`}
-                      className="w-16 h-16 rounded-full object-cover border-2 border-green-500"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 text-2xl border-2 border-gray-500">
-                      {user.username[0].toUpperCase()}
+                  <Link
+                    to={`/users/${user.username}`}
+                    className="flex items-center space-x-4"
+                  >
+                    {user.profilePicture ? (
+                      <img
+                        src={user.profilePicture}
+                        alt={`${user.username}'s profile`}
+                        className="w-16 h-16 rounded-full object-cover border-2 border-green-500"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 text-2xl border-2 border-gray-500">
+                        {user.username[0].toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-bold text-lg">{user.username}</h4>
+                      <p className="text-sm text-gray-400">{user.email}</p>
                     </div>
-                  )}
-                  <div>
-                    <h4 className="font-bold text-lg">{user.username}</h4>
-                    <p className="text-sm text-gray-400">{user.email}</p>
-                  </div>
+                  </Link>
                 </li>
               ))}
             </ul>

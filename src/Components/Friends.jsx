@@ -32,6 +32,10 @@ function Friends() {
           setLoading(false); // Set loading to false once the fetch is complete
         });
     }
+    else
+    {
+      setLoading(false);
+    }
   }, [user]);
 
   return (
