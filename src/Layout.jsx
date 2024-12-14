@@ -16,7 +16,6 @@ const Layout = () => {
           credentials: "include",
         });
         const data = await res.json();
-        console.log(data)
         setUser(data.data.user);
       } catch (e) {
         console.error("Error fetching user", e);

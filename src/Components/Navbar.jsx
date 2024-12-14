@@ -47,7 +47,7 @@ function Navbar() {
           menuOpen ? "flex" : "hidden"
         } md:flex flex-col md:flex-row items-center md:space-y-0 space-y-4 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-black md:bg-transparent p-6 md:p-0 shadow-lg md:shadow-none`}
       >
-        {["/", "/features", "/about", "/contact"].map((path, index) => (
+        {["/", "/features", "/about", "/contact","/friends"].map((path, index) => (
           <NavLink
             key={index}
             to={path}

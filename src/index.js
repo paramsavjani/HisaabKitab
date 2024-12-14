@@ -4,6 +4,12 @@ import Layout from "./Layout";
 import "./index.css";
 import Signup from "./Components/Signup";
 import Login from "./Components/Login";
+import Friends from "./Components/Friends";
+import NotFound from "./Components/NotFound";
+import AboutUs from "./Components/AboutUs";
+import Home from "./Components/Home";
+import FeaturesSection from "./Components/FeaturesSection";
+import UserContextProvider from "./context/UserContextProvider";
 
 import {
   createBrowserRouter,
@@ -11,12 +17,6 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
-
-import NotFound from "./Components/NotFound";
-import AboutUs from "./Components/AboutUs";
-import Home from "./Components/Home";
-import FeaturesSection from "./Components/FeaturesSection";
-import UserContextProvider from "./context/UserContextProvider";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,6 +26,7 @@ const router = createBrowserRouter(
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
       <Route path="about" element={<AboutUs />} />
+      <Route path="friends" element={<Friends />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

@@ -26,7 +26,6 @@ const Login = () => {
 
       const data = await response.json();
 
-      // Handle non-OK responses
       if (!response.ok) {
         const errorMessage = data.message || "An unknown error occurred.";
         setErrorMessage(errorMessage);
@@ -37,7 +36,8 @@ const Login = () => {
       if (data.statusCode >= 400) {
         setErrorMessage(data.message.message);
       } else {
-        setUser(data.data.user); // Set user context on successful login
+        setUser(data.data.user);
+        window.location.href = "/friends";
       }
     } catch (e) {
       console.error("Network or server error", e);
