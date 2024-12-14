@@ -19,33 +19,38 @@ function Navbar({ user }) {
   };
 
   return (
-    <nav className="bg-black p-4 shadow-lg flex items-center justify-between fixed top-0 left-0 w-full z-50">
+    <nav className="bg-black p-4 shadow-lg fixed top-0 left-0 w-full z-50 flex items-center justify-between">
       {/* Logo */}
-      <div className="text-3xl font-bold text-white">
-        <Link to="/" className="hover:text-green-500 transition duration-200">
+      <div className="text-3xl font-extrabold text-white">
+        <Link
+          to="/"
+          className="hover:text-green-500 transition-colors duration-300"
+        >
           Cash<span className="text-green-500">Track</span>
         </Link>
       </div>
 
-      {/* Hamburger Menu for Mobile - Positioned to the Right */}
-      <div
-        className="md:hidden text-white text-2xl cursor-pointer ml-auto"
+      {/* Hamburger Menu for Mobile */}
+      <button
+        className="md:hidden text-white text-2xl focus:outline-none ml-auto"
         onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle navigation menu"
       >
         {menuOpen ? <FaTimes /> : <FaBars />}
-      </div>
+      </button>
 
+      {/* Navigation Links */}
       <div
         className={`${
           menuOpen ? "flex" : "hidden"
-        } md:flex flex-col md:flex-row items-center md:items-center space-y-4 md:space-y-0 md:space-x-6 text-right absolute md:static top-16 left-0 w-full md:w-auto bg-black md:bg-transparent p-4 md:p-0`}
+        } md:flex flex-col md:flex-row items-center md:space-y-0 space-y-4 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-black md:bg-transparent p-6 md:p-0 shadow-lg md:shadow-none`}
       >
-        {["/", "/features", "/about", "/login"].map((path, index) => (
+        {["/", "/features", "/about", "/contact"].map((path, index) => (
           <NavLink
             key={index}
             to={path}
             className={({ isActive }) =>
-              `text-gray-300 hover:text-green-500 transition duration-200 font-medium ${
+              `text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
                 isActive ? "text-green-500 underline" : ""
               }`
             }
@@ -57,18 +62,20 @@ function Navbar({ user }) {
       </div>
 
       {/* User Section */}
-      <div className="flex items-center space-x-6">
+      <div className="hidden md:flex items-center space-x-6">
         {user ? (
           <div className="flex items-center space-x-4">
             <img
               src={user.profilePicture}
-              alt="profile"
-              className="w-10 h-10 rounded-full border-2 border-gray-700"
+              alt="User Profile"
+              className="w-10 h-10 rounded-full border-2 border-gray-700 object-cover"
             />
-            <span className="font-medium text-gray-300">{user.username}</span>
+            <span className="font-medium text-gray-300 capitalize">
+              {user.username}
+            </span>
             <button
               onClick={logout}
-              className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded-lg transition duration-200"
+              className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded-lg shadow-md transition duration-300"
             >
               Logout
             </button>
@@ -76,7 +83,7 @@ function Navbar({ user }) {
         ) : (
           <Link
             to="/login"
-            className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded-lg transition duration-200 md:block hidden"
+            className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded-lg shadow-md transition duration-300"
           >
             Login
           </Link>
