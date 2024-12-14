@@ -33,6 +33,7 @@ function Navbar() {
         `[LOG] User ${user.username || "Unknown"} has logged out successfully.`
       );
       setUser(null);
+      window.location.reload();
     } catch (e) {
       console.error("Logout failed", e);
 
@@ -135,6 +136,7 @@ function Navbar() {
               {/* Settings and Logout */}
               <Link
                 to="/settings"
+                onClick={() => setMenuOpen(false)}
                 className="flex items-center space-x-2 text-gray-300 hover:text-green-500 transition-colors duration-300"
               >
                 <FaUserCog />
@@ -156,6 +158,7 @@ function Navbar() {
           ) : (
             <Link
               to="/login"
+              onClick={() => setMenuOpen(false)}
               className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300"
             >
               Login
