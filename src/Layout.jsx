@@ -28,11 +28,16 @@ const Layout = () => {
   }, [setUser]);
 
   return (
-    <>
+    <div className="flex">
+      {/* Navbar */}
       <Navbar />
-      <Outlet />
-      <Footer />
-    </>
+
+      {/* Main Content */}
+      <div className="flex-1 md:ml-64">
+        <Outlet />
+        <Footer />
+      </div>
+    </div>
   );
 };
 
