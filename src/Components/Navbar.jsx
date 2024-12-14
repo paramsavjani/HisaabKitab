@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import Axios from "axios";
 import { FaBars, FaTimes } from "react-icons/fa";
 
@@ -35,21 +35,24 @@ function Navbar({ user }) {
         {menuOpen ? <FaTimes /> : <FaBars />}
       </div>
 
-      {/* Navigation Links */}
       <div
         className={`${
           menuOpen ? "flex" : "hidden"
         } md:flex flex-col md:flex-row items-center md:items-center space-y-4 md:space-y-0 md:space-x-6 text-right absolute md:static top-16 left-0 w-full md:w-auto bg-black md:bg-transparent p-4 md:p-0`}
       >
-        {["/", "/features", "/about","/login"].map((path, index) => (
-          <Link
+        {["/", "/features", "/about", "/login"].map((path, index) => (
+          <NavLink
             key={index}
             to={path}
-            className="text-gray-300 hover:text-green-500 transition duration-200 font-medium"
+            className={({ isActive }) =>
+              `text-gray-300 hover:text-green-500 transition duration-200 font-medium ${
+                isActive ? "text-green-500 underline" : ""
+              }`
+            }
             onClick={() => setMenuOpen(false)}
           >
             {path === "/" ? "Home" : path.replace("/", "")}
-          </Link>
+          </NavLink>
         ))}
       </div>
 
