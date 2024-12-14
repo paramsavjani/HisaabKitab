@@ -9,12 +9,7 @@ const Search = () => {
   const handleSearch = async (e) => {
     e.preventDefault();
     setErrorMessage(""); // Reset error message
-    setResults([
-      
-        { _id: "1", username: "john_doe", email: "john@example.com" },
-        { _id: "2", username: "jane_doe", email: "jane@example.com" },
-      ],
-    ); // Reset previous search results
+    setResults([]); // Reset previous search results
 
     if (!query.trim()) {
       return;
@@ -22,7 +17,7 @@ const Search = () => {
 
     try {
       const response = await fetch(
-        `https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/search?username=${query}`, // API endpoint to search by username
+        `https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/search?search=${query}`, // API endpoint to search by username
         {
           method: "GET",
           headers: {
