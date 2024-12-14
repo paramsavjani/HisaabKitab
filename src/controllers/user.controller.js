@@ -131,7 +131,6 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 });
 
-
 const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
@@ -217,4 +216,19 @@ const getUser = asyncHandler(async (req, res) => {
   res.status(response.statusCode).json(response);
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, getUser };
+const searchUser = asyncHandler(async (req, res) => {
+  const searchQuery = req.query.search;
+
+  const users = await User.find({
+    $or: [
+      { username: { $regex: searchQuery, $options: "i" } },
+      { name: { $regex: searchQuery, $options: "i" } },
+    ],
+  }).select("username email name profilePicture");
+
+  const response = new ApiResponse(200, users, "Search results");
+  res.status(response.statusCode).json(response);
+});
+
+
+export { registerUser, loginUser, logoutUser, refreshAccessToken, getUser, searchUser };

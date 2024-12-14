@@ -5,6 +5,7 @@ import {
   logoutUser,
   refreshAccessToken,
   getUser,
+  searchUser,
 } from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
@@ -20,5 +21,7 @@ router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/refresh-token").post(refreshAccessToken);
 
 router.route("/verify").get(verifyJWT, getUser);
+
+router.route("/search").get(searchUser);
 
 export default router;
