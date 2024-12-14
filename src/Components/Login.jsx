@@ -1,26 +1,47 @@
-import React, { useState,useContext } from "react";
-import Axios from "axios";
+import React, { useState, useContext } from "react";
+import { FaExclamationTriangle } from "react-icons/fa"; // Error icon
 import UserContext from "../context/UserContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); 
+
+    const userCredentials = { username, password };
+
     try {
-      const response = await Axios.post(
-        "http://localhost:1000/api/v1/users/login",
-        {
-          username: username,
-          password: password,
+      const response = await fetch("http://localhost:1000/api/v1/users/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        { withCredentials: true }
-      );
-      setUser(response.data.data.user);
+        credentials: "include",
+        body: JSON.stringify(userCredentials),
+      });
+
+      const data = await response.json();
+
+      // Handle non-OK responses
+      if (!response.ok) {
+        const errorMessage = data.message || "An unknown error occurred.";
+        setErrorMessage(errorMessage);
+        return;
+      }
+
+      // Handle errors from backend validation
+      if (data.statusCode >= 400) {
+        setErrorMessage(data.message.message);
+      } else {
+        setUser(data.data.user); // Set user context on successful login
+      }
     } catch (e) {
-      console.log(e);
+      console.error("Network or server error", e);
+      setErrorMessage("Failed to connect to the server. Please try again.");
     }
   };
 
@@ -65,6 +86,15 @@ const Login = () => {
               required
             />
           </div>
+
+          {/* Error message display with icon and styling */}
+          {errorMessage && (
+            <div className="flex items-center text-red-500 p-2 mt-2 rounded-lg">
+              <FaExclamationTriangle className="mr-2" />
+              <p className="text-sm">{errorMessage}</p>
+            </div>
+          )}
+
           <button
             type="submit"
             className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-200"
@@ -72,6 +102,7 @@ const Login = () => {
             Login
           </button>
         </form>
+
         <p className="mt-6 text-center text-gray-400 text-sm">
           Don't have an account?{" "}
           <a href="/signup" className="text-green-400 hover:underline">
