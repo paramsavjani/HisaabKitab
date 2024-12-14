@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Axios from "axios";
 import { FaBars, FaTimes } from "react-icons/fa";
+import { useContext } from "react";
+import UserContext from "../context/UserContext";
 
-function Navbar({ user }) {
+function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const {user,setUser} = useContext(UserContext);
 
-  // Logout function to handle the user logout
   const logout = async () => {
     try {
       await Axios.post("http://localhost:1000/api/v1/users/logout", null, {
         withCredentials: true,
       });
-      window.location.reload(); // Refresh to reset user state
+      setUser(null);
     } catch (e) {
       console.error("Logout failed", e);
     }
@@ -68,7 +70,7 @@ function Navbar({ user }) {
             <img
               src={user.profilePicture}
               alt="User Profile"
-              className="w-10 h-10 rounded-full border-2 border-gray-700 object-cover"
+              className="w-9 h-9 rounded-full border-2 border-gray-700 object-cover"
             />
             <span className="font-medium text-gray-300 capitalize">
               {user.username}

@@ -15,8 +15,8 @@ import {
 import NotFound from "./Components/NotFound";
 import AboutUs from "./Components/AboutUs";
 import Home from "./Components/Home";
-import UserContext from "./context/UserContext";
 import FeaturesSection from "./Components/FeaturesSection";
+import UserContextProvider from "./context/UserContextProvider";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,8 +34,8 @@ const router = createBrowserRouter(
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
-    <UserContext.Provider value={{ user: null }}>
+    <UserContextProvider>
       <RouterProvider router={router} />
-    </UserContext.Provider>
+    </UserContextProvider>
   </>
 );

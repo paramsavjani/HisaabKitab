@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import Axios from "axios";
+import UserContext from "../context/UserContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +18,7 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      console.log(response);
+      setUser(response.data.data.user);
     } catch (e) {
       console.log(e);
     }
