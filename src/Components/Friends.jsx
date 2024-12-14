@@ -35,7 +35,7 @@ function Friends() {
   }, [user]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-800 py-10">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-800 py-10 px-4">
       <h2 className="text-3xl font-semibold text-white mb-6">Your Friends</h2>
 
       {/* Error Handling */}
@@ -73,7 +73,7 @@ function Friends() {
               {friends.map((friend) => (
                 <li
                   key={friend._id}
-                  className="flex items-center space-x-4 border-b border-gray-700 py-2"
+                  className="flex items-center space-x-4 border-b border-gray-700 py-4"
                 >
                   <div className="w-12 h-12">
                     {/* Profile Picture */}
