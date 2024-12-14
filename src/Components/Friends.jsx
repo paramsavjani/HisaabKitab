@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useContext } from "react";
-import { FaSpinner } from "react-icons/fa"; // Import spinner icon
 import UserContext from "../context/UserContext";
 
 function Friends() {
@@ -23,7 +22,6 @@ function Friends() {
           return response.json(); // Parse response body as JSON
         })
         .then((data) => {
-          console.log(data.data); // Logging to inspect the structure of the response
           setFriends(data.data); // Assuming the response contains the 'friends' array
         })
         .catch((e) => {
@@ -47,10 +45,25 @@ function Friends() {
         </div>
       )}
 
-      {/* Loading Spinner */}
+      {/* Skeleton Loader */}
       {loading ? (
-        <div className="flex items-center justify-center mb-6">
-          <FaSpinner className="animate-spin text-white text-4xl" />
+        <div className="w-full max-w-xl bg-gray-900 p-6 rounded-lg shadow-lg">
+          {/* Skeleton for the friend list */}
+          <div className="space-y-4">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-4 animate-pulse"
+              >
+                <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-700 rounded w-2/3 mt-2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         // Friend List
