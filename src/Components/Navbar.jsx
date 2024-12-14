@@ -7,13 +7,17 @@ import UserContext from "../context/UserContext";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const {user,setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
 
   const logout = async () => {
     try {
-      await Axios.post("http://localhost:1000/api/v1/users/logout", null, {
-        withCredentials: true,
-      });
+      await Axios.post(
+        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/logout",
+        null,
+        {
+          withCredentials: true,
+        }
+      );
       setUser(null);
     } catch (e) {
       console.error("Logout failed", e);
@@ -47,20 +51,22 @@ function Navbar() {
           menuOpen ? "flex" : "hidden"
         } md:flex flex-col md:flex-row items-center md:space-y-0 space-y-4 md:space-x-6 absolute md:static top-16 left-0 w-full md:w-auto bg-black md:bg-transparent p-6 md:p-0 shadow-lg md:shadow-none`}
       >
-        {["/", "/features", "/about", "/contact","/friends"].map((path, index) => (
-          <NavLink
-            key={index}
-            to={path}
-            className={({ isActive }) =>
-              `text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
-                isActive ? "text-green-500 underline" : ""
-              }`
-            }
-            onClick={() => setMenuOpen(false)}
-          >
-            {path === "/" ? "Home" : path.replace("/", "")}
-          </NavLink>
-        ))}
+        {["/", "/features", "/about", "/contact", "/friends"].map(
+          (path, index) => (
+            <NavLink
+              key={index}
+              to={path}
+              className={({ isActive }) =>
+                `text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
+                  isActive ? "text-green-500 underline" : ""
+                }`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              {path === "/" ? "Home" : path.replace("/", "")}
+            </NavLink>
+          )
+        )}
       </div>
 
       {/* User Section */}

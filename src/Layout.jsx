@@ -11,10 +11,13 @@ const Layout = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
-        const res = await fetch("http://localhost:1000/api/v1/users/verify", {
-          method: "GET",
-          credentials: "include",
-        });
+        const res = await fetch(
+          "https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/verify",
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
         const data = await res.json();
         setUser(data.data.user);
       } catch (e) {

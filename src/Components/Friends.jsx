@@ -9,7 +9,7 @@ function Friends() {
   useEffect(() => {
     if (user) {
       // Fetch friends list
-      fetch("http://localhost:1000/api/v1/friends", {
+      fetch("https://backend-for-khatabook-f1cr.onrender.com/api/v1/friends", {
         method: "GET",
         credentials: "include",
       })
