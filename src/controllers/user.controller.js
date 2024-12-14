@@ -93,7 +93,7 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken"
+    "username email name profilePicture"
   );
 
   const options = {
@@ -193,7 +193,7 @@ const getUser = asyncHandler(async (req, res) => {
     throw new ApiError(410, "User not found");
   }
 
-  const response = new ApiResponse(200, user, "User details");
+  const response = new ApiResponse(200, {user}, "User details");
   res.status(response.statusCode).json(response);
 });
 

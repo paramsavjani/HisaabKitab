@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { User } from "../models/User.model.js";
 import jwt from "jsonwebtoken";
+import ApiResponse from "../utils/ApiResponse.js";
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
@@ -17,18 +18,19 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET
     );
 
+
     const user = await User.findById(decodedToken._id).select(
       "-password -refreshToken"
     );
 
     if (!user) {
-      return res.status(401).json(new ApiError(401, "Invalid token"));
+      return res.status(401).json(new ApiResponse(401, "Invalid token"));
     }
 
     req.user = user;
 
     next();
   } catch (error) {
-    return res.status(401).json(new ApiError(401, "Invalid token"));
+    return res.status(401).json(new ApiResponse(401, "Invalid token"));
   }
 });

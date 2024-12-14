@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../.env" });
 import connectDB from "./db/index.js";
 import { app } from "./app.js";
-const PORT = 7000;
+const PORT = 1000;
 
 connectDB()
   .then(() => {
@@ -14,5 +14,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log(err);
+    console.log(`Error: ${err}`);
   });
