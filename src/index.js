@@ -10,6 +10,7 @@ import AboutUs from "./Components/AboutUs";
 import Home from "./Components/Home";
 import FeaturesSection from "./Components/FeaturesSection";
 import UserContextProvider from "./context/UserContextProvider";
+import Search from "./Components/Search";
 
 import {
   createBrowserRouter,
@@ -27,6 +28,7 @@ const router = createBrowserRouter(
       <Route path="signup" element={<Signup />} />
       <Route path="about" element={<AboutUs />} />
       <Route path="friends" element={<Friends />} />
+      <Route path="search" element={<Search />} />
       <Route path="*" element={<NotFound />} />
     </Route>
   )

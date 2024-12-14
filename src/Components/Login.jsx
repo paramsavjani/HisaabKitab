@@ -1,16 +1,19 @@
 import React, { useState, useContext } from "react";
 import { FaExclamationTriangle } from "react-icons/fa"; // Error icon
+import { FaSpinner } from "react-icons/fa"; // Spinner icon
 import UserContext from "../context/UserContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
+  const [loading, setLoading] = useState(false); // State for loading spinner
   const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setLoading(true); // Set loading state to true when form is submitted
 
     const userCredentials = { username, password };
 
@@ -32,12 +35,14 @@ const Login = () => {
       if (!response.ok) {
         const errorMessage = data.message || "An unknown error occurred.";
         setErrorMessage(errorMessage);
+        setLoading(false); // Reset loading state after response
         return;
       }
 
       // Handle errors from backend validation
       if (data.statusCode >= 400) {
         setErrorMessage(data.message.message);
+        setLoading(false); // Reset loading state after response
       } else {
         setUser(data.data.user);
         window.location.href = "/friends";
@@ -45,6 +50,7 @@ const Login = () => {
     } catch (e) {
       console.error("Network or server error", e);
       setErrorMessage("Failed to connect to the server. Please try again.");
+      setLoading(false); // Reset loading state after error
     }
   };
 
@@ -100,9 +106,21 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-200"
+            className={`w-full py-2 rounded-lg transition duration-200 ${
+              loading
+                ? "bg-green-700 text-gray-100 cursor-not-allowed"
+                : "bg-green-500 text-white hover:bg-green-600"
+            }`}
+            disabled={loading} // Disable button while loading
           >
-            Login
+            {loading ? (
+              <div className="flex justify-center items-center">
+                <FaSpinner className="animate-spin mr-2" />
+                <span>Logging in...</span>
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 
