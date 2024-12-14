@@ -110,8 +110,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // Set cookies for the tokens
   const options = {
-    httpOnly: true,
-    secure: true,
+    httpOnly: true, // Prevents client-side access
+    secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+    sameSite: "None", // Needed for cross-origin cookies in production
   };
 
   // Respond with user details and tokens
@@ -139,8 +140,9 @@ const logoutUser = asyncHandler(async (req, res) => {
   );
 
   const option = {
-    httpOnly: true,
-    secure: true,
+    httpOnly: true, // Prevents client-side access
+    secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+    sameSite: "None", // Needed for cross-origin cookies in production
   };
 
   res
@@ -175,8 +177,9 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     const options = {
-      httpOnly: true,
-      secure: true,
+      httpOnly: true, // Prevents client-side access
+      secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+      sameSite: "None", // Needed for cross-origin cookies in production
     };
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
