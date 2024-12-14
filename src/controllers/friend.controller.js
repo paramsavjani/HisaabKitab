@@ -11,7 +11,7 @@ const getAllFriends = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username }).select("_id");
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiResponse(404, "User not found");
   }
 
   const friendsId = await Friend.find({
@@ -44,13 +44,13 @@ const deleteFriend = asyncHandler(async (req, res) => {
   const user = await User.findOne({ username }).select("_id");
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new ApiResponse(404, "User not found");
   }
 
   const friend = await User.findOne({ username: friendUsername }).select("_id");
 
   if (!friend) {
-    throw new ApiError(404, "Friend not found");
+    throw new ApiResponse(404, "Friend not found");
   }
 
   const friendShip = await Friend.findOne({
@@ -61,7 +61,7 @@ const deleteFriend = asyncHandler(async (req, res) => {
   });
 
   if (!friendShip) {
-    throw new ApiError(404, "Friendship not found");
+    throw new ApiResponse(404, "Friendship not found");
   }
 
   const transaction = await Transaction.find({
@@ -82,11 +82,11 @@ const deleteFriend = asyncHandler(async (req, res) => {
   });
 
   if (totalAmount < 0) {
-    throw new ApiError(400, "You have to return the loan first");
+    throw new ApiResponse(400, "You have to return the loan first");
   }
 
   if (totalAmount > 0 && !forced) {
-    throw new ApiError(405, "Your friend has to return the loan first");
+    throw new ApiResponse(405, "Your friend has to return the loan first");
   }
 
   await Friend.findByIdAndDelete(friendShip._id);
