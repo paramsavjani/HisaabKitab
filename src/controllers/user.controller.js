@@ -230,5 +230,28 @@ const searchUser = asyncHandler(async (req, res) => {
   res.status(response.statusCode).json(response);
 });
 
+const userInfo = asyncHandler(async (req, res) => {
+  console.log("hi i am userInfo");
+  const username = req.params.username;
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken, getUser, searchUser };
+  const user = await User.findOne({ username: username }).select(
+    "username email name profilePicture"
+  );
+
+  if (!user) {
+    throw new ApiResponce(410, "User not found");
+  }
+
+  const response = new ApiResponse(200, { user }, "User details");
+  res.status(response.statusCode).json(response);
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  getUser,
+  searchUser,
+  userInfo,
+};
