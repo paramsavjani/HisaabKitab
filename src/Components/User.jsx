@@ -18,7 +18,7 @@ const User = () => {
     const fetchUser = async () => {
       try {
         const response = await fetch(
-          `https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/get/${id}`
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/get/${id}`
         );
 
         if (user) {
@@ -59,7 +59,7 @@ const User = () => {
   const addFriend = async () => {
     try {
       await fetch(
-        `https://backend-for-khatabook-f1cr.onrender.com//api/v1/friendRequests/${profile.username}/send`,
+        `${process.env.REACT_APP_BACKEND_URL}//api/v1/friendRequests/${profile.username}/send`,
         { method: "POST" }
       );
 
@@ -73,7 +73,7 @@ const User = () => {
   const cancelFriendRequest = async () => {
     try {
       const response = await fetch(
-        `https://backend-for-khatabook-f1cr.onrender.com/api/v1/friends/cancel/${id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friends/cancel/${id}`,
         { method: "POST" }
       );
 

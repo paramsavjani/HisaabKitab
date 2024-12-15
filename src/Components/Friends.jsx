@@ -12,7 +12,7 @@ function Friends() {
     if (user) {
       // Fetch friends list
       setLoading(true); // Set loading to true when the request starts
-      fetch("https://backend-for-khatabook-f1cr.onrender.com/api/v1/friends", {
+      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/friends`, {
         method: "GET",
         credentials: "include",
       })

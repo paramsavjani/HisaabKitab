@@ -23,7 +23,7 @@ const Search = () => {
 
     try {
       const response = await fetch(
-        `https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/search?search=${query}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/search?search=${query}`,
         {
           method: "GET",
           headers: {

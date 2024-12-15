@@ -19,7 +19,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/login",
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/login`,
         {
           method: "POST",
           headers: {

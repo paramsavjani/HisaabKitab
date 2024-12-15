@@ -12,7 +12,7 @@ const Layout = () => {
     const checkUser = async () => {
       try {
         const res = await fetch(
-          "https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/verify",
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/verify`,
           {
             method: "GET",
             credentials: "include",

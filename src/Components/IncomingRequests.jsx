@@ -14,7 +14,7 @@ function IncomingRequests() {
     setLoading(true); // Set loading state to true when starting the fetch request
     axios
       .get(
-        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/friendRequests/receivedAll",
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
         { withCredentials: true }
       )
       .then((response) => {
@@ -34,7 +34,7 @@ function IncomingRequests() {
 
     setLoading(true);
     await axios.post(
-      `https://backend-for-khatabook-f1cr.onrender.com/api/v1/friendRequests/${id}/${action}`,
+      `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/${action}`,
       {},
       { withCredentials: true }
     );
@@ -42,7 +42,7 @@ function IncomingRequests() {
     // Fetch updated requests after accepting/denying
     axios
       .get(
-        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/friendRequests/receivedAll",
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
         { withCredentials: true }
       )
       .then((response) => {

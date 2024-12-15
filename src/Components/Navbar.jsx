@@ -17,7 +17,7 @@ function Navbar() {
   useEffect(() => {
     if (user) {
       Axios.get(
-        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/friendRequests/receivedAll",
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
         {
           withCredentials: true,
         }
@@ -41,7 +41,7 @@ function Navbar() {
     try {
       // Log the logout attempt to the server (for analytics or tracking)
       await Axios.post(
-        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/logout",
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`,
         null,
         { withCredentials: true }
       );
