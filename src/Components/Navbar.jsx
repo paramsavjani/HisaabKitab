@@ -132,27 +132,45 @@ function Navbar() {
           )}
 
           {/* Incoming Requests Link */}
-                {user && (
-                <div className="mt-6 mb-4 p-3 bg-slate-800 rounded-lg shadow-md w-full">
-                  <NavLink
-                  to="/incoming-requests"
-                  className={({ isActive }) =>
-                    `flex items-center justify-between text-gray-100 hover:text-green-500 transition-colors duration-300 text-lg ${
+          {user && (
+            <div className="mt-6 mb-4 p-3 bg-slate-800 rounded-lg shadow-md w-full">
+              <NavLink
+                to="/incoming-requests"
+                className={({ isActive }) =>
+                  `flex items-center justify-between text-gray-100 hover:text-green-500 transition-colors duration-300 text-lg ${
                     isActive ? "text-green-500 underline" : ""
-                    }`
-                  }
-                  onClick={() => setMenuOpen(false)} // Close menu on click
-                  >
-                  <span>Incoming Requests</span>
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                    {incomingRequests}
-                  </span>
-                  </NavLink>
-                </div>
-                )}
-              </div>
+                  }`
+                }
+                onClick={() => setMenuOpen(false)} // Close menu on click
+              >
+                <span>Incoming Requests</span>
+                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  {incomingRequests}
+                </span>
+              </NavLink>
+            </div>
+          )}
+          {user && (
+            <div className="mt-6 mb-4 p-3 bg-slate-800 rounded-lg shadow-md w-full">
+              <NavLink
+                to="/notfound"
+                className={({ isActive }) =>
+                  `flex items-center justify-between text-gray-100 hover:text-green-500 transition-colors duration-300 text-lg ${
+                    isActive ? "text-green-500 underline" : ""
+                  }`
+                }
+                onClick={() => setMenuOpen(false)} // Close menu on click
+              >
+                <span>Notifications</span>
+                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  {incomingRequests}
+                </span>
+              </NavLink>
+            </div>
+          )}
+        </div>
 
-              {/* User Information */}
+        {/* User Information */}
         <div className="p-4 text-white">
           {user ? (
             <div className="w-full flex flex-col space-y-4">
