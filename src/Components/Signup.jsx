@@ -34,7 +34,6 @@ const InputField = ({
 );
 
 const Signup = () => {
-  const { setUser } = useContext(UserContext);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -109,7 +108,7 @@ const Signup = () => {
         return;
       }
 
-      window.location.href = "/login";
+      // window.location.href = "/login";
     } catch (error) {
       setGeneralError("An unexpected error occurred. Please try again later.");
     } finally {
