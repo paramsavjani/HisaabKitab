@@ -95,4 +95,26 @@ const deleteFriend = asyncHandler(async (req, res) => {
   res.status(response.statusCode).json(response);
 });
 
-export { getAllFriends, deleteFriend };
+const isFriend = asyncHandler(async (req, res) => {
+  const username = req.user.username;
+  const user = await User.findOne({ username }).select("_id");
+  const friendUsername = req.params.username;
+  const friend = await User.findOne({ username: friendUsername }).select("_id");
+
+  const friendShip = await Friend.findOne({
+    $or: [
+      { userId: user._id, friendId: friend._id },
+      { userId: friend._id, friendId: user._id },
+    ],
+  });
+
+  if (!friendShip) {
+    throw new ApiResponse(404, "Not a friend");
+  }
+
+  const response = new ApiResponse(200, {}, "Friend");
+
+
+});
+
+export { getAllFriends, deleteFriend,isFriend };
