@@ -1,5 +1,4 @@
-import React, { useState, useContext } from "react";
-import UserContext from "../context/UserContext";
+import React, { useState } from "react";
 
 const InputField = ({
   id,
@@ -108,7 +107,7 @@ const Signup = () => {
         return;
       }
 
-      // window.location.href = "/login";
+      window.location.href = "/login";
     } catch (error) {
       setGeneralError("An unexpected error occurred. Please try again later.");
     } finally {

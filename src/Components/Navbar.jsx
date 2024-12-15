@@ -176,14 +176,20 @@ function Navbar() {
             <div className="w-full flex flex-col space-y-4">
               {/* User Profile Section */}
               <div className="flex items-center space-x-4">
-                <img
-                  src={user.profilePicture || "https://via.placeholder.com/50"}
-                  alt="User Profile"
-                  className="w-12 h-12 rounded-full border-2 border-gray-700 object-cover"
-                />
-                <div>
-                  <p className="font-medium">{user.username || "User"}</p>
-                  <p className="text-sm text-gray-400">
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
+                  <img
+                    src={
+                      user.profilePicture || "https://via.placeholder.com/50"
+                    }
+                    alt="User Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="overflow-hidden">
+                  <p className="font-medium truncate">
+                    {user.username || "User"}
+                  </p>
+                  <p className="text-sm text-gray-400 truncate">
                     {user.email || "example@email.com"}
                   </p>
                 </div>
