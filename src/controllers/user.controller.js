@@ -24,11 +24,19 @@ const registerUser = asyncHandler(async (req, res) => {
       return !field || field.trim() === "";
     })
   ) {
-    throw new ApiResponce(400, "All fields are required");
+    res.status(400).json({
+      status: "error",
+      message: "All fields are required",
+    });
+    return;
   }
 
   if (password.length < 6) {
-    throw new ApiResponce(401, "Password must be at least 6 characters long");
+    res.status(400).json({
+      status: "error",
+      message: "Password must be at least 6 characters",
+    });
+    return;
   }
 
   const exist = await User.exists({ username });
@@ -37,11 +45,16 @@ const registerUser = asyncHandler(async (req, res) => {
       status: "error",
       message: "Username already exists",
     });
+    return;
   }
 
   const existEmail = await User.exists({ email });
   if (existEmail) {
-    throw new ApiResponce(403, "Email already exists");
+    res.status(403).json({
+      status: "error",
+      message: "Email already exists",
+    });
+    return
   }
 
   const profilePicture = req.file ? req.file.path : null;
@@ -63,7 +76,11 @@ const registerUser = asyncHandler(async (req, res) => {
   );
 
   if (!createdUser) {
-    throw new ApiResponce(500, "Something went wrong while registering user");
+    res.status(500).json({
+      status: "error",
+      message: "User registration failed",
+    });
+    return;
   }
 
   console.log("user created", user.username);
