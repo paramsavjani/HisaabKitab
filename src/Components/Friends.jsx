@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import UserContext from "../context/UserContext";
+import { Link } from "react-router-dom";
 
 function Friends() {
   const { user } = useContext(UserContext);
@@ -75,9 +76,10 @@ function Friends() {
           {friends.length > 0 ? (
             <ul className="space-y-4">
               {friends.map((friend) => (
+                <Link to={`/users/${friend.username}`} className="">
                 <li
                   key={friend._id}
-                  className="flex items-center space-x-4 border-b border-gray-700 py-4"
+                  className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
                 >
                   <div className="w-12 h-12">
                     {/* Profile Picture */}
@@ -98,6 +100,7 @@ function Friends() {
                     <p className="text-sm text-gray-500">{friend.email}</p>
                   </div>
                 </li>
+                </Link>
               ))}
             </ul>
           ) : (
