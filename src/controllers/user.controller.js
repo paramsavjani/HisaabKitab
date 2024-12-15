@@ -1,9 +1,7 @@
 import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/User.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
-import ApiResponse from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import ApiResponce from "../utils/ApiResponse.js";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -54,7 +52,7 @@ const registerUser = asyncHandler(async (req, res) => {
       status: "error",
       message: "Email already exists",
     });
-    return
+    return;
   }
 
   const profilePicture = req.file ? req.file.path : null;
@@ -85,21 +83,18 @@ const registerUser = asyncHandler(async (req, res) => {
 
   console.log("user created", user.username);
 
-  const response = new ApiResponse(
-    201,
-    createdUser,
-    "User registered successfully"
-  );
-  res.status(response.statusCode).json(response);
+  return res.status(201).json({
+    status: "success",
+    message: "User registered successfully",
+    data: createdUser,
+  });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
-  // Find user by username
   const user = await User.findOne({ username });
 
-  // If user is not found, send a 410 error with a message
   if (!user) {
     return res.status(410).json({
       status: "error",
@@ -107,10 +102,8 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
-  // Check if password matches
   const match = await user.isCorrectPassword(password);
 
-  // If password is incorrect, send a 411 error with a message
   if (!match) {
     return res.status(411).json({
       status: "error",
@@ -118,24 +111,20 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
-  // Generate access and refresh tokens
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
     user._id
   );
 
-  // Find the logged-in user and select specific fields to return
   const loggedInUser = await User.findById(user._id).select(
     "username email name profilePicture -_id"
   );
 
-  // Set cookies for the tokens
   const options = {
-    httpOnly: true, // Prevents client-side access
-    secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
-    sameSite: "None", // Needed for cross-origin cookies in production
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
   };
 
-  // Respond with user details and tokens
   return res
     .status(200)
     .cookie("refreshToken", refreshToken, options)
@@ -160,7 +149,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
   const option = {
     httpOnly: true, // Prevents client-side access
-    secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+    secure: true,
     sameSite: "None", // Needed for cross-origin cookies in production
   };
 
@@ -168,7 +157,10 @@ const logoutUser = asyncHandler(async (req, res) => {
     .clearCookie("refreshToken", option)
     .clearCookie("accessToken", option)
     .status(200)
-    .json(new ApiResponse(200, {}, "User logged out successfully"));
+    .json({
+      status: "success",
+      message: "User logged out successfully",
+    });
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -176,7 +168,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
-    throw new ApiResponce(401, "Unauthorized");
+    return res.status(401).json({
+      status: "error",
+      message: "Refresh token is required",
+    });
   }
 
   try {
@@ -188,16 +183,22 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     const user = await User.findById(decoded?._id);
 
     if (!user) {
-      throw new ApiResponce(401, "Invalid refresh token");
+      return res.status(401).json({
+        status: "error",
+        message: "User not found",
+      });
     }
 
     if (user.refreshToken !== incomingRefreshToken) {
-      throw new ApiResponce(401, "Refresh token is used or expired");
+      return res.status(401).json({
+        status: "error",
+        message: "Invalid refresh token",
+      });
     }
 
     const options = {
       httpOnly: true, // Prevents client-side access
-      secure: process.env.NODE_ENV === "production", // Only send cookies over HTTPS in production
+      secure: true,
       sameSite: "None", // Needed for cross-origin cookies in production
     };
 
@@ -209,15 +210,19 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       .status(200)
       .cookie("refreshToken", refreshToken, options)
       .cookie("accessToken", accessToken, options)
-      .json(
-        new ApiResponse(
-          200,
-          { accessToken, refreshToken: refreshToken },
-          "Access token refreshed"
-        )
-      );
+      .json({
+        status: "success",
+        message: "Access token refreshed successfully",
+        data: {
+          accessToken,
+          refreshToken,
+        },
+      });
   } catch (error) {
-    throw new ApiResponce(401, error?.message || "Invalid refresh token");
+    return res.status(401).json({
+      status: "error",
+      message: "Invalid refresh token",
+    });
   }
 });
 
@@ -229,29 +234,39 @@ const getUser = asyncHandler(async (req, res) => {
   );
 
   if (!user) {
-    throw new ApiResponce(410, "User not found");
+    res.status(410).json({
+      status: "error",
+      message: "User not found",
+    });
+    return;
   }
 
-  const response = new ApiResponse(200, { user }, "User details");
-  res.status(response.statusCode).json(response);
+  return res.status(200).json({
+    status: "success",
+    user,
+  });
 });
 
 const searchUser = asyncHandler(async (req, res) => {
   const searchQuery = req.query.search;
 
-  const users = await User.find({
-    $or: [
-      { username: { $regex: searchQuery, $options: "i" } },
-      { name: { $regex: searchQuery, $options: "i" } },
-    ],
+  const users1 = await User.find({
+    $or: [{ username: { $regex: searchQuery, $options: "i" } }],
   }).select("username email name profilePicture");
 
-  const response = new ApiResponse(200, users, "Search results");
-  res.status(response.statusCode).json(response);
+  const users2 = await User.find({
+    $or: [{ name: { $regex: searchQuery, $options: "i" } }],
+  }).select("username email name profilePicture");
+
+  const users = [...users1, ...users2];
+
+  return res.status(200).json({
+    status: "success",
+    data: users,
+  });
 });
 
 const userInfo = asyncHandler(async (req, res) => {
-  console.log("hi i am userInfo");
   const username = req.params.username;
 
   const user = await User.findOne({ username: username }).select(
@@ -259,11 +274,17 @@ const userInfo = asyncHandler(async (req, res) => {
   );
 
   if (!user) {
-    throw new ApiResponce(410, "User not found");
+    res.status(410).json({
+      status: "error",
+      message: "User not found",
+    });
+    return;
   }
 
-  const response = new ApiResponse(200, { user }, "User details");
-  res.status(response.statusCode).json(response);
+  return res.status(200).json({
+    status: "success",
+    user,
+  });
 });
 
 export {

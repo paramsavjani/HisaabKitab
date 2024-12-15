@@ -25,7 +25,7 @@ import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the Splitwise API");
+  res.send("hello world");
 });
 
 app.use("/api/v1/users", userRouter);
