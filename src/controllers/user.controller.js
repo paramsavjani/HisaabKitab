@@ -28,17 +28,20 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   if (password.length < 6) {
-    throw new ApiResponce(400, "Password must be at least 6 characters long");
+    throw new ApiResponce(401, "Password must be at least 6 characters long");
   }
 
   const exist = await User.exists({ username });
   if (exist) {
-    throw new ApiResponce(400, "Username already exists");
+    res.status(403).json({
+      status: "error",
+      message: "Username already exists",
+    });
   }
 
   const existEmail = await User.exists({ email });
   if (existEmail) {
-    throw new ApiResponce(400, "Email already exists");
+    throw new ApiResponce(403, "Email already exists");
   }
 
   const profilePicture = req.file ? req.file.path : null;
