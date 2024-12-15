@@ -12,6 +12,7 @@ const User = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [friendStatus, setFriendStatus] = useState("not_friends");
+  const [isFriend, setIsFriend] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -19,6 +20,22 @@ const User = () => {
         const response = await fetch(
           `https://backend-for-khatabook-f1cr.onrender.com/api/v1/users/get/${id}`
         );
+
+        if (user) {
+          const Friend = await fetch(
+            `http://localhost:5000/api/v1/friends/${id}`,
+            {
+              method: "GET",
+              credentials: "include",
+              withCredentials: true,
+            }
+          );
+          const data = await Friend.json();
+          console.log(data);
+          if (Friend.data.data) {
+            setIsFriend(true);
+          }
+        }
 
         if (response.status === 410) {
           setError("User does not exist.");
@@ -37,7 +54,7 @@ const User = () => {
     };
 
     fetchUser();
-  }, [id]);
+  }, [id, user]);
 
   const addFriend = async () => {
     try {
@@ -77,9 +94,9 @@ const User = () => {
     );
   }
 
-  if (error) {
-    return <UserNotFound />;
-  }
+  // if (error) {
+  //   return <UserNotFound />;
+  // }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center py-8">

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 const Signup = () => {
   const [formData, setFormData] = useState({
     username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -13,9 +14,34 @@ const Signup = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle signup logic here
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("username", formData.username);
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("password", formData.password);
+    
+    const profilePicture = document.getElementById("profilePicture").files[0];
+    if (profilePicture) {
+      formDataToSend.append("profilePicture", profilePicture);
+    }
+
+    await fetch(
+      "http://localhost:5000/api/v1/users/register",
+      {
+        method: "POST",
+        body: formDataToSend,
+      }
+    );
+
     console.log("Signup Data:", formData);
   };
 
@@ -41,6 +67,38 @@ const Signup = () => {
               onChange={handleChange}
               className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Enter your username"
+              required
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="profilePicture"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Profile Picture
+            </label>
+            <input
+              type="file"
+              id="profilePicture"
+              name="profilePicture"
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-300"
+            >
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="Enter your name"
               required
             />
           </div>
