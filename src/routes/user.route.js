@@ -12,8 +12,8 @@ import { upload } from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import multer from "multer";
 
-const router = Router();
 
+const router = Router();
 
 router.route("/register").post((req, res, next) => {
   upload.single("profilePicture")(req, res, (err) => {
@@ -24,11 +24,11 @@ router.route("/register").post((req, res, next) => {
       // Other errors
       return res.status(500).json({ error: "File upload error" });
     }
-    // Proceed to the controller if no upload errors
+
     next();
+
   });
 }, registerUser);
-
 
 router.route("/login").post(loginUser);
 
