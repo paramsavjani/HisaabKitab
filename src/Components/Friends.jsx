@@ -75,10 +75,10 @@ function Friends() {
         <div className="w-full max-w-xl bg-gray-900 p-6 rounded-lg shadow-lg">
           {friends.length > 0 ? (
             <ul className="space-y-4">
-              {friends.map((friend) => (
+              {friends.map((friend,index) => (
                 <Link to={`/users/${friend.username}`} className="">
                 <li
-                  key={friend._id}
+                  key={index}
                   className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
                 >
                   <div className="w-12 h-12">

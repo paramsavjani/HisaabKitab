@@ -12,6 +12,7 @@ import FeaturesSection from "./Components/FeaturesSection";
 import UserContextProvider from "./context/UserContextProvider";
 import Search from "./Components/Search";
 import User from "./Components/User";
+import IncomingRequests from "./Components/IncomingRequests";
 
 import {
   createBrowserRouter,
@@ -31,7 +32,8 @@ const router = createBrowserRouter(
       <Route path="friends" element={<Friends />} />
       <Route path="search" element={<Search />} />
       <Route path="*" element={<NotFound />} />
-      <Route path="users/:id" element={<User param = "sdfds"/>} />
+      <Route path="incoming-requests" element={<IncomingRequests />} />
+      <Route path="users/:id" element={<User />} />
     </Route>
   )
 );

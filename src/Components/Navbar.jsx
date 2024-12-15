@@ -8,10 +8,28 @@ import UserContext from "../context/UserContext";
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state for logout button
+  const [incomingRequests, setIncomingRequests] = useState(0);
   const { user, setUser } = useContext(UserContext);
 
   // Ref to detect outside clicks
   const navRef = useRef();
+
+  useEffect(() => {
+    if (user) {
+      Axios.get(
+        "https://backend-for-khatabook-f1cr.onrender.com/api/v1/friendRequests/receivedAll",
+        {
+          withCredentials: true,
+        }
+      )
+        .then((response) => {
+          setIncomingRequests(response?.data?.data?.senders?.length || 0);
+        })
+        .catch((error) => {
+          console.error("Failed to fetch incoming requests count", error);
+        });
+    }
+  }, [user]);
 
   // Logout function with logging
   const logout = async () => {
@@ -80,7 +98,7 @@ function Navbar() {
       {/* Navbar */}
       <nav
         ref={navRef}
-        className={`bg-black p-4 shadow-xl fixed left-0 top-0 w-64 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
+        className={`bg-black p-4 shadow-xl fixed left-0 top-0 w-80 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
@@ -112,9 +130,29 @@ function Navbar() {
               </NavLink>
             )
           )}
-        </div>
 
-        {/* User Information */}
+          {/* Incoming Requests Link */}
+                {user && (
+                <div className="mt-6 mb-4 p-3 bg-slate-800 rounded-lg shadow-md w-full">
+                  <NavLink
+                  to="/incoming-requests"
+                  className={({ isActive }) =>
+                    `flex items-center justify-between text-gray-100 hover:text-green-500 transition-colors duration-300 text-lg ${
+                    isActive ? "text-green-500 underline" : ""
+                    }`
+                  }
+                  onClick={() => setMenuOpen(false)} // Close menu on click
+                  >
+                  <span>Incoming Requests</span>
+                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    {incomingRequests}
+                  </span>
+                  </NavLink>
+                </div>
+                )}
+              </div>
+
+              {/* User Information */}
         <div className="p-4 text-white">
           {user ? (
             <div className="w-full flex flex-col space-y-4">
