@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 function Home() {
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center px-6 py-20">
       {/* Hero Section */}
