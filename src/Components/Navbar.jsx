@@ -35,38 +35,28 @@ function Navbar() {
   const logout = async () => {
     setLoading(true); // Set loading to true when logout starts
 
-    // Log the logout action (for debugging purposes or tracking)
-    console.log(`[LOG] User ${user.username || "Unknown"} is logging out.`);
-
     try {
-      // Log the logout attempt to the server (for analytics or tracking)
-      await Axios.post(
+      const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`,
-        null,
-        { withCredentials: true }
+        {
+          method: "POST",
+          credentials: "include",
+        }
       );
 
-      // After successful logout, clear user data and log success
-      console.log(
-        `[LOG] User ${user.username || "Unknown"} has logged out successfully.`
-      );
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
       setUser(null);
       window.location.reload();
     } catch (e) {
       console.error("Logout failed", e);
-
-      // Log the error if logout fails
-      console.log(
-        `[ERROR] Logout failed for user ${user.username || "Unknown"}. Error: ${
-          e.message
-        }`
-      );
     } finally {
       setLoading(false); // Set loading to false after the logout process is done
     }
   };
 
-  // Detect click outside the navbar to close it
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (menuOpen && navRef.current && !navRef.current.contains(e.target)) {

@@ -16,10 +16,15 @@ const Layout = () => {
           {
             method: "GET",
             credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
         );
-        const data = await res.json();
-        setUser(data.data.user);
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        }
       } catch (e) {
         console.error("Error fetching user", e);
       }
