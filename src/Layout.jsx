@@ -33,7 +33,7 @@ const Layout = () => {
       <Navbar />
 
       {/* Main Content */}
-      <div className="flex-1 md:ml-64">
+      <div className="flex-1 md:ml-80">
         <Outlet />
         <Footer />
       </div>
