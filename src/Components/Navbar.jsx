@@ -10,6 +10,7 @@ import FriendsIcon from "../assets/icons/friend1.png";
 import SearchIcon from "../assets/icons/search.png";
 import AddTransactionIcon from "../assets/icons/transfer1.png";
 import SplitExpenseIcon from "../assets/icons/group.png";
+import SettingIcon from "../assets/icons/gear1.png";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -96,11 +97,7 @@ function Navbar() {
       >
         {/* Logo */}
         <div className="flex items-center space-x-1 py-6">
-          <img
-            src="/logo.png"
-            className="w-14 h-14"
-            alt="CashTrack Logo"
-          />
+          <img src="/logo.png" className="w-14 h-14" alt="CashTrack Logo" />
           <Link
             to="/"
             className="text-4xl px-1 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
@@ -182,44 +179,65 @@ function Navbar() {
         {/* User Information */}
         <div className="p-4 text-white">
           {user ? (
-            <div className="w-full flex flex-col space-y-4">
+            <div className="w-full flex flex-col space-y-6">
+              {/* User Profile */}
               <Link
                 to={`/users/${user.username}`}
                 onClick={() => setMenuOpen(false)}
+                className="flex items-center space-x-4"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
-                    <img
-                      src={
-                        user.profilePicture || "https://via.placeholder.com/50"
-                      }
-                      alt="User Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 overflow-hidden">
-                    <p className="font-medium text-sm text-white truncate">
-                      {user.username || "User"}
-                    </p>
-                    <p className="text-xs text-gray-400 truncate">
-                      {user.email || "example@email.com"}
-                    </p>
-                  </div>
+                {/* Profile Picture */}
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700">
+                  <img
+                    src={
+                      user.profilePicture || "https://via.placeholder.com/50"
+                    }
+                    alt="User Profile"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* User Info */}
+                <div className="flex-1 overflow-hidden">
+                  <p className="font-medium text-sm text-white truncate">
+                    {user.username || "User"}
+                  </p>
+                  <p className="text-xs text-gray-400 truncate">
+                    {user.email || "example@email.com"}
+                  </p>
                 </div>
               </Link>
 
-              <Link
+              {/* Settings Option */}
+              <NavLink
                 to="/settings"
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center space-x-2 text-gray-300 hover:text-green-500 transition-colors duration-300"
+                className={({ isActive }) =>
+                  `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
+                    isActive
+                      ? "bg-gray-700 text-white"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-green-500"
+                  }`
+                }
               >
-                <span>⚙️</span>
-                <span>Settings</span>
-              </Link>
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={SettingIcon}
+                    className="w-6 h-6"
+                    alt="Settings Icon"
+                  />
+                  <span className="font-medium text-sm uppercase tracking-wide">
+                    Settings
+                  </span>
+                </div>
+              </NavLink>
 
+              {/* Logout Button */}
               <button
                 onClick={logout}
-                className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300 w-full flex items-center justify-center"
+                className={`w-full flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-red-500 to-red-600 shadow-lg hover:from-red-600 hover:to-red-700 text-white font-bold tracking-wide transition-transform duration-300 ${
+                  loading ? "opacity-75 cursor-not-allowed" : "hover:scale-105"
+                }`}
                 disabled={loading}
               >
                 {loading ? (
@@ -233,7 +251,7 @@ function Navbar() {
             <Link
               to="/login"
               onClick={() => setMenuOpen(false)}
-              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300"
+              className="w-full flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-blue-500 shadow-lg text-white font-bold tracking-wide hover:scale-105 transform transition-transform duration-300"
             >
               Login
             </Link>
