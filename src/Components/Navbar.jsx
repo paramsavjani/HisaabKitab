@@ -119,7 +119,7 @@ function Navbar() {
       {/* Navbar */}
       <nav
         ref={navRef}
-        className={`bg-black p-4 shadow-xl fixed left-0 top-0 w-80 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
+        className={`bg-slate-900 p-4 shadow-xl fixed left-0 top-0 w-80 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
@@ -136,7 +136,7 @@ function Navbar() {
         </div>
 
         {/* Sidebar Navigation Links */}
-        <div className="flex flex-col items-start space-y-1 md:space-y-2 bg-black p-4 w-full">
+        <div className="flex flex-col items-start space-y-1 md:space-y-2 p-4 w-full">
           {[
             { to: "/", label: "Home", icon: HomeIcon },
             { to: "/friends", label: "Friends", icon: FriendsIcon },

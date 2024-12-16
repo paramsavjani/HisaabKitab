@@ -9,7 +9,7 @@ function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center px-6 py-20 font-poppins">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center px-6 py-20 font-poppins">
       {/* Hero Section */}
       <section className="text-center max-w-5xl mx-auto mb-20">
         {/* Logo */}
@@ -39,7 +39,7 @@ function Home() {
       </section>
 
       {/* Why CashTrack Section */}
-      <section className="w-full bg-gray-800 py-16 rounded-lg shadow-xl mb-16">
+      <section className="w-full bg-black py-16 rounded-lg shadow-xl mb-16">
         <h2
           className="text-5xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-400"
           data-aos="fade-up"
@@ -68,7 +68,7 @@ function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="w-full bg-gray-900 py-16">
+      <section className="w-full bg-black py-16">
         <h2
           className="text-5xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-br from-blue-500 to-green-400"
           data-aos="fade-right"
