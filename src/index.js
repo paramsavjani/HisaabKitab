@@ -11,5 +11,6 @@ connectDB()
     });
   })
   .catch((err) => {
+    console.log("hiiii")
     console.log(err);
   });

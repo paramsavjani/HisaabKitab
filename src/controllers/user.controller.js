@@ -65,12 +65,13 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // const hashedPassword = await bcrypt.hash(password, 10);
+
   const user = await User.create({
     username,
     name,
     email,
-    password: hashedPassword,
+    password,
     profilePicture: imageUrl,
   });
 
@@ -116,6 +117,9 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
+  console.table({ username, password });
+  
+
 
   const user = await User.findOne({ username });
 
@@ -126,7 +130,8 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const match = await user.isCorrectPassword(password);
+  const match = password === user.password;
+  console.log(match)
 
   if (!match) {
     return res.status(411).json({

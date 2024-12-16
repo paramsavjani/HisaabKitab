@@ -109,12 +109,16 @@ const isFriend = asyncHandler(async (req, res) => {
   });
 
   if (!friendShip) {
-    throw new ApiResponse(404, "Not a friend");
+    return res.status(404).json({
+      status: "error",
+      message: "Not a friend",
+    });
   }
 
-  const response = new ApiResponse(200, {}, "Friend");
-
-
+  return res.status(200).json({
+    status: "success",
+    message: "Friend",
+  });
 });
 
-export { getAllFriends, deleteFriend,isFriend };
+export { getAllFriends, deleteFriend, isFriend };
