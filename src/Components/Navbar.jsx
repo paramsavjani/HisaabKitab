@@ -20,6 +20,7 @@ function Navbar() {
 
   const navRef = useRef();
   const startX = useRef(0);
+  const closeX = useRef(0);
 
   useEffect(() => {
     if (user) {
@@ -42,6 +43,7 @@ function Navbar() {
   useEffect(() => {
     const handleTouchStart = (e) => {
       startX.current = e.touches[0].clientX; // Capture the initial touch point
+      console.log(e.touches[0].clientX);
     };
 
     const handleTouchEnd = (e) => {
@@ -64,6 +66,32 @@ function Navbar() {
       document.removeEventListener("touchend", handleTouchEnd);
     };
   }, []);
+
+   useEffect(() => {
+     const handleTouchStart = (e) => {
+       closeX.current = e.touches[0].clientX; // Capture the initial touch point
+     };
+
+     const handleTouchEnd = (e) => {
+       const endX = e.changedTouches[0].clientX; // Capture the touch end point
+       const distance = closeX.current - endX;
+
+       if (closeX.current <= 320 && distance > 70) {
+         // Open the navbar if the swipe starts from the left edge and moves right
+         setMenuOpen(false);
+       }
+     };
+
+     // Attach touch event listeners
+     document.addEventListener("touchstart", handleTouchStart);
+     document.addEventListener("touchend", handleTouchEnd);
+
+     return () => {
+       // Cleanup touch event listeners
+       document.removeEventListener("touchstart", handleTouchStart);
+       document.removeEventListener("touchend", handleTouchEnd);
+     };
+   }, []);
 
   const logout = async () => {
     setLoading(true);
