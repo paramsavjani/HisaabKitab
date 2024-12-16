@@ -56,7 +56,14 @@ const sendRequest = asyncHandler(async (req, res) => {
 
   await request.save();
 
-  return res.status(200).json(new ApiResponse(200, {}, "Request sent"));
+  console.log(request._id);
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      requestId: request._id,
+    },
+  });
 });
 
 const receivedAll = asyncHandler(async (req, res) => {
@@ -222,7 +229,6 @@ const cancelRequest = asyncHandler(async (req, res) => {
   if (request.sender.toString() !== user._id.toString()) {
     throw new ApiError(403, "This request was not sent by you");
   }
-  
 
   if (request.status !== "pending") {
     throw new ApiError(404, "This request is already accepted or rejected");
