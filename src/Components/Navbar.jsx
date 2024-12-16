@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Axios from "axios";
-import { FaBars, FaUserCog, FaSpinner } from "react-icons/fa";
+import {
+  FaBars,
+  FaUserCog,
+  FaSpinner,
+  FaMoneyCheckAlt,
+  FaUsers,
+  FaHome,
+  FaUserFriends,
+  FaSearch,
+} from "react-icons/fa";
 import { useContext } from "react";
 import UserContext from "../context/UserContext";
 
@@ -33,7 +42,7 @@ function Navbar() {
 
   // Logout function with logging
   const logout = async () => {
-    setLoading(true); // Set loading to true when logout starts
+    setLoading(true);
 
     try {
       const response = await fetch(
@@ -53,14 +62,14 @@ function Navbar() {
     } catch (e) {
       console.error("Logout failed", e);
     } finally {
-      setLoading(false); // Set loading to false after the logout process is done
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (menuOpen && navRef.current && !navRef.current.contains(e.target)) {
-        setMenuOpen(false); // Close the navbar
+        setMenuOpen(false);
       }
     };
 
@@ -75,10 +84,9 @@ function Navbar() {
     <div className="flex">
       {/* Hamburger Menu Button for Mobile */}
       <button
-        className={
-          `md:hidden text-white text-2xl p-4 fixed top-2 left-2 z-50 ` +
-          (menuOpen ? "hidden" : "")
-        }
+        className={`md:hidden text-white text-2xl p-4 fixed top-2 left-2 z-50 ${
+          menuOpen ? "hidden" : ""
+        }`}
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label="Toggle navigation menu"
       >
@@ -104,66 +112,65 @@ function Navbar() {
             className="text-3xl font-extrabold text-white hover:text-green-500 transition-colors duration-300"
             aria-label="Navigate to CashTrack homepage"
           >
-            Cash
-            <span className="text-green-500">Track</span>
+            Cash<span className="text-green-500">Track</span>
           </Link>
         </div>
 
         {/* Sidebar Navigation Links */}
         <div className="flex flex-col items-start space-y-4 bg-black p-4 w-full">
-          {["/", "/features", "/about", "/contact", "/friends", "/search"].map(
-            (path, index) => (
-              <NavLink
-                key={index}
-                to={path}
-                className={({ isActive }) =>
-                  `text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
-                    isActive ? "text-green-500 underline" : ""
-                  }`
-                }
-                onClick={() => setMenuOpen(false)} // Close menu on click
-              >
-                {path === "/" ? "Home" : path.replace("/", "")}
-              </NavLink>
-            )
-          )}
+          {[
+            { to: "/", label: "Home", icon: <FaHome /> },
+            { to: "/friends", label: "Friends", icon: <FaUserFriends /> },
+            { to: "/search", label: "Search", icon: <FaSearch /> },
+            {
+              to: "/add-one",
+              label: "Add Transaction",
+              icon: <FaMoneyCheckAlt />,
+            },
+            { to: "/split-expense", label: "Split Expense", icon: <FaUsers /> },
+          ].map(({ to, label, icon }, index) => (
+            <NavLink
+              key={index}
+              to={to}
+              className={({ isActive }) =>
+                `flex items-center space-x-2 text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
+                  isActive ? "text-green-500 underline" : ""
+                }`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              {icon}
+              <span>{label}</span>
+            </NavLink>
+          ))}
 
-          {/* Incoming Requests Link */}
           {user && (
-            <div className="mt-6 mb-4 p-3 bg-slate-800 rounded-lg shadow-md w-full">
-              <NavLink
-                to="/incoming-requests"
-                className={({ isActive }) =>
-                  `flex items-center justify-between text-gray-100 hover:text-green-500 transition-colors duration-300 text-lg ${
-                    isActive ? "text-green-500 underline" : ""
-                  }`
-                }
-                onClick={() => setMenuOpen(false)} // Close menu on click
-              >
-                <span>Incoming Requests</span>
-                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+            <NavLink
+              to="/incoming-requests"
+              className={({ isActive }) =>
+                `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
+                  isActive
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-green-500"
+                }`
+              }
+              onClick={() => setMenuOpen(false)}
+            >
+              <div className="flex items-center space-x-3">
+                <span className="text-lg">
+                  📩{" "}
+                  {/* Use an envelope icon or replace it with an icon library */}
+                </span>
+                <span className="font-medium text-sm uppercase tracking-wide">
+                  Incoming Requests
+                </span>
+              </div>
+              {incomingRequests > 0 && (
+                <span className="flex items-center justify-center bg-green-500 text-white text-xs font-bold w-6 h-6 rounded-full shadow-lg animate-pulse">
                   {incomingRequests}
                 </span>
-              </NavLink>
-            </div>
-          )}
-          {user && (
-            <div className="mt-6 mb-4 p-3 bg-slate-800 rounded-lg shadow-md w-full">
-              <NavLink
-                to="/notfound"
-                className={({ isActive }) =>
-                  `flex items-center justify-between text-gray-100 hover:text-green-500 transition-colors duration-300 text-lg ${
-                    isActive ? "text-green-500 underline" : ""
-                  }`
-                }
-                onClick={() => setMenuOpen(false)} // Close menu on click
-              >
-                <span>Notifications</span>
-                <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                  {incomingRequests}
-                </span>
-              </NavLink>
-            </div>
+              )}
+            </NavLink>
           )}
         </div>
 
@@ -171,12 +178,12 @@ function Navbar() {
         <div className="p-4 text-white">
           {user ? (
             <div className="w-full flex flex-col space-y-4">
-              {/* User Profile Section */}
               <Link
                 to={`/users/${user.username}`}
                 onClick={() => setMenuOpen(false)}
               >
                 <div className="flex items-center space-x-4">
+                  {/* Profile Picture */}
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
                     <img
                       src={
@@ -186,18 +193,19 @@ function Navbar() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="overflow-hidden">
-                    <p className="font-medium truncate">
+
+                  {/* User Details */}
+                  <div className="flex-1 overflow-hidden">
+                    <p className="font-medium text-sm text-white truncate">
                       {user.username || "User"}
                     </p>
-                    <p className="text-sm text-gray-400 truncate">
+                    <p className="text-xs text-gray-400 truncate">
                       {user.email || "example@email.com"}
                     </p>
                   </div>
                 </div>
               </Link>
 
-              {/* Settings and Logout */}
               <Link
                 to="/settings"
                 onClick={() => setMenuOpen(false)}
@@ -210,7 +218,7 @@ function Navbar() {
               <button
                 onClick={logout}
                 className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md transition duration-300 w-full flex items-center justify-center"
-                disabled={loading} // Disable button when loading
+                disabled={loading}
               >
                 {loading ? (
                   <FaSpinner className="animate-spin mr-2" />
