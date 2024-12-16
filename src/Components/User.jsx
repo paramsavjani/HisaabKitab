@@ -13,6 +13,10 @@ const User = () => {
   const [isRequestSent, setIsRequestSent] = useState(false);
   const [requestId, setRequestId] = useState(null);
 
+  // Additional loading states for buttons
+  const [isAddingFriend, setIsAddingFriend] = useState(false);
+  const [isCancelingRequest, setIsCancelingRequest] = useState(false);
+
   // Fetch user profile
   useEffect(() => {
     const fetchUser = async () => {
@@ -83,6 +87,7 @@ const User = () => {
 
   // Send friend request
   const addFriend = async () => {
+    setIsAddingFriend(true); // Set loading state for adding friend
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${profile.username}/send`,
@@ -92,16 +97,18 @@ const User = () => {
         const data = await response.json();
         setRequestId(data.data.requestId);
         setIsRequestSent(true);
-        
       }
     } catch (error) {
       console.error("Error adding friend:", error);
+    } finally {
+      setIsAddingFriend(false); // Reset loading state after request is complete
     }
   };
 
   // Cancel friend request
   const cancelFriendRequest = async () => {
     if (isRequestSent && requestId) {
+      setIsCancelingRequest(true); // Set loading state for canceling request
       try {
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${requestId}/cancel`,
@@ -113,6 +120,8 @@ const User = () => {
         }
       } catch (error) {
         console.error("Error canceling friend request:", error);
+      } finally {
+        setIsCancelingRequest(false); // Reset loading state after request is complete
       }
     }
   };
@@ -184,18 +193,42 @@ const User = () => {
             {!isFriend && !isRequestSent && (
               <button
                 onClick={addFriend}
-                className="w-full px-6 py-3 bg-green-600 text-white text-lg font-semibold rounded-lg hover:bg-green-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+                disabled={isAddingFriend}
+                className={`w-full px-6 py-3 text-lg font-semibold rounded-lg transition duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 ${
+                  isAddingFriend
+                    ? "bg-green-700 text-white"
+                    : "bg-green-600 text-white hover:bg-green-700"
+                }`}
               >
-                Add Friend
+                {isAddingFriend ? (
+                  <span className="flex items-center justify-center space-x-2">
+                    <FaSpinner className="animate-spin text-white" />
+                    <span>Adding...</span>
+                  </span>
+                ) : (
+                  "Add Friend"
+                )}
               </button>
             )}
 
             {!isFriend && isRequestSent && (
               <button
                 onClick={cancelFriendRequest}
-                className="w-full px-6 py-3 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                disabled={isCancelingRequest}
+                className={`w-full px-6 py-3 text-lg font-semibold rounded-lg transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 ${
+                  isCancelingRequest
+                    ? "bg-red-700 text-white"
+                    : "bg-red-600 text-white hover:bg-red-700"
+                }`}
               >
-                Cancel Request
+                {isCancelingRequest ? (
+                  <span className="flex items-center justify-center space-x-2">
+                    <FaSpinner className="animate-spin text-white" />
+                    <span>Canceling...</span>
+                  </span>
+                ) : (
+                  "Cancel Request"
+                )}
               </button>
             )}
 
