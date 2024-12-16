@@ -97,16 +97,16 @@ function Navbar() {
         {/* Logo */}
         <div className="flex items-center space-x-1 py-6">
           <img
-            src="http://res.cloudinary.com/dso4amwem/image/upload/v1734325639/zozxrirfkw14gweuq3hq.webp"
+            src="/logo.png"
             className="w-14 h-14"
             alt="CashTrack Logo"
           />
           <Link
             to="/"
-            className="text-3xl font-extrabold text-white hover:text-green-500 transition-colors duration-300"
+            className="text-4xl px-1 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
             aria-label="Navigate to CashTrack homepage"
           >
-            Cash<span className="text-green-500">Track</span>
+            Cash<span className="text-white">Track</span>
           </Link>
         </div>
 
@@ -134,7 +134,7 @@ function Navbar() {
                 `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
                   isActive
                     ? "bg-gray-700 text-white"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-green-500"
+                    : "text-gray-300 hover:bg-gray-800"
                 }`
               }
               onClick={() => setMenuOpen(false)}
