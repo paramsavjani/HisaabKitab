@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/User.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -18,76 +19,100 @@ const registerUser = asyncHandler(async (req, res) => {
   const { username, name, email, password } = req.body;
 
   if (
-    [username, name, email, password].some((field) => {
-      return !field || field.trim() === "";
-    })
+    [username, name, email, password].some(
+      (field) => !field || field.trim() === ""
+    )
   ) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "error",
       message: "All fields are required",
     });
-    return;
   }
 
   if (password.length < 6) {
-    res.status(400).json({
+    return res.status(400).json({
       status: "error",
       message: "Password must be at least 6 characters",
     });
-    return;
   }
 
-  const exist = await User.exists({ username });
+  const exist = await User.findOne({ username });
   if (exist) {
-    res.status(403).json({
+    console.log(exist);
+    return res.status(400).json({
       status: "error",
       message: "Username already exists",
     });
-    return;
   }
 
-  const existEmail = await User.exists({ email });
+  const existEmail = await User.findOne({ email });
   if (existEmail) {
-    res.status(403).json({
+    return res.status(400).json({
       status: "error",
       message: "Email already exists",
     });
-    return;
   }
 
   const profilePicture = req.file ? req.file.path : null;
   let imageUrl = "";
   if (profilePicture) {
-    imageUrl = await uploadOnCloudinary(profilePicture);
+    try {
+      imageUrl = await uploadOnCloudinary(profilePicture);
+    } catch (error) {
+      return res.status(500).json({
+        status: "error",
+        message: "Image upload failed",
+      });
+    }
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
   const user = await User.create({
     username,
     name,
     email,
-    password,
+    password: hashedPassword,
     profilePicture: imageUrl,
   });
 
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
+    "email username name profilePicture"
   );
-
   if (!createdUser) {
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
-      message: "User registration failed",
+      message: "Failed to fetch created user",
     });
-    return;
   }
 
-  console.log("user created", user.username);
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    createdUser._id
+  );
 
-  return res.status(201).json({
-    status: "success",
-    message: "User registered successfully",
-    data: createdUser,
-  });
+  const options = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  };
+
+  return res
+    .status(201)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
+    .json({
+      status: "success",
+      message: "User registered successfully",
+      data: {
+        user: {
+          username: createdUser.username,
+          email: createdUser.email,
+          name: createdUser.name,
+          profilePicture: createdUser.profilePicture,
+        },
+        accessToken,
+        refreshToken,
+      },
+    });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
