@@ -1,4 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import UserContext from "../context/UserContext";
 
 const InputField = ({
@@ -11,7 +13,7 @@ const InputField = ({
   required = false,
   errorMessage,
 }) => (
-  <div>
+  <div data-aos="fade-up">
     <label htmlFor={id} className="block text-sm font-medium text-gray-300">
       {label}
     </label>
@@ -44,7 +46,21 @@ const Signup = () => {
   });
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 }); // Initialize AOS animation
+
+    // Detect Mobile Device
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,72 +85,63 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGeneralError(null);
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     const fieldErrors = validateFields();
     setErrors(fieldErrors);
     if (Object.keys(fieldErrors).length > 0) {
-      setIsLoading(false); // Stop loading
-      return;
-    }
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("username", formData.username);
-    formDataToSend.append("name", formData.name);
-    formDataToSend.append("email", formData.email);
-    formDataToSend.append("password", formData.password);
-
-    const profilePicture = document.getElementById("profilePicture").files[0];
-
-    if (profilePicture && !profilePicture.type.startsWith("image/")) {
-      setGeneralError("Profile picture must be an image file.");
       setIsLoading(false);
       return;
     }
 
-    if (profilePicture) {
-      formDataToSend.append("profilePicture", profilePicture);
-    }
-
     try {
+      // Example API call setup
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/register`,
         {
           method: "POST",
-          body: formDataToSend,
-          credentials: "include",
+          body: JSON.stringify(formData),
+          headers: { "Content-Type": "application/json" },
         }
       );
-      const data = await response.json();
 
+      const data = await response.json();
       if (!response.ok) {
-        setGeneralError(
-          data.message || "Failed to register. Please try again."
-        );
-        setIsLoading(false);
+        setGeneralError(data.message || "Registration failed");
         return;
       }
 
       setUser(data.data.user);
       window.location.href = "/friends";
     } catch (error) {
-      setGeneralError("Failed to register. Please try again.");
-      console.error(error);
+      setGeneralError("Something went wrong. Please try again.");
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white text-center mb-6">
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        isMobile ? "bg-gray-800" : "bg-black"
+      }`}
+    >
+      <div
+        className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md"
+        data-aos="zoom-in"
+      >
+        <h2
+          className="text-2xl font-bold text-white text-center mb-6"
+          data-aos="fade-down"
+        >
           Create an Account
         </h2>
 
-        {/* General Error Alert */}
         {generalError && (
-          <div className="bg-red-600 text-white text-sm p-3 rounded mb-4 flex justify-between items-center">
+          <div
+            className="bg-red-600 text-white text-sm p-3 rounded mb-4 flex justify-between items-center"
+            data-aos="fade-up"
+          >
             <span>{generalError}</span>
             <button
               className="ml-2 text-lg font-bold"
@@ -156,20 +163,6 @@ const Signup = () => {
             required
             errorMessage={errors.username}
           />
-          <div>
-            <label
-              htmlFor="profilePicture"
-              className="block text-sm font-medium text-gray-300"
-            >
-              Profile Picture
-            </label>
-            <input
-              type="file"
-              id="profilePicture"
-              name="profilePicture"
-              className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
-          </div>
           <InputField
             id="name"
             label="Name"
@@ -212,39 +205,17 @@ const Signup = () => {
           />
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition duration-200"
+            className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg hover:scale-105 hover:ring-2 hover:ring-blue-500 transition-transform duration-300 shadow-lg"
             disabled={isLoading}
+            data-aos="fade-up"
           >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  ></path>
-                </svg>
-                Signing Up...
-              </span>
-            ) : (
-              "Sign Up"
-            )}
+            {isLoading ? "Signing Up..." : "Sign Up"}
           </button>
         </form>
-        <p className="mt-6 text-center text-gray-400 text-sm">
+        <p
+          className="mt-6 text-center text-gray-400 text-sm"
+          data-aos="fade-up"
+        >
           Already have an account?{" "}
           <a href="/login" className="text-green-400 hover:underline">
             Log in
