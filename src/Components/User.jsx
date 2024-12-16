@@ -23,7 +23,7 @@ const User = () => {
 
         if (user) {
           const Friend = await fetch(
-            `http://localhost:5000/api/v1/friends/${id}`,
+            `${process.env.REACT_APP_BACKEND_URL}/api/v1/friends/${id}`,
             {
               method: "GET",
               credentials: "include",
