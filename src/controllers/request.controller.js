@@ -204,27 +204,28 @@ const sendAll = asyncHandler(async (req, res) => {
 const cancelRequest = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   if (!user) {
-    throw new ApiError(404, "Unauthorized");
+    throw new ApiError(400, "Unauthorized");
   }
 
   const requestId = req.params.requestId;
 
   if (!requestId.match(/^[0-9a-fA-F]{24}$/)) {
-    throw new ApiError(400, "Invalid request ID");
+    throw new ApiError(401, "Invalid request ID");
   }
 
   const request = await Request.findById(requestId);
 
   if (!request || request == null || request == undefined) {
-    throw new ApiError(404, "Request not found");
+    throw new ApiError(402, "Request not found");
   }
 
   if (request.sender.toString() !== user._id.toString()) {
     throw new ApiError(403, "This request was not sent by you");
   }
+  
 
   if (request.status !== "pending") {
-    throw new ApiError(400, "This request is already accepted or rejected");
+    throw new ApiError(404, "This request is already accepted or rejected");
   }
 
   const deleted = await Request.deleteOne({
@@ -238,6 +239,47 @@ const cancelRequest = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, {}, "Request cancelled"));
 });
 
+const alreadyRequested = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({
+      status: "error",
+      message: "Unauthorized",
+    });
+  }
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    return res.status(404).json({
+      status: "error",
+      message: "User not found",
+    });
+  }
+
+  const username = req.params.username;
+
+  const receiver = await User.findOne({ username });
+
+  if (!receiver) {
+    return res.status(404).json({
+      status: "error",
+      message: "User not found",
+    });
+  }
+
+  const requestExists = await Request.findOne({
+    sender: user._id,
+    receiver: receiver._id,
+    status: "pending",
+  });
+
+  if (requestExists) {
+    return res.status(200).json({
+      status: "success",
+      data: { requestId: requestExists._id },
+    });
+  }
+});
+
 export {
   sendRequest,
   receivedAll,
@@ -245,4 +287,5 @@ export {
   denyRequest,
   sendAll,
   cancelRequest,
+  alreadyRequested,
 };

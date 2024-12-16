@@ -5,7 +5,8 @@ import {
   acceptRequest,
   denyRequest,
   sendAll,
-    cancelRequest,
+  cancelRequest,
+  alreadyRequested,
 } from "../controllers/request.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
@@ -22,5 +23,7 @@ router.route("/:requestId/deny").post(verifyJWT, denyRequest);
 router.route("/sendAll").get(verifyJWT, sendAll);
 
 router.route("/:requestId/cancel").delete(verifyJWT, cancelRequest);
+
+router.route("/:username/alreadyRequested").get(verifyJWT, alreadyRequested);
 
 export default router;
