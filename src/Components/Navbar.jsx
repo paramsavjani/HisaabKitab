@@ -50,7 +50,7 @@ function Navbar() {
       const endX = e.changedTouches[0].clientX; // Capture the touch end point
       const distance = endX - startX.current;
 
-      if (startX.current <= 50 && distance > 50) {
+      if (startX.current <= 70 && distance > 60) {
         // Open the navbar if the swipe starts from the left edge and moves right
         setMenuOpen(true);
       }
