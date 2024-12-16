@@ -241,7 +241,7 @@ function Navbar() {
                 to="/settings"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between w-full px-4 py-2 md:py-3 rounded-lg transition duration-300 ${
+                  `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
                     isActive
                       ? "bg-gray-700 text-white"
                       : "text-gray-300 hover:bg-gray-800"

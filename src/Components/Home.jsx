@@ -1,118 +1,129 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 function Home() {
+  useEffect(() => {
+    AOS.init({ duration: 1200, easing: "ease-in-out" });
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center px-6 py-20">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center px-6 py-20 font-poppins">
       {/* Hero Section */}
-      <div className="text-center max-w-4xl mx-auto mb-16">
-        <h1 className="text-5xl font-extrabold text-gray-100 mb-6">
-          Welcome to CashTrack
+      <section className="text-center max-w-5xl mx-auto mb-20">
+        {/* Logo */}
+        <div className="flex justify-center items-center mb-10">
+          <img src="/logo.png" alt="CashTrack Logo" className="w-40 h-40" />
+        </div>
+
+        {/* Hero Text */}
+        <h1 className="text-6xl md:text-7xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-green-400">
+          CashTrack
         </h1>
-        <p className="text-xl text-gray-400 mb-8">
-          Track your personal and group expenses effortlessly. Keep an eye on
-          your finances, share costs with friends, and stay organized.
+        <p className="text-2xl md:text-3xl text-gray-300 mb-10 leading-relaxed font-light">
+          Track expenses, synchronize transactions, and share costs
+          effortlessly.
         </p>
+
+        {/* Hero Buttons */}
         <div className="flex justify-center space-x-6">
           <Link
             to="/signup"
-            className="px-8 py-3 bg-green-600 text-lg font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+            className="px-10 py-4 bg-gradient-to-r from-green-400 to-blue-500 text-lg font-semibold rounded-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition duration-300"
           >
             Get Started
           </Link>
-          <Link
-            to="/login"
-            className="px-8 py-3 bg-gray-600 text-lg font-semibold rounded-lg shadow-md hover:bg-gray-700 transition duration-300"
-          >
-            Login
-          </Link>
+         
         </div>
-      </div>
+      </section>
 
-      {/* Features Section */}
-      <div className="text-center w-full bg-gray-800 py-16">
-        <h2 className="text-4xl font-semibold text-gray-100 mb-12">
+      {/* Why CashTrack Section */}
+      <section className="w-full bg-gray-800 py-16 rounded-lg shadow-xl mb-16">
+        <h2
+          className="text-5xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-400"
+          data-aos="fade-up"
+        >
           Why CashTrack?
         </h2>
-        <div className="flex flex-wrap justify-center gap-16">
-          {/* Feature 1 */}
-          <div className="w-72 p-8 bg-gray-700 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Track Your Expenses
-            </h3>
-            <p className="text-gray-300">
-              Easily record and categorize your expenses. Gain insights into
-              your spending habits and make informed decisions.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div className="w-72 p-8 bg-gray-700 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Settle Up with Friends
-            </h3>
-            <p className="text-gray-300">
-              Quickly calculate who owes what, and settle debts with friends. No
-              more confusion or hassle when splitting costs.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div className="w-72 p-8 bg-gray-700 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Smart Group Management
-            </h3>
-            <p className="text-gray-300">
-              Manage your group expenses with ease. Whether it’s a trip or
-              shared household expenses, CashTrack makes it simple.
-            </p>
-          </div>
+        {/* Grid Layout for Features */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-8">
+          <FeatureCard
+            title="Sync Transactions"
+            description="Automatically synchronize transactions between your account and your friends' accounts."
+          />
+          <FeatureCard
+            title="Secure Requests"
+            description="Send secure money requests. Approvals make it safe and convenient."
+          />
+          <FeatureCard
+            title="Group Splits"
+            description="Manage group expenses seamlessly and track shared costs easily."
+          />
+          <FeatureCard
+            title="Detailed Reports"
+            description="Get detailed reports of your transactions for better financial management."
+          />
         </div>
-      </div>
+      </section>
 
       {/* How It Works Section */}
-      <div className="text-center w-full bg-gray-900 text-white py-16">
-        <h2 className="text-4xl font-semibold text-gray-100 mb-12">
+      <section className="w-full bg-gray-900 py-16">
+        <h2
+          className="text-5xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-br from-blue-500 to-green-400"
+          data-aos="fade-right"
+        >
           How It Works
         </h2>
-        <div className="flex flex-col md:flex-row justify-center items-center space-y-8 md:space-y-0 md:space-x-8">
-          {/* Step 1 */}
-          <div className="w-72 p-8 bg-gray-700 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Create an Account
-            </h3>
-            <p className="text-gray-300">
-              Sign up easily with just a few details. It takes seconds to get
-              started.
-            </p>
-          </div>
-
-          {/* Step 2 */}
-          <div className="w-72 p-8 bg-gray-700 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Add Expenses
-            </h3>
-            <p className="text-gray-300">
-              Record your expenses manually or automatically track them from
-              your bank account.
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="w-72 p-8 bg-gray-700 rounded-lg shadow-lg hover:bg-gray-600 transition duration-300">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Settle Up
-            </h3>
-            <p className="text-gray-300">
-              Easily calculate and track who owes what. Settle your expenses
-              quickly and conveniently.
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-8">
+          <StepCard
+            step={1}
+            title="Create an Account"
+            description="Sign up with a unique username and Gmail. Duplicates are not allowed."
+          />
+          <StepCard
+            step={2}
+            title="Find Friends"
+            description="Search for friends using their usernames and send requests."
+          />
+          <StepCard
+            step={3}
+            title="Sync Transactions"
+            description="Once connected, all transactions will auto-sync to both accounts."
+          />
+          <StepCard
+            step={4}
+            title="Request Money"
+            description="Request funds securely. Approvals make transactions transparent."
+          />
         </div>
-      </div>
+      </section>
     </div>
   );
 }
+
+// Reusable Feature Card Component
+const FeatureCard = ({ title, description }) => (
+  <div
+    className="p-8 bg-gradient-to-r from-gray-700 to-gray-800 rounded-xl shadow-md hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+    data-aos="fade-up"
+  >
+    <h3 className="text-2xl font-semibold text-white mb-4">{title}</h3>
+    <p className="text-gray-300">{description}</p>
+  </div>
+);
+
+// Reusable Step Card Component
+const StepCard = ({ step, title, description }) => (
+  <div
+    className="p-8 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-md hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+    data-aos="zoom-in"
+  >
+    <h3 className="text-2xl font-semibold text-white mb-4">
+      Step {step}: {title}
+    </h3>
+    <p className="text-gray-300">{description}</p>
+  </div>
+);
 
 export default Home;
