@@ -98,7 +98,7 @@ const Signup = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/users/register`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/register`,
         {
           method: "POST",
           body: formDataToSend,
