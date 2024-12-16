@@ -1,26 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Axios from "axios";
-import {
-  FaBars,
-  FaUserCog,
-  FaSpinner,
-  FaMoneyCheckAlt,
-  FaUsers,
-  FaHome,
-  FaUserFriends,
-  FaSearch,
-} from "react-icons/fa";
 import { useContext } from "react";
 import UserContext from "../context/UserContext";
 
+// Import PNG images
+import HomeIcon from "../assets/icons/home.png";
+import FriendsIcon from "../assets/icons/friend1.png";
+import SearchIcon from "../assets/icons/search.png";
+import AddTransactionIcon from "../assets/icons/transfer1.png";
+import SplitExpenseIcon from "../assets/icons/group.png";
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // Loading state for logout button
+  const [loading, setLoading] = useState(false);
   const [incomingRequests, setIncomingRequests] = useState(0);
   const { user, setUser } = useContext(UserContext);
 
-  // Ref to detect outside clicks
   const navRef = useRef();
 
   useEffect(() => {
@@ -40,10 +36,8 @@ function Navbar() {
     }
   }, [user]);
 
-  // Logout function with logging
   const logout = async () => {
     setLoading(true);
-
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`,
@@ -82,7 +76,7 @@ function Navbar() {
 
   return (
     <div className="flex">
-      {/* Hamburger Menu Button for Mobile */}
+      {/* Hamburger Menu Button */}
       <button
         className={`md:hidden text-white text-2xl p-4 fixed top-2 left-2 z-50 ${
           menuOpen ? "hidden" : ""
@@ -90,7 +84,7 @@ function Navbar() {
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label="Toggle navigation menu"
       >
-        <FaBars />
+        <span>☰</span> {/* Replace with your desired hamburger menu icon */}
       </button>
 
       {/* Navbar */}
@@ -119,28 +113,42 @@ function Navbar() {
         {/* Sidebar Navigation Links */}
         <div className="flex flex-col items-start space-y-4 bg-black p-4 w-full">
           {[
-            { to: "/", label: "Home", icon: <FaHome /> },
-            { to: "/friends", label: "Friends", icon: <FaUserFriends /> },
-            { to: "/search", label: "Search", icon: <FaSearch /> },
+            { to: "/", label: "Home", icon: HomeIcon },
+            { to: "/friends", label: "Friends", icon: FriendsIcon },
+            { to: "/search", label: "Search", icon: SearchIcon },
             {
               to: "/add-one",
               label: "Add Transaction",
-              icon: <FaMoneyCheckAlt />,
+              icon: AddTransactionIcon,
             },
-            { to: "/split-expense", label: "Split Expense", icon: <FaUsers /> },
+            {
+              to: "/split-expense",
+              label: "Split Expense",
+              icon: SplitExpenseIcon,
+            },
           ].map(({ to, label, icon }, index) => (
             <NavLink
               key={index}
               to={to}
               className={({ isActive }) =>
-                `flex items-center space-x-2 text-gray-300 hover:text-green-500 transition-colors duration-300 font-medium uppercase tracking-wide ${
-                  isActive ? "text-green-500 underline" : ""
+                `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
+                  isActive
+                    ? "bg-gray-700 text-white"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-green-500"
                 }`
               }
               onClick={() => setMenuOpen(false)}
             >
-              {icon}
-              <span>{label}</span>
+              <div className="flex items-center space-x-3">
+                <img
+                  src={icon}
+                  alt={`${label} Icon`}
+                  className="w-8 h-8"
+                />
+                <span className="font-medium text-sm uppercase tracking-wide">
+                  {label}
+                </span>
+              </div>
             </NavLink>
           ))}
 
@@ -157,10 +165,7 @@ function Navbar() {
               onClick={() => setMenuOpen(false)}
             >
               <div className="flex items-center space-x-3">
-                <span className="text-lg">
-                  📩{" "}
-                  {/* Use an envelope icon or replace it with an icon library */}
-                </span>
+                <span className="text-lg text-green-500">📩</span>
                 <span className="font-medium text-sm uppercase tracking-wide">
                   Incoming Requests
                 </span>
@@ -183,7 +188,6 @@ function Navbar() {
                 onClick={() => setMenuOpen(false)}
               >
                 <div className="flex items-center space-x-4">
-                  {/* Profile Picture */}
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
                     <img
                       src={
@@ -193,8 +197,6 @@ function Navbar() {
                       className="w-full h-full object-cover"
                     />
                   </div>
-
-                  {/* User Details */}
                   <div className="flex-1 overflow-hidden">
                     <p className="font-medium text-sm text-white truncate">
                       {user.username || "User"}
@@ -211,7 +213,7 @@ function Navbar() {
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center space-x-2 text-gray-300 hover:text-green-500 transition-colors duration-300"
               >
-                <FaUserCog />
+                <span>⚙️</span>
                 <span>Settings</span>
               </Link>
 
@@ -221,7 +223,7 @@ function Navbar() {
                 disabled={loading}
               >
                 {loading ? (
-                  <FaSpinner className="animate-spin mr-2" />
+                  <span className="animate-spin mr-2">🔄</span>
                 ) : (
                   "Logout"
                 )}

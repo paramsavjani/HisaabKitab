@@ -156,24 +156,26 @@ const User = () => {
       <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center py-8">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl space-y-6">
           <div className="flex items-center space-x-6">
+            {/* Profile Picture */}
             {profile.profilePicture ? (
               <img
                 src={profile.profilePicture}
                 alt={profile.username}
-                className="w-32 h-32 rounded-full object-cover border-4 border-green-500"
+                className="w-32 h-32 rounded-full object-cover border-4 border-green-500 flex-shrink-0"
               />
             ) : (
-              <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold">
-                {profile.username[0].toUpperCase()}
+              <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold text-white flex-shrink-0">
+                {profile.username[0]?.toUpperCase()}
               </div>
             )}
 
-            <div>
-              <h1 className="text-3xl font-semibold">
+            {/* User Details */}
+            <div className="flex-1 overflow-hidden">
+              <h1 className="text-3xl font-semibold truncate">
                 {profile.name || "No Name"}
               </h1>
-              <p className="text-green-400">@{profile.username}</p>
-              <p className="text-gray-400 mt-1">{profile.email}</p>
+              <p className="text-green-400 truncate">@{profile.username}</p>
+              <p className="text-gray-400 truncate">{profile.email}</p>
             </div>
           </div>
 
