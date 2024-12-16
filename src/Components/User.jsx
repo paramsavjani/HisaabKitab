@@ -34,7 +34,7 @@ const User = () => {
       }
     };
     fetchRequestStatus();
-  }, []);
+  }, [id, isFriend]);
 
   useEffect(() => {
     const fetchFriendStatus = async () => {
