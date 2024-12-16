@@ -19,6 +19,7 @@ function Navbar() {
   const { user, setUser } = useContext(UserContext);
 
   const navRef = useRef();
+  const startX = useRef(0);
 
   useEffect(() => {
     if (user) {
@@ -36,6 +37,33 @@ function Navbar() {
         });
     }
   }, [user]);
+
+  // Handle swipe gesture for opening the navbar
+  useEffect(() => {
+    const handleTouchStart = (e) => {
+      startX.current = e.touches[0].clientX; // Capture the initial touch point
+    };
+
+    const handleTouchEnd = (e) => {
+      const endX = e.changedTouches[0].clientX; // Capture the touch end point
+      const distance = endX - startX.current;
+
+      if (startX.current <= 50 && distance > 50) {
+        // Open the navbar if the swipe starts from the left edge and moves right
+        setMenuOpen(true);
+      }
+    };
+
+    // Attach touch event listeners
+    document.addEventListener("touchstart", handleTouchStart);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      // Cleanup touch event listeners
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, []);
 
   const logout = async () => {
     setLoading(true);
@@ -179,12 +207,12 @@ function Navbar() {
         {/* User Information */}
         <div className="p-4 text-white">
           {user ? (
-            <div className="w-full flex flex-col space-y-6">
+            <div className="w-full flex flex-col space-y-3">
               {/* User Profile */}
               <Link
                 to={`/users/${user.username}`}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center space-x-4"
+                className="flex items-center space-x-3"
               >
                 {/* Profile Picture */}
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700">
@@ -213,10 +241,10 @@ function Navbar() {
                 to="/settings"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
+                  `flex items-center justify-between w-full px-4 py-3 rounded-lg transition duration-300 ${
                     isActive
                       ? "bg-gray-700 text-white"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-green-500"
+                      : "text-gray-300 hover:bg-gray-800"
                   }`
                 }
               >
