@@ -29,7 +29,7 @@ function AboutUs() {
             <img
               src="./param.jpg"
               alt="Param Savjani"
-              className="w-60 h-60 border-4 border-green-500 mb-6 mx-auto lg:mx-0"
+              className="w-72 h-72 border-4 border-green-500 mb-6 mx-auto lg:mx-0"
               style={{ borderRadius: "10%" }}
             />
           </div>

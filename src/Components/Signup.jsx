@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import UserContext from "../context/UserContext";
 
 const InputField = ({
   id,
@@ -33,6 +34,7 @@ const InputField = ({
 );
 
 const Signup = () => {
+  const { setUser } = useContext(UserContext);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -83,6 +85,13 @@ const Signup = () => {
     formDataToSend.append("password", formData.password);
 
     const profilePicture = document.getElementById("profilePicture").files[0];
+
+    if (profilePicture && !profilePicture.type.startsWith("image/")) {
+      setGeneralError("Profile picture must be an image file.");
+      setIsLoading(false);
+      return;
+    }
+
     if (profilePicture) {
       formDataToSend.append("profilePicture", profilePicture);
     }
@@ -93,11 +102,10 @@ const Signup = () => {
         {
           method: "POST",
           body: formDataToSend,
+          credentials: "include",
         }
       );
       const data = await response.json();
-      console.log(data);
-      console.log(response);
 
       if (!response.ok) {
         setGeneralError(
@@ -107,9 +115,11 @@ const Signup = () => {
         return;
       }
 
-      window.location.href = "/login";
+      setUser(data.data.user);
+      window.location.href = "/friends";
     } catch (error) {
-      setGeneralError("An unexpected error occurred. Please try again later.");
+      setGeneralError("Failed to register. Please try again.");
+      console.error(error);
     } finally {
       setIsLoading(false); // Stop loading
     }
