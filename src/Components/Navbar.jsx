@@ -207,7 +207,7 @@ function Navbar() {
         {/* User Information */}
         <div className="md:p-4 p-1 text-white">
           {user ? (
-            <div className="w-full flex flex-col space-y-3">
+            <div className="w-full flex flex-col space-y-2 md:space-y-3">
               {/* User Profile */}
               <Link
                 to={`/users/${user.username}`}
@@ -241,7 +241,7 @@ function Navbar() {
                 to="/settings"
                 onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between w-full px-4 py-3 rounded-lg transition duration-300 ${
+                  `flex items-center justify-between w-full px-4 py-2 md:py-3 rounded-lg transition duration-300 ${
                     isActive
                       ? "bg-gray-700 text-white"
                       : "text-gray-300 hover:bg-gray-800"
@@ -263,7 +263,7 @@ function Navbar() {
               {/* Logout Button */}
               <button
                 onClick={logout}
-                className={`w-full flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-red-500 to-red-600 shadow-lg hover:from-red-600 hover:to-red-700 text-white font-bold tracking-wide transition-transform duration-300 ${
+                className={`w-full flex items-center justify-center px-4 py-2 md:py-3 rounded-lg bg-gradient-to-r from-red-500 to-red-600 shadow-lg hover:from-red-600 hover:to-red-700 text-white font-bold tracking-wide transition-transform duration-300 ${
                   loading ? "opacity-75 cursor-not-allowed" : "hover:scale-105"
                 }`}
                 disabled={loading}
