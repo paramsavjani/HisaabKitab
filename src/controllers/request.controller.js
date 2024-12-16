@@ -76,8 +76,6 @@ const sendRequest = asyncHandler(async (req, res) => {
 
   await request.save();
 
-  console.log(request._id);
-
   return res.status(200).json({
     status: "success",
     data: {

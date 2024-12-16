@@ -117,7 +117,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
-  console.table({ username, password });
   
 
 
@@ -131,7 +130,6 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 
   const match = password === user.password;
-  console.log(match)
 
   if (!match) {
     return res.status(411).json({
