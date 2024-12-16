@@ -111,7 +111,7 @@ function Navbar() {
         </div>
 
         {/* Sidebar Navigation Links */}
-        <div className="flex flex-col items-start space-y-4 bg-black p-4 w-full">
+        <div className="flex flex-col items-start space-y-2 bg-black p-4 w-full">
           {[
             { to: "/", label: "Home", icon: HomeIcon },
             { to: "/friends", label: "Friends", icon: FriendsIcon },
@@ -143,7 +143,7 @@ function Navbar() {
                 <img
                   src={icon}
                   alt={`${label} Icon`}
-                  className="w-8 h-8"
+                  className="w-8 h-8 md:w-6 md:h-6"
                 />
                 <span className="font-medium text-sm uppercase tracking-wide">
                   {label}
