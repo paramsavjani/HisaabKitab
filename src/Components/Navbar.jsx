@@ -205,7 +205,7 @@ function Navbar() {
         </div>
 
         {/* User Information */}
-        <div className="p-4 text-white">
+        <div className="md:p-4 p-1 text-white">
           {user ? (
             <div className="w-full flex flex-col space-y-3">
               {/* User Profile */}
