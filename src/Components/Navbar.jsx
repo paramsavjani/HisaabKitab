@@ -93,12 +93,15 @@ function Navbar() {
         } md:translate-x-0`}
       >
         {/* Logo */}
-        <div className="text-3xl font-extrabold text-white py-6">
+        <div className="flex items-center space-x-1 py-6">
+          <img src="./logo.png" className="w-14 h-14" alt="CashTrack Logo" />
           <Link
             to="/"
-            className="hover:text-green-500 transition-colors duration-300"
+            className="text-3xl font-extrabold text-white hover:text-green-500 transition-colors duration-300"
+            aria-label="Navigate to CashTrack homepage"
           >
-            Cash<span className="text-green-500">Track</span>
+            Cash
+            <span className="text-green-500">Track</span>
           </Link>
         </div>
 
@@ -165,25 +168,27 @@ function Navbar() {
           {user ? (
             <div className="w-full flex flex-col space-y-4">
               {/* User Profile Section */}
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
-                  <img
-                    src={
-                      user.profilePicture || "https://via.placeholder.com/50"
-                    }
-                    alt="User Profile"
-                    className="w-full h-full object-cover"
-                  />
+              <Link to={`/users/${user.username}`}>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
+                    <img
+                      src={
+                        user.profilePicture || "https://via.placeholder.com/50"
+                      }
+                      alt="User Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="font-medium truncate">
+                      {user.username || "User"}
+                    </p>
+                    <p className="text-sm text-gray-400 truncate">
+                      {user.email || "example@email.com"}
+                    </p>
+                  </div>
                 </div>
-                <div className="overflow-hidden">
-                  <p className="font-medium truncate">
-                    {user.username || "User"}
-                  </p>
-                  <p className="text-sm text-gray-400 truncate">
-                    {user.email || "example@email.com"}
-                  </p>
-                </div>
-              </div>
+              </Link>
 
               {/* Settings and Logout */}
               <Link
