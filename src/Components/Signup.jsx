@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import UserContext from "../context/UserContext";
 
 const InputField = ({
@@ -12,7 +12,7 @@ const InputField = ({
   errorMessage,
 }) => (
   <div>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-300">
+    <label htmlFor={id} className="block text-sm font-medium text-white">
       {label}
     </label>
     <input
@@ -21,7 +21,7 @@ const InputField = ({
       name={id}
       value={value}
       onChange={onChange}
-      className={`mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
+      className={`mt-1 block w-full px-3 py-2 md:bg-gray-700 bg-slate-900 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none ${
         errorMessage ? "border-red-500" : ""
       }`}
       placeholder={placeholder}
@@ -45,6 +45,14 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth <= 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -126,8 +134,20 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center md:bg-black bg-gray-800">
-      <div className="bg-gray-800 p-8 rounded-lg w-full max-w-md">
+    <div
+      className={`min-h-screen flex items-center justify-center ${
+        isMobile
+          ? "bg-black" // Solid black background for mobile
+          : "bg-gradient-to-b from-black to-gray-900" // Gradient for desktop view
+      }`}
+    >
+      <div
+        className={`${
+          isMobile
+            ? "bg-transparent" // Transparent background for mobile to blend into the black background
+            : "bg-gray-800" // Dark background for desktop
+        } p-8 rounded-lg w-full max-w-md shadow-lg`}
+      >
         <h2 className="text-2xl font-bold text-white text-center mb-6">
           Create an Account
         </h2>
@@ -159,7 +179,7 @@ const Signup = () => {
           <div>
             <label
               htmlFor="profilePicture"
-              className="block text-sm font-medium text-gray-300"
+              className="block text-sm font-medium text-white"
             >
               Profile Picture
             </label>
@@ -167,7 +187,7 @@ const Signup = () => {
               type="file"
               id="profilePicture"
               name="profilePicture"
-              className="mt-1 block w-full px-3 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              className="mt-1 block w-full px-3 py-2 md:bg-gray-700 bg-slate-900 text-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
           <InputField
