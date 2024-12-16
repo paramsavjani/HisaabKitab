@@ -137,7 +137,7 @@ const Signup = () => {
     <div
       className={`min-h-screen flex items-center justify-center ${
         isMobile
-          ? "bg-black" // Solid black background for mobile
+          ? "bg-gradient-to-b from-black to-gray-950" // Solid black background for mobile
           : "bg-gradient-to-b from-black to-gray-900" // Gradient for desktop view
       }`}
     >

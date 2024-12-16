@@ -66,7 +66,7 @@ const Login = () => {
     <div
       className={`min-h-screen flex items-center justify-center ${
         isMobile
-          ? "bg-black" // Black background for mobile
+          ? "bg-gradient-to-b from-black to-gray-900" // Black background for mobile
           : "bg-gradient-to-b from-black to-gray-900" // Gradient for desktop view
       }`}
     >
