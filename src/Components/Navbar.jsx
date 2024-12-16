@@ -94,7 +94,11 @@ function Navbar() {
       >
         {/* Logo */}
         <div className="flex items-center space-x-1 py-6">
-          <img src="./logo.png" className="w-14 h-14" alt="CashTrack Logo" />
+          <img
+            src="http://res.cloudinary.com/dso4amwem/image/upload/v1734325639/zozxrirfkw14gweuq3hq.webp"
+            className="w-14 h-14"
+            alt="CashTrack Logo"
+          />
           <Link
             to="/"
             className="text-3xl font-extrabold text-white hover:text-green-500 transition-colors duration-300"
@@ -168,7 +172,10 @@ function Navbar() {
           {user ? (
             <div className="w-full flex flex-col space-y-4">
               {/* User Profile Section */}
-              <Link to={`/users/${user.username}`} onClick={() => setMenuOpen(false)}>
+              <Link
+                to={`/users/${user.username}`}
+                onClick={() => setMenuOpen(false)}
+              >
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
                     <img
