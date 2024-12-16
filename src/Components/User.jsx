@@ -4,7 +4,6 @@ import { FaSpinner } from "react-icons/fa"; // Importing a spinner icon
 import UserContext from "../context/UserContext";
 import { useContext } from "react";
 import UserNotFound from "./UserNotFound";
-import { useCallback } from "react";
 
 const User = () => {
   const { user } = useContext(UserContext);
@@ -15,80 +14,81 @@ const User = () => {
   const [isRequestSent, setIsRequestSent] = useState(false);
   const [requestId, setRequestId] = useState(null);
 
-  const fetchFriendStatus = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friends/${id}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      if (response.ok) {
-        setIsFriend(true);
-        setIsRequestSent(false);
-      }
-    } catch (error) {
-      console.error("Error fetching friend status:", error);
-    }
-  }, [id]);
-
-  const fetchUser = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/get/${id}`
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        setProfile(data.user);
-      }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [id]);
-
-  const fetchRequestStatus = useCallback(async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/alreadyRequested`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setRequestId(data.data.requestId);
-        setIsRequestSent(true);
-      }
-    } catch (error) {
-      console.error("Error fetching friend request status:", error);
-    }
-  }, [id]);
-
   useEffect(() => {
+    const fetchRequestStatus = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/alreadyRequested`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setRequestId(data.data.requestId);
+          setIsRequestSent(true);
+        }
+      } catch (error) {
+        console.error("Error fetching friend request status:", error);
+      }
+    };
     fetchRequestStatus();
-  }, [fetchRequestStatus]);
+  }, []);
 
   useEffect(() => {
+    const fetchFriendStatus = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/friends/${id}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          setIsFriend(true);
+          setIsRequestSent(false);
+        }
+      } catch (error) {
+        console.log("yes you are friends");
+        console.error("Error fetching friend status:", error);
+      }
+    };
+
     fetchFriendStatus();
-  }, [fetchFriendStatus]);
+  }, [id, isRequestSent]);
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/get/${id}`
+        );
+
+        const data = await response.json();
+        if (response.ok) {
+          setProfile(data.user);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchUser();
-  }, [fetchUser]);
+  }, [id]);
 
   const addFriend = async () => {
     try {
-      await fetch(
+      const responce = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${profile.username}/send`,
         { method: "POST", credentials: "include" }
       );
-      setIsRequestSent(true);
-      fetchRequestStatus();
+      // console.log("hii");
+      if (responce.ok) {
+        setIsRequestSent(true);
+      }
     } catch (error) {
       console.error("Error adding friend:", error);
     }
@@ -112,6 +112,7 @@ const User = () => {
     }
   };
 
+  console.log(isFriend, isRequestSent);
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white space-y-6">
@@ -184,14 +185,12 @@ const User = () => {
                 )}
 
                 {!isFriend && isRequestSent && (
-                  <>
-                    <button
-                      onClick={cancelFriendRequest}
-                      className="w-full px-6 py-3 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-                    >
-                      Cancel Request
-                    </button>
-                  </>
+                  <button
+                    onClick={cancelFriendRequest}
+                    className="w-full px-6 py-3 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                  >
+                    Cancel Request
+                  </button>
                 )}
 
                 {isFriend && (

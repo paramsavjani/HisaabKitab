@@ -168,7 +168,7 @@ function Navbar() {
           {user ? (
             <div className="w-full flex flex-col space-y-4">
               {/* User Profile Section */}
-              <Link to={`/users/${user.username}`}>
+              <Link to={`/users/${user.username}`} onClick={() => setMenuOpen(false)}>
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700 flex-shrink-0">
                     <img
