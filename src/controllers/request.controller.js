@@ -11,13 +11,20 @@ const sendRequest = asyncHandler(async (req, res) => {
   const username = req.params.username;
 
   if (user.username === username) {
-    throw new ApiError(400, "You cannot send a request to yourself");
+    return res.status(400).json({
+      status: "error",
+      message: "You cannot send a friend request to yourself !",
+    });
   }
 
   const receiver = await User.findOne({ username });
 
   if (!receiver) {
-    throw new ApiError(404, "User not found");
+    res.status(401).json({
+      status: "error",
+      message: "User not found",
+    });
+    return;
   }
 
   const isfriend = await Friend.findOne({
@@ -28,25 +35,38 @@ const sendRequest = asyncHandler(async (req, res) => {
   });
 
   if (isfriend) {
-    throw new ApiError(400, "You are already friends with this user");
+    return res.status(402).json({
+      status: "error",
+      message: "You are already friends with this user",
+    });
   }
 
   const requestExists = await Request.findOne({
     sender: user._id,
     receiver: receiver._id,
+    status: "pending",
   });
 
   if (requestExists) {
-    throw new ApiError(400, "You already sent a request to this user");
+    res.status(403).json({
+      status: "error",
+      message: "You already sent a request to this user",
+    });
+    return;
   }
 
   const otherUserAlreadySentRequest = await Request.findOne({
     sender: receiver._id,
     receiver: user._id,
-  });
+    status: "pending",
+  }); 
 
   if (otherUserAlreadySentRequest) {
-    throw new ApiError(400, "You already have a request from this user");
+    res.status(403).json({
+      status: "error",
+      message: "This user already sent you a request",
+    });
+    return;
   }
 
   const request = new Request({
@@ -217,21 +237,33 @@ const cancelRequest = asyncHandler(async (req, res) => {
   const requestId = req.params.requestId;
 
   if (!requestId.match(/^[0-9a-fA-F]{24}$/)) {
-    throw new ApiError(401, "Invalid request ID");
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid request ID",
+    });
   }
 
   const request = await Request.findById(requestId);
 
   if (!request || request == null || request == undefined) {
-    throw new ApiError(402, "Request not found");
+    return res.status(404).json({
+      status: "error",
+      message: "Request not found",
+    });
   }
 
   if (request.sender.toString() !== user._id.toString()) {
-    throw new ApiError(403, "This request was not sent by you");
+    return res.status(403).json({
+      status: "error",
+      message: "This request was not sent by you",
+    });
   }
 
   if (request.status !== "pending") {
-    throw new ApiError(404, "This request is already accepted or rejected");
+    return res.status(400).json({
+      status: "error",
+      message: "This request is already accepted or rejected",
+    });
   }
 
   const deleted = await Request.deleteOne({
@@ -239,10 +271,16 @@ const cancelRequest = asyncHandler(async (req, res) => {
   });
 
   if (deleted.deletedCount === 0) {
-    throw new ApiError(500, "Could not cancel request");
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while cancelling the request",
+    });
   }
 
-  return res.status(200).json(new ApiResponse(200, {}, "Request cancelled"));
+  return res.status(200).json({
+    status: "success",
+    message: "Request cancelled",
+  });
 });
 
 const alreadyRequested = asyncHandler(async (req, res) => {
