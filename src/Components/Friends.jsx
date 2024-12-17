@@ -29,7 +29,9 @@ function Friends() {
           return response.json(); // Parse response body as JSON
         })
         .then((data) => {
-          setFriends(data.data); // Assuming the response contains the 'friends' array
+          if (data.data && data.data.length > 0) {
+            setFriends(data.data);
+          }
         })
         .catch((e) => {
           console.error("Failed to fetch friends", e);
