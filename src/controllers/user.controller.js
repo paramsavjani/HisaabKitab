@@ -117,8 +117,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
-  
-
 
   const user = await User.findOne({ username });
 
@@ -277,15 +275,12 @@ const getUser = asyncHandler(async (req, res) => {
 const searchUser = asyncHandler(async (req, res) => {
   const searchQuery = req.query.search;
 
-  const users1 = await User.find({
-    $or: [{ username: { $regex: searchQuery, $options: "i" } }],
-  }).select("username email name profilePicture");
-
-  const users2 = await User.find({
-    $or: [{ name: { $regex: searchQuery, $options: "i" } }],
-  }).select("username email name profilePicture");
-
-  const users = [...users1, ...users2];
+  const users = await User.find({
+    $or: [
+      { username: { $regex: searchQuery, $options: "i" } },
+      { name: { $regex: searchQuery, $options: "i" } },
+    ],
+  });
 
   return res.status(200).json({
     status: "success",
