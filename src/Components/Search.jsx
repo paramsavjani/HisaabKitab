@@ -10,6 +10,7 @@ const Search = () => {
   const [loading, setLoading] = useState(false); // State for loading status
 
   const handleSearch = async (e) => {
+    document.activeElement.blur();
     e.preventDefault();
     setErrorMessage(""); // Reset error message
     setResults([]); // Reset previous search results
@@ -56,8 +57,8 @@ const Search = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="md:bg-gray-800 bg-black p-8 md:m-10 m-5 rounded-lg shadow-2xl w-full max-w-3xl">
-        <h2 className="text-2xl font-bold text-white text-center mb-6">
+      <div className="md:bg-gray-800 bg-black p-8 md:m-10 m-1 rounded-lg shadow-2xl w-full max-w-3xl">
+        <h2 className="text-2xl font-bold text-white text-center mb-7">
           Search User
         </h2>
         <form onSubmit={handleSearch} className="space-y-6">
@@ -102,13 +103,13 @@ const Search = () => {
         </form>
 
         {results.length > 0 && (
-          <div className="mt-16 text-white">
+          <div className="md:mt-16 mt-8 text-white">
             <h3 className="text-xl font-semibold mb-4 text-center">Results</h3>
             <ul className="md:space--2 space-y-1">  
               {results.map((user) => (
                 <li
                   key={user._id}
-                  className="md:bg-gray-700 bg-slate-800 hover:bg-gray-700 px-4 py-3 rounded-lg flex items-center space-x-4 shadow-lg transition-all duration-300 transform hover:scale-105"
+                  className="md:bg-gray-700 bg-slate-800 md:hover:bg-gray-600 hover:bg-slate-700 px-4 py-3 rounded-lg flex items-center space-x-4 shadow-lg transition-all duration-300 transform "
                 >
                   <Link
                     to={`/users/${user.username}`}

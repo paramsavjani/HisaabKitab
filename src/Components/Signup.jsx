@@ -62,8 +62,13 @@ const Signup = () => {
   const validateFields = () => {
     const newErrors = {};
     if (!formData.username) newErrors.username = "Username is required";
-    else if(formData.username.length < 4) newErrors.username = "Username must be at least 4 characters";
-    else if(formData.username.length > 10) newErrors.username = "Username must be at most 10 characters";
+    else if (formData.username.length < 4)
+      newErrors.username = "Username must be at least 4 characters";
+    else if (formData.username.length > 10)
+      newErrors.username = "Username must be at most 10 characters";
+    else if (!/^[a-zA-Z0-9_]+$/.test(formData.username))
+      newErrors.username =
+        "Username must contain only letters, numbers, and underscores";
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
     else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email))
