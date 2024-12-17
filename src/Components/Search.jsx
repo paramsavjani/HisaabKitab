@@ -104,7 +104,7 @@ const Search = () => {
         {results.length > 0 && (
           <div className="mt-16 text-white">
             <h3 className="text-xl font-semibold mb-4 text-center">Results</h3>
-            <ul className="space-y-3">
+            <ul className="md:space--2 space-y-1">  
               {results.map((user) => (
                 <li
                   key={user._id}
@@ -133,9 +133,8 @@ const Search = () => {
                       </div>
                     )}
                     <div className="truncate">
-                      <h4 className="font-bold text-lg">{user.username}</h4>
+                      <h4 className="text-green-500 font-bold text-lg">{user.username}</h4>
                       <p className="text-sm text-gray-400">{user.name}</p>
-                      <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                   </Link>
                 </li>
