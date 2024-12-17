@@ -32,15 +32,13 @@ function Friends() {
         .finally(() => {
           setLoading(false); // Set loading to false once the fetch is complete
         });
-    }
-    else
-    {
+    } else {
       setLoading(false);
     }
   }, [user]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-800 py-10 px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black py-10 px-4">
       <h2 className="text-3xl font-semibold text-white mb-6">Your Friends</h2>
 
       {/* Error Handling */}
@@ -72,34 +70,33 @@ function Friends() {
         </div>
       ) : (
         // Friend List
-        <div className="w-full max-w-xl bg-gray-900 p-6 rounded-lg shadow-lg">
+        <div className="w-full max-w-xl bg-gray-900 md:p-6 p-3 rounded-lg shadow-lg">
           {friends.length > 0 ? (
             <ul className="space-y-4">
-              {friends.map((friend,index) => (
+              {friends.map((friend, index) => (
                 <Link to={`/users/${friend.username}`} className="">
-                <li
-                  key={index}
-                  className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
-                >
-                  <div className="w-12 h-12">
-                    {/* Profile Picture */}
-                    <img
-                      src={
-                        friend.profilePicture ||
-                        "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
-                      }
-                      alt={friend.username}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-white font-semibold">
-                      {friend.username}
-                    </p>
-                    <p className="text-sm text-gray-400">{friend.name}</p>
-                    <p className="text-sm text-gray-500">{friend.email}</p>
-                  </div>
-                </li>
+                  <li
+                    key={index}
+                    className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
+                  >
+                    <div className="w-12 h-12">
+                      {/* Profile Picture */}
+                      <img
+                        src={
+                          friend.profilePicture ||
+                          "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        }
+                        alt={friend.username}
+                        className="w-full h-full rounded-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-white font-semibold">{friend.name}</p>
+                      <p className="text-sm text-green-400">
+                        {"@" + friend.username}
+                      </p>
+                    </div>
+                  </li>
                 </Link>
               ))}
             </ul>

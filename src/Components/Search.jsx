@@ -105,7 +105,7 @@ const Search = () => {
         {results.length > 0 && (
           <div className="md:mt-16 mt-8 text-white">
             <h3 className="text-xl font-semibold mb-4 text-center">Results</h3>
-            <ul className="md:space--2 space-y-1">  
+            <ul className="md:space--2 space-y-1">
               {results.map((user) => (
                 <li
                   key={user._id}
@@ -115,26 +115,25 @@ const Search = () => {
                     to={`/users/${user.username}`}
                     className="flex items-center space-x-4 w-full"
                   >
-                    {user.profilePicture ? (
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500">
-                        <img
-                          src={user.profilePicture}
-                          alt={`${user.username}'s profile`}
-                          className="w-full h-full object-cover"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: "50%",
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 text-2xl border-2 border-gray-500">
-                        {user.username[0].toUpperCase()}
-                      </div>
-                    )}
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500">
+                      <img
+                        src={
+                          user.profilePicture ||
+                          "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        }
+                        alt={`${user.username}'s profile`}
+                        className="w-full h-full object-cover"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          borderRadius: "50%",
+                        }}
+                      />
+                    </div>
                     <div className="truncate">
-                      <h4 className="text-green-500 font-bold text-lg">{user.username}</h4>
+                      <h4 className="text-green-500 font-bold text-lg">
+                        {user.username}
+                      </h4>
                       <p className="text-sm text-gray-400">{user.name}</p>
                     </div>
                   </Link>

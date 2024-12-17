@@ -20,6 +20,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    document.activeElement.blur();
     setErrorMessage("");
     setLoading(true); // Set loading state to true when form is submitted
 

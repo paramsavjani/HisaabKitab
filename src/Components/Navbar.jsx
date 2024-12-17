@@ -249,7 +249,8 @@ function Navbar() {
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700">
                   <img
                     src={
-                      user.profilePicture || "https://via.placeholder.com/50"
+                      user.profilePicture ||
+                      "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
                     }
                     alt="User Profile"
                     className="w-full h-full object-cover"

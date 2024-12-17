@@ -135,7 +135,7 @@ const User = () => {
   // Loading UI
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white space-y-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white space-y-6">
         <div className="flex items-center space-x-4">
           <FaSpinner className="animate-spin text-6xl text-green-500" />
           <p className="text-2xl font-semibold tracking-wide animate-pulse">
@@ -156,18 +156,14 @@ const User = () => {
       <div className="min-h-screen bg-black text-white flex items-center justify-center py-8">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl space-y-6">
           <div className="flex items-center space-x-6">
-            {/* Profile Picture */}
-            {profile.profilePicture ? (
-              <img
-                src={profile.profilePicture}
-                alt={profile.username}
-                className="w-32 h-32 rounded-full object-cover border-4 border-green-500 flex-shrink-0"
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-gray-600 flex items-center justify-center text-4xl font-bold text-white flex-shrink-0">
-                {profile.username[0]?.toUpperCase()}
-              </div>
-            )}
+            <img
+              src={
+                profile.profilePicture ||
+                "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+              }
+              alt={profile.username}
+              className="w-32 h-32 rounded-full object-cover border-4 border-black-500 flex-shrink-0"
+            />
 
             {/* User Details */}
             <div className="flex-1 overflow-hidden">

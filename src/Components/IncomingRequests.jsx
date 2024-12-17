@@ -85,17 +85,14 @@ function IncomingRequests() {
               >
                 <Link to={`/users/${request.username}`}>
                   <div className="flex items-center space-x-4">
-                    {request.profilePicture ? (
-                      <img
-                        src={request.profilePicture}
-                        alt={`${request.username}'s profile`}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-green-500"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 text-2xl border-2 border-gray-500">
-                        {request.username[0].toUpperCase()}
-                      </div>
-                    )}
+                    <img
+                      src={
+                        request.profilePicture ||
+                        "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                      }
+                      alt={`${request.username}'s profile`}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-green-500"
+                    />
                     <span className="text-lg font-semibold text-white">
                       {request.name}
                     </span>

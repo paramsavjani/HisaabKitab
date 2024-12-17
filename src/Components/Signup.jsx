@@ -83,6 +83,7 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    document.activeElement.blur();
     setGeneralError(null);
     setIsLoading(true);
 
