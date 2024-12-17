@@ -28,7 +28,7 @@ const router = createBrowserRouter(
       <Route path="features" element={<FeaturesSection />} />
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
-      <Route path="about" element={<AboutUs />} />
+      <Route path="about-us" element={<AboutUs />} />
       <Route path="friends" element={<Friends />} />
       <Route path="search" element={<Search />} />
       <Route path="*" element={<NotFound />} />

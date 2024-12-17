@@ -1,16 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 function AboutUs() {
-  return (
-    <div className="min-h-screen bg-gray-900 text-cyan-50 p-6 flex flex-col items-center justify-center pt-20">
-      <div className="max-w-6xl mx-auto">
-        {/* Title Section */}
-        <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-green-600 mb-10 text-center animate-pulse">
-          About Me
-        </h1>
+  useEffect(() => {
+    AOS.init({ duration: 1500, easing: "ease-in-out", once: true });
+  }, []);
 
-        {/* Introduction and Image Section */}
-        <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-between mb-16 gap-10">
+  return (
+    <div className="min-h-screen bg-black text-white p-6 flex flex-col items-center pt-20">
+      <div className="max-w-7xl mx-auto w-full">
+        {/* Hero Section */}
+        <div className="text-center mb-16" data-aos="fade-up">
+          <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-blue-500 to-green-600 animate-text">
+            About Me
+          </h1>
+          <p className="mt-4 text-lg text-gray-400">
+            Welcome to my world, where technology and creativity meet to
+            simplify finance management.
+          </p>
+        </div>
+
+        {/* Profile Section */}
+        <div
+          className="flex flex-col lg:flex-row items-center justify-between gap-10 mb-16"
+          data-aos="fade-right"
+        >
           <div className="flex-1 text-center lg:text-left">
             <p className="text-xl font-medium text-gray-300 mb-6 leading-relaxed">
               Hi! I'm Param Savjani, a passionate solo developer on a mission to
@@ -19,50 +34,90 @@ function AboutUs() {
               personal finances and group expenses.
             </p>
             <p className="text-lg text-gray-400 leading-relaxed">
-              This platform is the result of my commitment to bringing
-              simplicity and fun to financial tracking. Whether you're managing
-              your own finances or sharing expenses with friends, I aim to
-              provide a seamless, easy-to-use solution.
+              With every line of code, I strive to make your financial life
+              simpler, more organized, and stress-free.
             </p>
           </div>
-          <div className="justify-center">
+          <div
+            className="relative w-80 h-80 rounded-full overflow-hidden  border-4 border-green-500"
+            data-aos="zoom-in"
+          >
             <img
               src="./param.jpg"
               alt="Param Savjani"
-              className="w-72 h-72 border-4 border-green-500 mb-6 mx-auto lg:mx-0"
-              style={{ borderRadius: "10%" }}
+              className="w-full h-full object-cover"
             />
+            <div className="absolute inset-0 w-full h-full blur-2xl"></div>
           </div>
         </div>
 
         {/* My Story Section */}
-        <div className="bg-gray-800 rounded-lg p-8 shadow-xl mb-16">
-          <h2 className="text-4xl font-semibold text-green-500 mb-6 text-center">
+        <div
+          className="bg-gray-900 rounded-lg shadow-xl p-8 mb-16 border border-gray-700"
+          data-aos="fade-left"
+        >
+          <h2 className="text-4xl font-bold text-green-400 text-center mb-6">
             My Story
           </h2>
           <p className="text-lg text-gray-400 leading-relaxed">
-            My journey began with a realization: managing personal and group
-            finances could be so much easier. There were no simple, all-in-one
-            solutions that truly combined both aspects of financial tracking.
-            So, I took it upon myself to build one.
+            It all started with an idea—an idea to make personal and group
+            finances easier to manage. Frustrated by the lack of simple
+            solutions, I took the challenge into my own hands and built a
+            platform that blends simplicity with functionality.
           </p>
           <p className="text-lg text-gray-400 leading-relaxed mt-4">
-            From the idea to its development, every part of this platform has
-            been carefully designed and built by me. It’s my way of solving a
-            problem that many people face—making money management
-            straightforward and enjoyable.
+            Every feature of this app reflects my vision of seamless financial
+            management. With your support, I continue to enhance and evolve
+            CashTrack for a better tomorrow.
           </p>
         </div>
 
-        {/* Call to Action Section */}
-        <div className="mt-10 text-center">
-          <p className="text-lg font-semibold text-gray-400 mb-6 leading-relaxed">
-            I’m constantly working on new features and improvements. Stay tuned
-            for future updates and releases!
+        {/* Features or Call to Action */}
+        <div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          data-aos="fade-up"
+        >
+          {/* Feature 1 */}
+          <div className="p-6 bg-gray-800 rounded-lg shadow-lg text-center hover:scale-105 transition-transform duration-300">
+            <h3 className="text-2xl font-semibold text-green-400 mb-4">
+              Intuitive Design
+            </h3>
+            <p className="text-gray-300">
+              Enjoy a clean, user-friendly interface designed to simplify your
+              financial journey.
+            </p>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="p-6 bg-gray-800 rounded-lg shadow-lg text-center hover:scale-105 transition-transform duration-300">
+            <h3 className="text-2xl font-semibold text-green-400 mb-4">
+              Seamless Integration
+            </h3>
+            <p className="text-gray-300">
+              Effortlessly manage both personal and group finances in one place.
+            </p>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="p-6 bg-gray-800 rounded-lg shadow-lg text-center hover:scale-105 transition-transform duration-300">
+            <h3 className="text-2xl font-semibold text-green-400 mb-4">
+              Constant Innovation
+            </h3>
+            <p className="text-gray-300">
+              I’m always working to improve and add new features to make your
+              experience better.
+            </p>
+          </div>
+        </div>
+
+        {/* Contact Section */}
+        <div className="text-center mt-16" data-aos="fade-up">
+          <p className="text-lg font-medium text-gray-400 mb-6">
+            Have questions or feedback? Feel free to reach out!
           </p>
           <a
             href="/contact"
-            className="px-8 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white text-lg font-semibold rounded-lg shadow-xl transform transition duration-300 hover:scale-105 hover:from-green-600 hover:to-green-700"
+            className="px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white text-lg font-semibold rounded-lg shadow-xl transform transition duration-300 hover:scale-110 hover:from-green-600 hover:to-blue-700"
           >
             Contact Me
           </a>
