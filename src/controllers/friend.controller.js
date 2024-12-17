@@ -22,11 +22,11 @@ const getAllFriends = asyncHandler(async (req, res) => {
     friendsId.map(async (friend) => {
       if (friend.userId.toString() === user._id.toString()) {
         return await User.findById(friend.friendId).select(
-          "username email profilePicture"
+          "username email profilePicture name"
         );
       }
       return await User.findById(friend.userId).select(
-        "username email profilePicture"
+        "username email profilePicture name"
       );
     })
   );
