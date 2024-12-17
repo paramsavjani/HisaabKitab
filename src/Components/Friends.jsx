@@ -1,12 +1,18 @@
 import React, { useEffect, useState, useContext } from "react";
 import UserContext from "../context/UserContext";
 import { Link } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css"; // AOS styles
 
 function Friends() {
   const { user } = useContext(UserContext);
   const [friends, setFriends] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 }); // Initialize AOS with a default animation duration
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -39,24 +45,33 @@ function Friends() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black py-10 px-4">
-      <h2 className="text-3xl font-semibold text-white mb-6">Your Friends</h2>
+      <h2 className="text-3xl font-semibold text-white mb-6" data-aos="fade-up">
+        Your Friends
+      </h2>
 
       {/* Error Handling */}
       {error && (
-        <div className="bg-red-500 text-white p-4 rounded-md mb-6 max-w-xl w-full">
+        <div
+          className="bg-red-500 text-white p-4 rounded-md mb-6 max-w-xl w-full"
+          data-aos="fade-up"
+        >
           <strong>Error:</strong> {error}
         </div>
       )}
 
       {/* Skeleton Loader */}
       {loading ? (
-        <div className="w-full max-w-xl bg-gray-900 p-6 rounded-lg shadow-lg">
-          {/* Skeleton for the friend list */}
+        <div
+          className="w-full max-w-xl bg-gray-900 p-6 rounded-lg shadow-lg"
+          data-aos="fade-up"
+        >
           <div className="space-y-4">
             {Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
                 className="flex items-center space-x-4 animate-pulse"
+                data-aos="fade-right"
+                data-aos-delay={index * 100} // Staggered animations
               >
                 <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
                 <div className="flex-1">
@@ -70,14 +85,18 @@ function Friends() {
         </div>
       ) : (
         // Friend List
-        <div className="w-full max-w-xl bg-gray-900 md:p-6 p-3 rounded-lg shadow-lg">
+        <div
+          className="w-full max-w-xl bg-gray-900 md:p-6 p-3 rounded-lg shadow-lg"
+          data-aos="fade-up"
+        >
           {friends.length > 0 ? (
             <ul className="space-y-4">
               {friends.map((friend, index) => (
-                <Link to={`/users/${friend.username}`} className="">
+                <Link to={`/users/${friend.username}`} className="" key={index}>
                   <li
-                    key={index}
                     className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
+                    data-aos="zoom-in"
+                    data-aos-delay={index * 100} // Staggered animations for each friend
                   >
                     <div className="w-12 h-12">
                       {/* Profile Picture */}
@@ -88,6 +107,7 @@ function Friends() {
                         }
                         alt={friend.username}
                         className="w-full h-full rounded-full object-cover"
+                        data-aos="flip-left"
                       />
                     </div>
                     <div className="flex-1">
@@ -101,7 +121,11 @@ function Friends() {
               ))}
             </ul>
           ) : (
-            <p className="text-gray-400 text-center">
+            <p
+              className="text-gray-400 text-center"
+              data-aos="fade-up"
+              data-aos-duration="1200"
+            >
               You have no friends yet.
             </p>
           )}
