@@ -153,7 +153,7 @@ const User = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center py-8">
+      <div className="min-h-screen bg-black text-white flex items-center justify-center py-8">
         <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-xl space-y-6">
           <div className="flex items-center space-x-6">
             {/* Profile Picture */}

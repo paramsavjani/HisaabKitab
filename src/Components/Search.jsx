@@ -55,8 +55,8 @@ const Search = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-3xl">
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="md:bg-gray-800 bg-black p-8 md:m-10 m-5 rounded-lg shadow-2xl w-full max-w-3xl">
         <h2 className="text-2xl font-bold text-white text-center mb-6">
           Search User
         </h2>
@@ -73,7 +73,7 @@ const Search = () => {
               id="query"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="mt-1 block w-full px-4 py-2 bg-gray-700 text-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+              className="mt-1 block w-full px-4 py-2 md:bg-gray-700 bg-slate-800 text-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
               placeholder="Enter username to search"
               autoComplete="off"
             />
@@ -88,7 +88,7 @@ const Search = () => {
 
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition-all duration-200 flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-blue-500 to-green-500 text-white py-2 rounded-lg hover:bg-gradient-to-r hover:from-blue-600 hover:to-green-600 transition-all duration-200 flex items-center justify-center"
             disabled={loading}
           >
             {loading ? (
@@ -108,26 +108,34 @@ const Search = () => {
               {results.map((user) => (
                 <li
                   key={user._id}
-                  className="bg-gray-700 hover:bg-gray-600 px-4 py-3 rounded-lg flex items-center space-x-4 shadow-lg transform transition duration-300"
+                  className="md:bg-gray-700 bg-slate-800 hover:bg-gray-700 px-4 py-3 rounded-lg flex items-center space-x-4 shadow-lg transition-all duration-300 transform hover:scale-105"
                 >
                   <Link
                     to={`/users/${user.username}`}
-                    className="flex items-center space-x-4"
+                    className="flex items-center space-x-4 w-full"
                   >
                     {user.profilePicture ? (
-                      <img
-                        src={user.profilePicture}
-                        alt={`${user.username}'s profile`}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-green-500"
-                      />
+                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-500">
+                        <img
+                          src={user.profilePicture}
+                          alt={`${user.username}'s profile`}
+                          className="w-full h-full object-cover"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "50%",
+                          }}
+                        />
+                      </div>
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-gray-300 text-2xl border-2 border-gray-500">
                         {user.username[0].toUpperCase()}
                       </div>
                     )}
-                    <div>
+                    <div className="truncate">
                       <h4 className="font-bold text-lg">{user.username}</h4>
-                      <p className="text-sm text-gray-400">{user.email}</p>
+                      <p className="text-sm text-gray-400">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
                   </Link>
                 </li>

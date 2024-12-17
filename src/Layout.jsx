@@ -41,7 +41,7 @@ const Layout = () => {
       <div className="flex-1 md:ml-80 w-full h-full">
         <Outlet />
         
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );
