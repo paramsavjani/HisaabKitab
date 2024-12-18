@@ -240,6 +240,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Fetch active friend relationships
     const activeFriends = await Friend.find(
       {
         $or: [{ userId }, { friendId: userId }],
@@ -252,7 +253,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       return res.status(200).json({ friends: [] });
     }
 
-    // Extract unique friend IDs and map their lastTransactionTime
+    // Map friend IDs and lastTransactionTime
     const friendMap = {};
     activeFriends.forEach((connection) => {
       const friendId =
@@ -265,7 +266,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
 
     const friendIds = Object.keys(friendMap);
 
-    // Fetch user details in a single query
+    // Fetch user details
     const friends = await User.find(
       { _id: { $in: friendIds } },
       {
@@ -275,13 +276,47 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       }
     ).lean();
 
+    // Aggregate transaction amounts for each friend
+    const transactionCounts = await Transaction.find(
+      {
+        $or: [
+          { sender: userId, receiver: { $in: friendIds } },
+          { receiver: userId, sender: { $in: friendIds } },
+        ],
+        status: "completed", // Only completed transactions
+      },
+      {
+        sender: 1,
+        amount: 1,
+        receiver: 1,
+        status: 1,
+      }
+    ).lean();
+
+    const transactionMap = {};
+    transactionCounts.forEach((transaction) => {
+      if (transaction.sender.toString() === userId.toString()) {
+        transactionMap[transaction.receiver.toString()] =
+          (transactionMap[transaction.receiver.toString()] || 0) +
+          transaction.amount;
+      } else {
+        transactionMap[transaction.sender.toString()] =
+          (transactionMap[transaction.sender.toString()] || 0) +
+          transaction.amount;
+      }
+    });
+
     // Construct the final result
-    const result = friends.map((friend) => ({
-      username: friend.username,
-      name: friend.name,
-      profilePicture: friend.profilePicture,
-      lastTransactionTime: friendMap[friend._id.toString()],
-    }));
+    const result = friends.map((friend) => {
+      const totalAmount = transactionMap[friend._id.toString()] || 0; // Default to 0 if no transactions
+      return {
+        username: friend.username,
+        name: friend.name,
+        profilePicture: friend.profilePicture,
+        lastTransactionTime: friendMap[friend._id.toString()],
+        totalAmount: totalAmount, // Add total transaction amount
+      };
+    });
 
     return res.status(200).json({ friends: result });
   } catch (error) {
