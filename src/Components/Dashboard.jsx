@@ -79,14 +79,14 @@ const Dashboard = () => {
         >
           {/* Left Side - Total Owe */}
           <div
-            className="flex-1 text-center py-3 px-4 transform transition-all duration-300"
+            className="flex-1 text-center py-2 px-3 transform transition-all duration-300"
             style={{
               borderRight: "1px solid rgba(255, 255, 255, 0.1)", // Separator
               boxShadow: "inset 0px 0 15px -5px rgba(255, 69, 69, 0.5)", // Red glow on left side
             }}
           >
             <p
-              className="text-lg font-semibold"
+              className="text-base font-semibold"
               style={{
                 background: "linear-gradient(to right, #FF7A7A, #FF4B4B)",
                 WebkitBackgroundClip: "text",
@@ -95,20 +95,20 @@ const Dashboard = () => {
             >
               Total Owe
             </p>
-            <p className="text-2xl font-bold text-red-400 ">
+            <p className="text-xl font-bold text-red-400 ">
               ₹{Math.abs(totalGive)}
             </p>
           </div>
 
           {/* Right Side - Total Receive */}
           <div
-            className="flex-1 text-center py-3 px-4 transform transition-all duration-300"
+            className="flex-1 text-center py-2 px-3 transform transition-all duration-300"
             style={{
               boxShadow: "inset 0px 0 15px -5px rgba(69, 255, 144, 0.5)", // Green glow on right side
             }}
           >
             <p
-              className="text-lg font-semibold"
+              className="text-base font-semibold"
               style={{
                 background: "linear-gradient(to right, #77FFD9, #45FF8F)",
                 WebkitBackgroundClip: "text",
@@ -117,7 +117,7 @@ const Dashboard = () => {
             >
               Total Receive
             </p>
-            <p className="text-2xl font-bold text-green-400 ">₹{totalTake}</p>
+            <p className="text-xl font-bold text-green-400 ">₹{totalTake}</p>
           </div>
         </div>
       </div>
