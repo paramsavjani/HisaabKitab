@@ -13,6 +13,7 @@ import UserContextProvider from "./context/UserContextProvider";
 import Search from "./Components/Search";
 import User from "./Components/User";
 import IncomingRequests from "./Components/IncomingRequests";
+import Transactions from "./Components/Transactions";
 
 import {
   createBrowserRouter,
@@ -34,6 +35,7 @@ const router = createBrowserRouter(
       <Route path="*" element={<NotFound />} />
       <Route path="incoming-requests" element={<IncomingRequests />} />
       <Route path="users/:id" element={<User />} />
+      <Route path="transactions/:chatId" element={<Transactions />} />
     </Route>
   )
 );

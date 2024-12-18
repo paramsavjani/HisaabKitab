@@ -62,7 +62,7 @@ function Navbar() {
       const distanceY = Math.abs(endY - startY.current);
 
       // Detect swipe gesture for opening the menu
-      if (distanceY <= 30 && distanceX > 40) {
+      if (distanceY <= 25 && distanceX > 40) {
         setMenuOpen(true);
       }
     };
@@ -97,7 +97,7 @@ function Navbar() {
       const distanceY = Math.abs(closeY.current - endY);
 
       // Detect swipe gesture for closing the menu
-      if (distanceY <= 30 && distanceX > 40) {
+      if (distanceY <= 25 && distanceX > 40) {
         setMenuOpen(false);
       }
     };

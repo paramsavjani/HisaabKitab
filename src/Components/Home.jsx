@@ -5,7 +5,7 @@ import "aos/dist/aos.css";
 
 function Home() {
   useEffect(() => {
-    AOS.init({ duration: 1200, easing: "ease-in-out" });
+    AOS.init({ duration: 700, easing: "ease-in-out" });
   }, []);
 
   return (
@@ -34,7 +34,6 @@ function Home() {
           >
             Get Started
           </Link>
-         
         </div>
       </section>
 
