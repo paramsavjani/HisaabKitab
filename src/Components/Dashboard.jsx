@@ -10,7 +10,7 @@ const UserList = ({ friends }) => {
   return (
     <div className="p-4 bg-gray-900 min-h-screen text-white">
       {/* Header Section */}
-      <div className="py-4 text-center mb-2 pt-1">
+      <div className="pb-2 text-center mb-2 pt-1">
         <h1
           className="text-3xl font-bold pl-7"
           style={{
@@ -23,7 +23,7 @@ const UserList = ({ friends }) => {
         </h1>
       </div>
 
-      <div className="md:hidden p-4">
+      <div className="md:hidden p-4 px-0">
         {/* Combined Summary Section */}
         <div
           className="flex items-center justify-center rounded-lg shadow-lg overflow-hidden"
@@ -34,7 +34,7 @@ const UserList = ({ friends }) => {
         >
           {/* Left Side - Total Owe */}
           <div
-            className="flex-1 text-center py-4 px-4 transform transition-all duration-300"
+            className="flex-1 text-center py-3 px-4 transform transition-all duration-300"
             style={{
               borderRight: "1px solid rgba(255, 255, 255, 0.1)", // Separator
               boxShadow: "inset 0px 0 15px -5px rgba(255, 69, 69, 0.5)", // Red glow on left side
@@ -50,12 +50,12 @@ const UserList = ({ friends }) => {
             >
               Total Owe
             </p>
-            <p className="text-2xl font-bold text-red-400 mt-1">₹1500</p>
+            <p className="text-2xl font-bold text-red-400 ">₹1500</p>
           </div>
 
           {/* Right Side - Total Receive */}
           <div
-            className="flex-1 text-center py-4 px-4 transform transition-all duration-300"
+            className="flex-1 text-center py-3 px-4 transform transition-all duration-300"
             style={{
               boxShadow: "inset 0px 0 15px -5px rgba(69, 255, 144, 0.5)", // Green glow on right side
             }}
@@ -70,7 +70,7 @@ const UserList = ({ friends }) => {
             >
               Total Receive
             </p>
-            <p className="text-2xl font-bold text-green-400 mt-1">₹2500</p>
+            <p className="text-2xl font-bold text-green-400 ">₹2500</p>
           </div>
         </div>
       </div>
