@@ -21,6 +21,7 @@ import {
   Route,
   RouterProvider,
 } from "react-router-dom";
+import Dashboard from "./Components/Dashboard";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
       <Route path="incoming-requests" element={<IncomingRequests />} />
       <Route path="users/:id" element={<User />} />
       <Route path="transactions/:chatId" element={<Transactions />} />
+      <Route path="dashboard" element={<Dashboard />} />
     </Route>
   )
 );

@@ -132,7 +132,8 @@ const Signup = () => {
       }
 
       setUser(data.data.user);
-      window.location.href = "/friends";
+      window.history.pushState({}, "", "/friends");
+      window.dispatchEvent(new PopStateEvent("popstate"));
     } catch (error) {
       setGeneralError("Failed to register. Please try again.");
       console.error(error);

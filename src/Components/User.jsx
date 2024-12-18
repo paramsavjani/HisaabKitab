@@ -22,6 +22,7 @@ const User = () => {
 
   // Fetch user profile
   useEffect(() => {
+    setLoading(true);
     const fetchUser = async () => {
       try {
         const response = await fetch(
@@ -41,7 +42,10 @@ const User = () => {
 
   // Fetch friend status
   useEffect(() => {
-    if (!profile) return;
+    if (!profile) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const fetchFriendStatus = async () => {
       try {
@@ -58,7 +62,6 @@ const User = () => {
         }
       } catch (error) {
         console.log("Not friends yet");
-      } finally {
       }
     };
     const fetchRequestStatus = async () => {

@@ -54,7 +54,8 @@ const Login = () => {
         setLoading(false); // Reset loading state after response
       } else {
         setUser(data.data.user);
-        window.location.href = "/friends";
+        window.history.pushState({}, "", "/dashboard");
+        window.dispatchEvent(new PopStateEvent("popstate"));
       }
     } catch (e) {
       console.error("Network or server error", e);
