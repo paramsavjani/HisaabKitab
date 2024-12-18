@@ -106,7 +106,7 @@ const UserList = ({ friends }) => {
 
                 {/* User Info */}
                 <div className="flex-1">
-                  <p className="text-xl font-semibold">{friend.name}</p>
+                  <p className="text-base font-semibold">{friend.name}</p>
                   <p className="text-sm text-gray-400">
                     {"@" + friend.username}
                   </p>
@@ -114,7 +114,7 @@ const UserList = ({ friends }) => {
 
                 {/* Balance */}
                 <div
-                  className={`text-xl font-bold ${
+                  className={`text-base font-bold ${
                     friend.balance < 0 ? "text-red-400" : "text-green-400"
                   }`}
                 >
