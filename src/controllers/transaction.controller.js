@@ -293,8 +293,8 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       }
     ).lean();
 
-    const totalTake = 0;
-    const totalGive = 0;
+    let totalTake = 0;
+    let totalGive = 0;
 
     const transactionMap = {};
     transactionCounts.forEach((transaction) => {
@@ -302,22 +302,20 @@ const getActiveFriends = asyncHandler(async (req, res) => {
         transactionMap[transaction.receiver.toString()] =
           (transactionMap[transaction.receiver.toString()] || 0) +
           transaction.amount;
-
-        if (transaction.amount > 0) {
-          totalTake += transaction.amount;
-        } else {
-          totalGive += transaction.amount;
-        }
       } else {
         transactionMap[transaction.sender.toString()] =
           (transactionMap[transaction.sender.toString()] || 0) +
           transaction.amount;
+      }
+    });
 
-        if (transaction.amount > 0) {
-          totalGive += transaction.amount;
-        } else {
-          totalTake += transaction.amount;
-        }
+    // Calculate totalTake and totalGive
+    friendIds.forEach((friendId) => {
+      const amount = transactionMap[friendId] || 0;
+      if (amount > 0) {
+        totalTake += amount;
+      } else {
+        totalGive += amount;
       }
     });
 
