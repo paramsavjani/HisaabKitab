@@ -41,26 +41,27 @@ function Navbar() {
     }
   }, [user]);
 
-  // Handle swipe gesture for opening the navbar
   useEffect(() => {
     const handleTouchStart = (e) => {
-      startX.current = e.touches[0].clientX;
-      startY.current = e.touches[0].clientY;
+      // Ignore gestures with multiple fingers
       if (e.touches.length > 1) {
         return;
       }
-      console.log(e.touches);
+      startX.current = e.touches[0].clientX;
+      startY.current = e.touches[0].clientY;
     };
 
     const handleTouchEnd = (e) => {
-      const endX = e.changedTouches[0].clientX; // Capture the touch end point
-      const endY = e.changedTouches[0].clientY;
-      const distanceX = endX - startX.current;
-      const distanceY = Math.abs(endY - startY.current);
+      // Ignore gestures with multiple fingers
       if (e.changedTouches.length > 1) {
         return;
       }
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const distanceX = endX - startX.current;
+      const distanceY = Math.abs(endY - startY.current);
 
+      // Detect swipe gesture for opening the menu
       if (distanceY <= 30 && distanceX > 40) {
         setMenuOpen(true);
       }
@@ -77,30 +78,34 @@ function Navbar() {
 
   useEffect(() => {
     const handleTouchStart = (e) => {
-      closeX.current = e.touches[0].clientX; // Capture the initial touch point
+      // Ignore gestures with multiple fingers
+      if (e.touches.length > 1) {
+        return;
+      }
+      closeX.current = e.touches[0].clientX;
       closeY.current = e.touches[0].clientY;
     };
 
     const handleTouchEnd = (e) => {
-      const endX = e.changedTouches[0].clientX; // Capture the touch end point
-      const endY = e.changedTouches[0].clientY;
-      const distanceX = closeX.current - endX;
-      const distanceY = closeY.current - endY;
+      // Ignore gestures with multiple fingers
       if (e.changedTouches.length > 1) {
         return;
       }
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const distanceX = closeX.current - endX;
+      const distanceY = Math.abs(closeY.current - endY);
 
+      // Detect swipe gesture for closing the menu
       if (distanceY <= 30 && distanceX > 40) {
         setMenuOpen(false);
       }
     };
 
-    // Attach touch event listeners
     document.addEventListener("touchstart", handleTouchStart);
     document.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      // Cleanup touch event listeners
       document.removeEventListener("touchstart", handleTouchStart);
       document.removeEventListener("touchend", handleTouchEnd);
     };
