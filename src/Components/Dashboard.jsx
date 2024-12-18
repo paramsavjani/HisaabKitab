@@ -34,7 +34,7 @@ const UserList = ({ friends }) => {
         >
           {/* Left Side - Total Owe */}
           <div
-            className="flex-1 text-center py-6 px-4 transform transition-all duration-300"
+            className="flex-1 text-center py-4 px-4 transform transition-all duration-300"
             style={{
               borderRight: "1px solid rgba(255, 255, 255, 0.1)", // Separator
               boxShadow: "inset 0px 0 15px -5px rgba(255, 69, 69, 0.5)", // Red glow on left side
@@ -55,7 +55,7 @@ const UserList = ({ friends }) => {
 
           {/* Right Side - Total Receive */}
           <div
-            className="flex-1 text-center py-6 px-4 transform transition-all duration-300"
+            className="flex-1 text-center py-4 px-4 transform transition-all duration-300"
             style={{
               boxShadow: "inset 0px 0 15px -5px rgba(69, 255, 144, 0.5)", // Green glow on right side
             }}
