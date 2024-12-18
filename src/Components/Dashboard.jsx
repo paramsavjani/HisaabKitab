@@ -4,13 +4,51 @@ import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext";
 
-const UserList = ({ friends }) => {
+const Dashboard = () => {
+  const { user } = useContext(UserContext);
+  const [friends, setFriends] = React.useState([]);
+  const [totalGive, setTotalGive] = React.useState(0);
+  const [totalTake, setTotalTake] = React.useState(0);
+  // friend:{username,name,lastTransactionTime,profilePicture}
+
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
     document.title = "Dashboard";
-  }, []);
+    setTimeout(() => {
+      if (!user) {
+        window.history.pushState({}, "", "/login");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }
+    }, 3000);
+  }, [user]);
 
-  const { user } = useContext(UserContext);
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        if (!res.ok) {
+          throw new Error("Failed to fetch friends");
+        }
+        const data = await res.json();
+        console.log(data);
+        setFriends(data.friends);
+        setTotalGive(data.totalGive);
+        setTotalTake(data.totalTake);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchFriends();
+  }, [user]);
 
   return (
     <div className="p-4 md:bg-gray-950 bg-slate-900 min-h-screen text-white">
@@ -55,7 +93,9 @@ const UserList = ({ friends }) => {
             >
               Total Owe
             </p>
-            <p className="text-2xl font-bold text-red-400 ">₹1500</p>
+            <p className="text-2xl font-bold text-red-400 ">
+              ₹{Math.abs(totalGive)}
+            </p>
           </div>
 
           {/* Right Side - Total Receive */}
@@ -75,7 +115,7 @@ const UserList = ({ friends }) => {
             >
               Total Receive
             </p>
-            <p className="text-2xl font-bold text-green-400 ">₹2500</p>
+            <p className="text-2xl font-bold text-green-400 ">₹{totalTake}</p>
           </div>
         </div>
       </div>
@@ -85,7 +125,7 @@ const UserList = ({ friends }) => {
         <ul className="divide-y divide-gray-700">
           {friends.map((friend, index) => (
             <li
-              key={friend.id}
+              key={friend.username}
               data-aos="fade-up"
               data-aos-delay={index * 100} // Staggered animations
             >
@@ -116,10 +156,10 @@ const UserList = ({ friends }) => {
                 {/* Balance */}
                 <div
                   className={`text-base font-bold ${
-                    friend.balance < 0 ? "text-red-400" : "text-green-400"
+                    friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
                   }`}
                 >
-                  ₹{friend.balance}
+                  ₹{Math.abs(friend.totalAmount)}
                 </div>
               </Link>
             </li>
@@ -150,7 +190,9 @@ const UserList = ({ friends }) => {
             >
               Total Owe
             </p>
-            <p className="text-3xl font-bold text-red-400 mt-2">₹1500</p>
+            <p className="text-3xl font-bold text-red-400 mt-2">
+              ₹{Math.abs(totalGive)}
+            </p>
           </div>
 
           {/* Total Receive */}
@@ -172,7 +214,9 @@ const UserList = ({ friends }) => {
             >
               Total Receive
             </p>
-            <p className="text-3xl font-bold text-green-400 mt-2">₹2500</p>
+            <p className="text-3xl font-bold text-green-400 mt-2">
+              ₹{totalTake}
+            </p>
           </div>
         </div>
 
@@ -181,7 +225,7 @@ const UserList = ({ friends }) => {
         <ul className="space-y-3">
           {friends.map((friend, index) => (
             <li
-              key={friend.id}
+              key={friend.username}
               className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
               data-aos="fade-up"
               data-aos-delay={index * 100}
@@ -211,10 +255,10 @@ const UserList = ({ friends }) => {
                 {/* Balance */}
                 <div
                   className={`text-xl font-bold ${
-                    friend.balance < 0 ? "text-red-400" : "text-green-400"
+                    friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
                   }`}
                 >
-                  ₹{friend.balance}
+                  ₹{Math.abs(friend.totalAmount)}
                 </div>
               </Link>
             </li>
@@ -225,14 +269,4 @@ const UserList = ({ friends }) => {
   );
 };
 
-// Example Usage
-const friends = [
-  { id: 1, name: "Alice", username: "alice123", balance: -200 },
-  { id: 2, name: "Bob", username: "bobby456", balance: 500 },
-  { id: 3, name: "Charlie", username: "charlie789", balance: -300 },
-  { id: 4, name: "David", username: "david321", balance: 1000 },
-];
-
-export default function App() {
-  return <UserList friends={friends} />;
-}
+export default Dashboard;

@@ -34,7 +34,7 @@ const InputField = ({
 );
 
 const Signup = () => {
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -48,11 +48,16 @@ const Signup = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    if (user) {
+      window.history.pushState({}, "", "/dashboard");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+
     const checkMobile = () => setIsMobile(window.innerWidth <= 768);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
