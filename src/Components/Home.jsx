@@ -1,12 +1,22 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import UserContext from "../context/UserContext";
 
 function Home() {
   useEffect(() => {
     AOS.init({ duration: 700, easing: "ease-in-out" });
   }, []);
+
+  const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    if (user) {
+      window.history.pushState({}, "", "/dashboard");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-center px-6 py-20 font-poppins">

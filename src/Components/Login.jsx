@@ -1,16 +1,22 @@
-import React, { useState, useContext } from "react";
-import { FaExclamationTriangle } from "react-icons/fa"; // Error icon
+import React, { useState, useContext, useEffect } from "react";
+import { FaExclamationTriangle } from "react-icons/fa";
 import UserContext from "../context/UserContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
-  const [loading, setLoading] = useState(false); // State for loading spinner
-  const { setUser } = useContext(UserContext);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { user, setUser } = useContext(UserContext);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if the window is mobile width
+  useEffect(() => {
+    if (user) {
+      window.history.pushState({}, "", "/dashboard");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  }, [user]);
+
   const checkMobile = () => setIsMobile(window.innerWidth <= 768);
   React.useEffect(() => {
     checkMobile();
@@ -22,7 +28,7 @@ const Login = () => {
     e.preventDefault();
     document.activeElement.blur();
     setErrorMessage("");
-    setLoading(true); // Set loading state to true when form is submitted
+    setLoading(true);
 
     const userCredentials = { username, password };
 
@@ -44,14 +50,13 @@ const Login = () => {
       if (!response.ok) {
         const errorMessage = data.message || "An unknown error occurred.";
         setErrorMessage(errorMessage);
-        setLoading(false); // Reset loading state after response
+        setLoading(false);
         return;
       }
 
-      // Handle errors from backend validation
       if (data.statusCode >= 400) {
         setErrorMessage(data.message.message);
-        setLoading(false); // Reset loading state after response
+        setLoading(false);
       } else {
         setUser(data.data.user);
         window.history.pushState({}, "", "/dashboard");
@@ -60,7 +65,7 @@ const Login = () => {
     } catch (e) {
       console.error("Network or server error", e);
       setErrorMessage("Failed to connect to the server. Please try again.");
-      setLoading(false); // Reset loading state after error
+      setLoading(false);
     }
   };
 
@@ -68,15 +73,13 @@ const Login = () => {
     <div
       className={`min-h-screen flex items-center justify-center ${
         isMobile
-          ? "bg-gradient-to-b from-black to-gray-900" // Black background for mobile
-          : "bg-gradient-to-b from-black to-gray-900" // Gradient for desktop view
+          ? "bg-gradient-to-b from-black to-gray-900"
+          : "bg-gradient-to-b from-black to-gray-900"
       }`}
     >
       <div
         className={`${
-          isMobile
-            ? "bg-transparent" // Transparent background for mobile to blend into black background
-            : "bg-gray-800" // Dark background for desktop
+          isMobile ? "bg-transparent" : "bg-gray-800"
         } p-8 rounded-lg shadow-lg w-full max-w-md`}
       >
         <h2 className="text-2xl font-bold text-white text-center mb-6">
@@ -129,7 +132,7 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-2 rounded-lg hover:scale-105 hover:ring-2 hover:ring-green-500 transition-transform duration-300 shadow-lg"
-            disabled={loading} // Disable button while loading
+            disabled={loading}
           >
             {loading ? (
               <span className="flex items-center justify-center">

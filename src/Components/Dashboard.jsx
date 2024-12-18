@@ -7,6 +7,7 @@ import UserContext from "../context/UserContext";
 const UserList = ({ friends }) => {
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
+    document.title = "Dashboard";
   }, []);
 
   const { user } = useContext(UserContext);
