@@ -293,16 +293,31 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       }
     ).lean();
 
+    const totalTake = 0;
+    const totalGive = 0;
+
     const transactionMap = {};
     transactionCounts.forEach((transaction) => {
       if (transaction.sender.toString() === userId.toString()) {
         transactionMap[transaction.receiver.toString()] =
           (transactionMap[transaction.receiver.toString()] || 0) +
           transaction.amount;
+
+        if (transaction.amount > 0) {
+          totalTake += transaction.amount;
+        } else {
+          totalGive += transaction.amount;
+        }
       } else {
         transactionMap[transaction.sender.toString()] =
           (transactionMap[transaction.sender.toString()] || 0) +
           transaction.amount;
+
+        if (transaction.amount > 0) {
+          totalGive += transaction.amount;
+        } else {
+          totalTake += transaction.amount;
+        }
       }
     });
 
@@ -318,7 +333,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       };
     });
 
-    return res.status(200).json({ friends: result });
+    return res.status(200).json({ friends: result, totalTake, totalGive });
   } catch (error) {
     console.error("Error fetching active friends:", error);
     return res.status(500).json({ message: "Internal server error" });
