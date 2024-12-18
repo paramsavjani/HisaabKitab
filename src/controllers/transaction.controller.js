@@ -13,13 +13,15 @@ const addTransaction = asyncHandler(async (req, res) => {
   const friendUsername = req.params.username;
 
   if (friendUsername === user.username) {
-    throw new ApiError(400, "You cannot send a transaction to yourself");
+    return res.status(401).json({
+      message: "You cannot send a transaction to yourself",
+    });
   }
 
   const friend = await User.findOne({ username: friendUsername });
 
   if (!friend) {
-    throw new ApiError(404, "Friend not found");
+    return res.status(402).json({ message: "Friend not found" });
   }
 
   const friendship = await Friend.findOne({
@@ -30,18 +32,24 @@ const addTransaction = asyncHandler(async (req, res) => {
   });
 
   if (!friendship) {
-    throw new ApiError(400, "You are not friends with this user");
+    return res
+      .status(403)
+      .json({ message: "You are not friends with this user" });
   }
 
   const { amount } = req.body;
   const description = req.body?.description || "";
 
   if (!amount) {
-    throw new ApiError(400, "Amount is required");
+    return res.status(405).json({ message: "Amount is required" });
+  }
+
+  if (isNaN(amount)) {
+    return res.status(405).json({ message: "Amount should be a number" });
   }
   const roundedAmount = Math.round(amount * 100) / 100;
-  if (roundedAmount < 0.1 && roundedAmount > -0.1) {
-    throw new ApiError(400, "Amount should be greater than 0.1");
+  if (roundedAmount < 1 && roundedAmount > -1) {
+    return res.status(406).json({ message: "Amount should be greater than 1" });
   }
 
   const isAdded = await Transaction.create({
@@ -53,11 +61,14 @@ const addTransaction = asyncHandler(async (req, res) => {
   });
 
   if (!isAdded) {
-    throw new ApiError(500, "Transaction failed");
+    return res.status(500).json({ message: "Transaction failed" });
   }
 
-  const response = new ApiResponse(200, {}, "Transaction added successfully");
-  res.status(200).json(response);
+  friendship.lastTransactionTime = new Date();
+  friendship.isActive = true;
+  await friendship.save();
+
+  return res.status(200).json({ message: "Transaction added successfully" });
 });
 
 const showTransactions = asyncHandler(async (req, res) => {
