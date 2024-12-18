@@ -35,16 +35,16 @@ const Dashboard = () => {
           throw new Error("Failed to fetch friends");
         }
         const data = await res.json();
-        console.log(data);
         setFriends(data.friends);
         setTotalGive(data.totalGive);
         setTotalTake(data.totalTake);
       } catch (err) {
         console.error(err);
+      } finally {
+        if (user) setLoading(false);
       }
     };
     fetchFriends();
-    if (user) setLoading(false);
   }, [user]);
 
   // Loading UI
