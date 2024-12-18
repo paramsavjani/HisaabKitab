@@ -304,18 +304,18 @@ const getActiveFriends = asyncHandler(async (req, res) => {
           transaction.amount;
       } else {
         transactionMap[transaction.sender.toString()] =
-          (transactionMap[transaction.sender.toString()] || 0) +
+          (transactionMap[transaction.sender.toString()] || 0) -
           transaction.amount;
       }
     });
-
+    console.log(transactionCounts);
     // Calculate totalTake and totalGive
     friendIds.forEach((friendId) => {
       const amount = transactionMap[friendId] || 0;
       if (amount > 0) {
         totalTake += amount;
       } else {
-        totalGive += amount;
+        totalGive -= amount;
       }
     });
 
