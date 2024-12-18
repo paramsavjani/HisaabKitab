@@ -3,7 +3,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext";
-import { FaSpinner } from "react-icons/fa";
+import DashboardSkeleton from "./DashboardSkeleton";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -49,16 +49,7 @@ const Dashboard = () => {
 
   // Loading UI
   if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white space-y-6">
-        <div className="flex items-center space-x-4">
-          <FaSpinner className="animate-spin text-6xl text-green-500" />
-          <p className="text-2xl font-semibold tracking-wide animate-pulse">
-            Loading...
-          </p>
-        </div>
-      </div>
-    );
+    return <DashboardSkeleton />;
   }
 
   return (
