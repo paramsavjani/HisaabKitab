@@ -117,7 +117,7 @@ const UserList = ({ friends }) => {
       {/* Desktop View */}
       <div className="hidden md:block">
         {/* Summary Section */}
-        <div className="mb-6 flex flex-col items-center space-y-4 md:flex-row md:justify-around">
+        <div className="my-6 flex flex-col md:flex-row items-stretch justify-around space-y-4 md:space-y-0 md:space-x-6">
           {/* Total Owe */}
           <div
             className="p-6 rounded-lg shadow-lg w-full md:w-1/3 text-center transform transition-transform duration-300 "
