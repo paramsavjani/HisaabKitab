@@ -209,7 +209,7 @@ const UserList = ({ friends }) => {
 
                 {/* Balance */}
                 <div
-                  className={`text-lg font-bold ${
+                  className={`text-xl font-bold ${
                     friend.balance < 0 ? "text-red-400" : "text-green-400"
                   }`}
                 >
