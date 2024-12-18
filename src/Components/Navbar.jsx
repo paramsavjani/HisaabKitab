@@ -46,6 +46,10 @@ function Navbar() {
     const handleTouchStart = (e) => {
       startX.current = e.touches[0].clientX;
       startY.current = e.touches[0].clientY;
+      if (e.touches.length > 1) {
+        return;
+      }
+      console.log(e.touches);
     };
 
     const handleTouchEnd = (e) => {
@@ -53,6 +57,9 @@ function Navbar() {
       const endY = e.changedTouches[0].clientY;
       const distanceX = endX - startX.current;
       const distanceY = Math.abs(endY - startY.current);
+      if (e.changedTouches.length > 1) {
+        return;
+      }
 
       if (distanceY <= 30 && distanceX > 40) {
         setMenuOpen(true);
@@ -79,6 +86,9 @@ function Navbar() {
       const endY = e.changedTouches[0].clientY;
       const distanceX = closeX.current - endX;
       const distanceY = closeY.current - endY;
+      if (e.changedTouches.length > 1) {
+        return;
+      }
 
       if (distanceY <= 30 && distanceX > 40) {
         setMenuOpen(false);
