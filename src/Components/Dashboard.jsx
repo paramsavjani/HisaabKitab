@@ -3,22 +3,20 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext";
+import { FaSpinner } from "react-icons/fa";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
   const [friends, setFriends] = React.useState([]);
   const [totalGive, setTotalGive] = React.useState(0);
   const [totalTake, setTotalTake] = React.useState(0);
+  const [loading, setLoading] = React.useState(true);
   // friend:{username,name,lastTransactionTime,profilePicture}
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
     document.title = "Dashboard";
-    if (!user) {
-      window.history.pushState({}, "", "/login");
-      window.dispatchEvent(new PopStateEvent("popstate"));
-    }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -46,7 +44,22 @@ const Dashboard = () => {
       }
     };
     fetchFriends();
+    setLoading(false);
   }, [user]);
+
+  // Loading UI
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white space-y-6">
+        <div className="flex items-center space-x-4">
+          <FaSpinner className="animate-spin text-6xl text-green-500" />
+          <p className="text-2xl font-semibold tracking-wide animate-pulse">
+            Loading...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:bg-gray-950 bg-slate-900 min-h-screen text-white">
