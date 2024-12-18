@@ -14,12 +14,10 @@ const Dashboard = () => {
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
     document.title = "Dashboard";
-    setTimeout(() => {
-      if (!user) {
-        window.history.pushState({}, "", "/login");
-        window.dispatchEvent(new PopStateEvent("popstate"));
-      }
-    }, 3000);
+    if (!user) {
+      window.history.pushState({}, "", "/login");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
   }, [user]);
 
   useEffect(() => {
