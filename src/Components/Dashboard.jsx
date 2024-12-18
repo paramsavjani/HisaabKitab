@@ -44,7 +44,7 @@ const Dashboard = () => {
       }
     };
     fetchFriends();
-    setLoading(false);
+    if (user) setLoading(false);
   }, [user]);
 
   // Loading UI
