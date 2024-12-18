@@ -23,16 +23,55 @@ const UserList = ({ friends }) => {
         </h1>
       </div>
 
-      {/* Mobile Summary Section */}
-      <div className="md:hidden flex justify-around items-center px-4 py-3 mb-4 bg-gray-800 rounded-lg shadow-md">
-        <div className="text-center">
-          <p className="text-sm text-gray-400">You Will Give</p>
-          <p className="text-lg text-green-400 font-bold">₹0</p>
-        </div>
-        <div className="border-l-2 border-gray-600 h-6"></div>
-        <div className="text-center">
-          <p className="text-sm text-gray-400">You Will Get</p>
-          <p className="text-lg text-red-400 font-bold">₹910</p>
+      <div className="md:hidden p-4">
+        {/* Combined Summary Section */}
+        <div
+          className="flex items-center justify-center rounded-lg shadow-lg overflow-hidden"
+          style={{
+            backgroundColor: "rgba(30, 30, 30, 0.8)", // Dark background
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.4)", // Subtle card shadow
+          }}
+        >
+          {/* Left Side - Total Owe */}
+          <div
+            className="flex-1 text-center py-6 px-4 transform transition-all duration-300"
+            style={{
+              borderRight: "1px solid rgba(255, 255, 255, 0.1)", // Separator
+              boxShadow: "inset 0px 0 15px -5px rgba(255, 69, 69, 0.5)", // Red glow on left side
+            }}
+          >
+            <p
+              className="text-lg font-semibold"
+              style={{
+                background: "linear-gradient(to right, #FF7A7A, #FF4B4B)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Total Owe
+            </p>
+            <p className="text-2xl font-bold text-red-400 mt-1">₹1500</p>
+          </div>
+
+          {/* Right Side - Total Receive */}
+          <div
+            className="flex-1 text-center py-6 px-4 transform transition-all duration-300"
+            style={{
+              boxShadow: "inset 0px 0 15px -5px rgba(69, 255, 144, 0.5)", // Green glow on right side
+            }}
+          >
+            <p
+              className="text-lg font-semibold"
+              style={{
+                background: "linear-gradient(to right, #77FFD9, #45FF8F)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Total Receive
+            </p>
+            <p className="text-2xl font-bold text-green-400 mt-1">₹2500</p>
+          </div>
         </div>
       </div>
 
@@ -79,24 +118,57 @@ const UserList = ({ friends }) => {
       <div className="hidden md:block">
         {/* Summary Section */}
         <div className="mb-6 flex flex-col items-center space-y-4 md:flex-row md:justify-around">
-          <div className="bg-gray-800 p-4 rounded-lg shadow-md w-full md:w-1/3 text-center">
-            <p className="text-green-300 text-lg font-semibold">Total Owe</p>
-            <p className="text-2xl font-bold text-red-400">₹1500</p>
+          {/* Total Owe */}
+          <div
+            className="p-6 rounded-lg shadow-lg w-full md:w-1/3 text-center transform transition-transform duration-300 "
+            style={{
+              backgroundColor: "rgba(30, 30, 30, 0.6)", // Subtle dark background
+              border: "1px solid rgba(255, 69, 69, 0.5)", // Soft red border
+              boxShadow: "0px 0px 15px rgba(255, 69, 69, 0.2)", // Subtle glow effect
+            }}
+          >
+            <p
+              className="text-lg font-semibold"
+              style={{
+                background: "linear-gradient(to right, #FF7A7A, #FF4B4B)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              Total Owe
+            </p>
+            <p className="text-3xl font-bold text-red-400 mt-2">₹1500</p>
           </div>
-          <div className="bg-gray-800 p-4 rounded-lg shadow-md w-full md:w-1/3 text-center">
-            <p className="text-green-300 text-lg font-semibold">
+
+          {/* Total Receive */}
+          <div
+            className="p-6 rounded-lg shadow-lg w-full md:w-1/3 text-center transform transition-transform duration-300 "
+            style={{
+              backgroundColor: "rgba(30, 30, 30, 0.6)", // Subtle dark background
+              border: "1px solid rgba(69, 255, 144, 0.5)", // Soft green border
+              boxShadow: "0px 0px 15px rgba(69, 255, 144, 0.2)", // Subtle glow effect
+            }}
+          >
+            <p
+              className="text-lg font-semibold"
+              style={{
+                background: "linear-gradient(to right, #77FFD9, #45FF8F)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
               Total Receive
             </p>
-            <p className="text-2xl font-bold text-green-400">₹2500</p>
+            <p className="text-3xl font-bold text-green-400 mt-2">₹2500</p>
           </div>
         </div>
 
         {/* User List */}
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {friends.map((friend, index) => (
             <li
               key={friend.id}
-              className="flex items-center space-x-6 bg-gray-800 p-4 rounded-lg shadow-md hover:bg-gray-700 transform hover:scale-105 transition-all duration-300"
+              className="flex items-center space-x-4 bg-gray-800 p-4 pr-6 rounded-lg shadow-md hover:bg-gray-700 transform hover:scale-105 transition-all duration-300"
               data-aos="fade-up"
               data-aos-delay={index * 100}
             >
