@@ -215,7 +215,7 @@ function Navbar() {
                 `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
                   isActive
                     ? "bg-gray-700 text-white"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-green-500"
+                    : "text-gray-300 hover:bg-gray-800"
                 }`
               }
               onClick={() => setMenuOpen(false)}

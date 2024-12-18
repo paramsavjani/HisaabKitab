@@ -32,8 +32,7 @@ const User = () => {
           setProfile(data.user);
         }
       } catch (error) {
-      } finally {
-        setLoading(false);
+        console.log(error);
       }
     };
 
@@ -43,6 +42,7 @@ const User = () => {
   // Fetch friend status
   useEffect(() => {
     if (!profile) return;
+    setLoading(true);
     const fetchFriendStatus = async () => {
       try {
         const response = await fetch(
@@ -58,9 +58,27 @@ const User = () => {
         }
       } catch (error) {
         console.log("Not friends yet");
+      } finally {
+      }
+    };
+    const fetchRequestStatus = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/alreadyRequested`,
+          { method: "GET", credentials: "include" }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setRequestId(data.data.requestId);
+          setIsRequestSent(true);
+        }
+      } catch (error) {
+        toast.error("Error fetching request status!");
       }
     };
     fetchFriendStatus();
+    fetchRequestStatus();
+    setLoading(false);
   }, [profile, id]);
 
   // Fetch if a request was already sent

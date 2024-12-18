@@ -1,17 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im"; // Loading spinner icon
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const Search = () => {
   const [query, setQuery] = useState(""); // State for search query (username)
   const [results, setResults] = useState([]); // State for search results (users)
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
   const [loading, setLoading] = useState(false); // State for loading status
+  const [search, setSearch] = useSearchParams();
+
+  useEffect(() => {
+    const temp = async () => {
+      if (!search.has("search") || !search.get("search").trim()) {
+        return;
+      }
+      setQuery(search.get("search"));
+      setLoading(true);
+
+      try {
+        const response = await fetch(
+          `${
+            process.env.REACT_APP_BACKEND_URL
+          }/api/v1/users/search?search=${search.get("search")}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorMessage = data.message || "An unknown error occurred.";
+          setErrorMessage(errorMessage);
+          return;
+        }
+
+        if (data.data.length === 0) {
+          setErrorMessage("No users found with that username.");
+        } else {
+          setResults(data.data);
+        }
+      } catch (e) {
+        console.error("Network or server error", e);
+        setErrorMessage("Failed to connect to the server. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    temp();
+  }, [query, search]);
 
   const handleSearch = async (e) => {
     document.activeElement.blur();
     e.preventDefault();
+
     setErrorMessage(""); // Reset error message
     setResults([]); // Reset previous search results
 
@@ -19,6 +65,7 @@ const Search = () => {
       setErrorMessage("Please enter a username to search.");
       return;
     }
+    setSearch({ search: query });
 
     setLoading(true); // Start loading
 
@@ -34,6 +81,8 @@ const Search = () => {
       );
 
       const data = await response.json();
+
+      console.log("hii i am main");
 
       if (!response.ok) {
         const errorMessage = data.message || "An unknown error occurred.";
