@@ -8,7 +8,7 @@ const UserList = ({ friends }) => {
   }, []);
 
   return (
-    <div className="p-4 bg-gray-900 min-h-screen text-white">
+    <div className="p-4 md:bg-gray-950 bg-slate-900 min-h-screen text-white">
       {/* Header Section */}
       <div className="pb-2 text-center mb-2 pt-1">
         <h1
@@ -76,43 +76,45 @@ const UserList = ({ friends }) => {
       </div>
 
       {/* Mobile User List */}
-      <ul className="block md:hidden space-y-3">
-        {friends.map((friend, index) => (
-          <li
-            key={friend.id}
-            className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg shadow-md"
-            data-aos="fade-up"
-            data-aos-delay={index * 100}
-          >
-            {/* Profile Picture */}
-            <div className="w-14 h-14">
-              <img
-                src={
-                  friend.profilePicture ||
-                  "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
-                }
-                alt={friend.username}
-                className="w-full h-full rounded-full object-cover border-2 border-blue-400"
-              />
-            </div>
-
-            {/* User Info */}
-            <div className="flex-1">
-              <p className="text-lg font-semibold">{friend.name}</p>
-              <p className="text-sm text-gray-400">@{friend.username}</p>
-            </div>
-
-            {/* Balance */}
-            <div
-              className={`text-base font-bold ${
-                friend.balance < 0 ? "text-red-400" : "text-green-400"
-              }`}
+      <div className="block md:hidden">
+        <ul className="divide-y divide-gray-700">
+          {friends.map((friend, index) => (
+            <li
+              key={friend.id}
+              className="flex items-center space-x-4 p-3"
+              data-aos="fade-up"
+              data-aos-delay={index * 100} // Staggered animations
             >
-              ₹{friend.balance}
-            </div>
-          </li>
-        ))}
-      </ul>
+              {/* Profile Picture */}
+              <div className="w-12 h-12">
+                <img
+                  src={
+                    friend.profilePicture ||
+                    "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                  }
+                  alt={friend.username}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              </div>
+
+              {/* User Info */}
+              <div className="flex-1">
+                <p className="font-semibold">{friend.name}</p>
+                <p className="text-sm text-gray-400">{"@" + friend.username}</p>
+              </div>
+
+              {/* Analyzing Point */}
+              <div
+                className={`text-sm font-bold ${
+                  friend.balance < 0 ? "text-red-400" : "text-green-400"
+                }`}
+              >
+                ₹{friend.balance}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {/* Desktop View */}
       <div className="hidden md:block">
@@ -168,7 +170,7 @@ const UserList = ({ friends }) => {
           {friends.map((friend, index) => (
             <li
               key={friend.id}
-              className="flex items-center space-x-4 bg-gray-800 p-4 pr-6 rounded-lg shadow-md hover:bg-gray-700 transform hover:scale-105 transition-all duration-300"
+              className="flex items-center space-x-4 bg-gray-900 p-4 pr-6 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
               data-aos="fade-up"
               data-aos-delay={index * 100}
             >
