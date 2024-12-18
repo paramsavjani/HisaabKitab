@@ -8,7 +8,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       req.cookies.accessToken || req.header("Authorization")?.split(" ")[1];
 
     if (!accessToken) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(431).json({ message: "Unauthorized" });
     }
 
     const decodedToken = jwt.verify(
@@ -21,13 +21,13 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     );
 
     if (!user) {
-      return res.status(401).json({ message: "User does not exist" });
+      return res.status(432).json({ message: "User does not exist" });
     }
 
     req.user = user;
 
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(433).json({ message: "Unauthorized" });
   }
 });

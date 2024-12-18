@@ -1,3 +1,4 @@
+import { de } from "@faker-js/faker";
 import mongoose, { Schema } from "mongoose";
 
 const friendSchema = new Schema(
@@ -11,6 +12,13 @@ const friendSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    lastTransactionTime: {
+      type: Date,
     },
   },
   { timestamps: true }

@@ -65,19 +65,21 @@ const showTransactions = asyncHandler(async (req, res) => {
   const user = await User.findOne({ _id: userId });
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    return res.status(400).json({ message: "User not found" });
   }
 
   const friendUsername = req.params.username;
 
   if (friendUsername === user.username) {
-    throw new ApiError(400, "You cannot fetch transactions of yourself");
+    return res.status(401).json({
+      message: "You cannot view transactions with yourself",
+    });
   }
 
   const friend = await User.findOne({ username: friendUsername });
 
   if (!friend) {
-    throw new ApiError(404, "Friend not found");
+    return res.status(402).json({ message: "Friend not found" });
   }
 
   const friendship = await Friend.findOne({
@@ -88,7 +90,9 @@ const showTransactions = asyncHandler(async (req, res) => {
   });
 
   if (!friendship) {
-    throw new ApiError(400, "You are not friends with this user");
+    return res
+      .status(403)
+      .json({ message: "You are not friends with this user" });
   }
 
   const transactions = await Transaction.find({
@@ -216,10 +220,70 @@ const cancelTransaction = asyncHandler(async (req, res) => {
   res.status(200).json(response);
 });
 
+const getActiveFriends = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const userExists = await User.exists({ _id: userId });
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const activeFriends = await Friend.find(
+      {
+        $or: [{ userId }, { friendId: userId }],
+        isActive: true,
+      },
+      { userId: 1, friendId: 1, lastTransactionTime: 1, _id: 0 }
+    );
+
+    if (!activeFriends.length) {
+      return res.status(200).json({ friends: [] });
+    }
+
+    // Extract unique friend IDs and map their lastTransactionTime
+    const friendMap = {};
+    activeFriends.forEach((connection) => {
+      const friendId =
+        connection.userId.toString() === userId.toString()
+          ? connection.friendId.toString()
+          : connection.userId.toString();
+
+      friendMap[friendId] = connection.lastTransactionTime;
+    });
+
+    const friendIds = Object.keys(friendMap);
+
+    // Fetch user details in a single query
+    const friends = await User.find(
+      { _id: { $in: friendIds } },
+      {
+        username: 1,
+        name: 1,
+        profilePicture: 1,
+      }
+    ).lean();
+
+    // Construct the final result
+    const result = friends.map((friend) => ({
+      username: friend.username,
+      name: friend.name,
+      profilePicture: friend.profilePicture,
+      lastTransactionTime: friendMap[friend._id.toString()],
+    }));
+
+    return res.status(200).json({ friends: result });
+  } catch (error) {
+    console.error("Error fetching active friends:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 export {
   addTransaction,
   showTransactions,
   acceptTransaction,
   denyTransaction,
   cancelTransaction,
+  getActiveFriends,
 };

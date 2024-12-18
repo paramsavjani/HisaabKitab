@@ -6,9 +6,12 @@ import {
   acceptTransaction,
   denyTransaction,
   cancelTransaction,
+  getActiveFriends,
 } from "../controllers/transaction.controller.js";
 
 const router = Router();
+
+router.route("/").get(verifyJWT, getActiveFriends);
 
 router.route("/:username/add").post(verifyJWT, addTransaction);
 
