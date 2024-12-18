@@ -3,6 +3,7 @@ import UserContext from "../context/UserContext";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // AOS styles
+import { use } from "react";
 
 function Friends() {
   const { user } = useContext(UserContext);
@@ -94,7 +95,7 @@ function Friends() {
           {friends.length > 0 ? (
             <ul className="space-y-4">
               {friends.map((friend, index) => (
-                <Link to={`/users/${friend.username}`} className="" key={index}>
+                <Link to={`/transactions/${user.username}--${friend.username}`} className="" key={index}>
                   <li
                     className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
                     data-aos="zoom-in"
