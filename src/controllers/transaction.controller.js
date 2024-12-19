@@ -122,6 +122,8 @@ const showTransactions = asyncHandler(async (req, res) => {
       description: transaction.description,
       status: transaction.status,
       createdAt: transaction.createdAt,
+      sender:
+        transaction.sender.toString() === user._id.toString() ? user : friend,
     };
   });
 
