@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import UserContext from "../context/UserContext.js";
+import Accept from "../assets/icons/accept.png";
+import Deny from "../assets/icons/denied.png";
 
 const Transactions = () => {
-  const { user } = useContext(UserContext);
   const { chatId } = useParams();
-
+  const [total, setTotal] = useState(0);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [friend, setFriend] = useState(null);
 
   const friendId = chatId.split("--")[1];
 
@@ -33,7 +34,13 @@ const Transactions = () => {
         }
 
         const data = await res.json();
-        setTransactions(data.data);
+        setTransactions(data.transactions);
+        for (let transaction of data.transactions) {
+          if (transaction.status === "completed") {
+            setTotal((prevTotal) => prevTotal + transaction.amount);
+          }
+        }
+        setFriend(data.friend);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -55,14 +62,10 @@ const Transactions = () => {
 
   const groupedTransactions = groupTransactionsByDate(transactions);
 
-
   const SkeletonCard = () => (
-    <div className="bg-gray-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 animate-pulse">
-      <div className="flex flex-col space-y-2">
-        <div className="h-4 w-16 bg-gray-600 rounded"></div>
-        <div className="h-6 w-24 bg-gray-600 rounded"></div>
-      </div>
-      <div className="h-4 w-48 bg-gray-600 rounded"></div>
+    <div className="bg-gray-800 rounded-lg p-4 flex justify-between items-center animate-pulse">
+      <div className="h-4 w-16 bg-gray-600 rounded"></div>
+      <div className="h-6 w-24 bg-gray-600 rounded"></div>
     </div>
   );
 
@@ -76,29 +79,80 @@ const Transactions = () => {
     </div>
   );
 
-  const TransactionCard = ({ transaction }) => (
-    <div className="bg-gray-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
-      <div>
-        <p className="text-sm text-gray-400">
-          {new Date(transaction.createdAt).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </p>
-        <p
-          className={`text-lg font-semibold ${
-            transaction.amount > 0 ? "text-green-400" : "text-red-400"
-          }`}
-        >
-          ₹{transaction.amount}
-        </p>
-      </div>
-      <p className="text-sm text-gray-300">
-        {transaction.description || "No description"}
-      </p>
-    </div>
-  );
+  const TransactionCard = ({ transaction, onAccept, onReject }) => {
+    const { createdAt, amount, description, status, transactionId } =
+      transaction;
 
+    return (
+      <div className="relative bg-gray-800 rounded-lg p-4 shadow-lg overflow-hidden">
+        {status === "pending" ? (
+          <div className="relative">
+            <div className="relative z-1 flex items-center justify-between">
+              <div className="flex flex-col">
+                <span className="text-sm text-gray-400 font-medium mb-2">
+                  {new Date(createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+
+                <p className="text-sm text-gray-300 truncate max-w-xs">
+                  {description || "No Description"}
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-4">
+                <p className="text-xl font-bold text-white">
+                  ₹{Math.abs(amount)}
+                </p>
+
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => onAccept(transactionId)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => onReject(transactionId)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-400 font-medium">
+                {new Date(createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+              <p
+                className={`text-xl font-bold ${
+                  status === "rejected"
+                    ? "text-red-600 line-through"
+                    : amount > 0
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
+              >
+                ₹{Math.abs(amount)}
+              </p>
+            </div>
+
+            <p className="text-sm text-gray-300">
+              {description || "No Description"}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const ErrorState = () => (
     <div className="text-red-500 text-center text-lg">{error}</div>
@@ -116,7 +170,7 @@ const Transactions = () => {
       <div className="bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 max-w-3xl mx-auto w-full justify-start">
         <img
           src={
-            user?.profilePicture ||
+            friend?.profilePicture ||
             "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
           }
           alt="Profile"
@@ -124,43 +178,71 @@ const Transactions = () => {
         />
         <div className="flex-1">
           <h1 className="text-2xl font-bold sm:text-3xl">
-            {user?.name || "Friend"}
+            {friend?.name || "Friend"}
           </h1>
           <span className="text-gray-400">Settled Up</span>
         </div>
-        <p className="text-2xl font-bold text-green-400">₹0</p>
+        <p className="text-2xl font-bold text-green-400">₹{total}</p>
       </div>
 
       {/* Transactions Section */}
-      <div className="flex-1 max-w-3xl mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
+      <div className="flex-1 max-w-3xl pb-24 md:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
         {loading && <SkeletonTransactions />}
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
-          <div className="space-y-6">
-            {Object.keys(groupedTransactions).map((date) => (
-              <div key={date}>
-                <div className="text-gray-400 text-sm mb-2">
-                  {new Date(date).toLocaleDateString("en-US", {
-                    weekday: "long",
-                  })}
+          <>
+            <div className="space-y-6">
+              {Object.keys(groupedTransactions).map((date) => (
+                <div key={date}>
+                  <div className="text-gray-400 text-sm mb-2">{date}</div>
+                  <div className="space-y-4">
+                    {groupedTransactions[date].map((transaction) => (
+                      <TransactionCard
+                        key={transaction.transactionId}
+                        transaction={transaction}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-4">
-                  {groupedTransactions[date].map((transaction) => (
-                    <TransactionCard
-                      key={transaction.transactionId}
-                      transaction={transaction}
-                    />
-                  ))}
+              ))}
+            </div>
+            <div className="space-y-6">
+              {Object.keys(groupedTransactions).map((date) => (
+                <div key={date}>
+                  <div className="text-gray-400 text-sm mb-2">{date}</div>
+                  <div className="space-y-4">
+                    {groupedTransactions[date].map((transaction) => (
+                      <TransactionCard
+                        key={transaction.transactionId}
+                        transaction={transaction}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <div className="space-y-6">
+              {Object.keys(groupedTransactions).map((date) => (
+                <div key={date}>
+                  <div className="text-gray-400 text-sm mb-2">{date}</div>
+                  <div className="space-y-4">
+                    {groupedTransactions[date].map((transaction) => (
+                      <TransactionCard
+                        key={transaction.transactionId}
+                        transaction={transaction}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
         {!loading && !error && transactions.length === 0 && <EmptyState />}
       </div>
 
       {/* Bottom Button Bar */}
-      <div className="fixed bottom-0 w-full md:left-320 bg-gray-800 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 z-50 md:w-[calc(100%-320px)]">
+      <div className="fixed bottom-0 w-full md:left-320 bg-gray-800 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
         <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex-1">
           You Gave
         </button>

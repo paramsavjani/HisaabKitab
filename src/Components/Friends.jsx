@@ -3,7 +3,6 @@ import UserContext from "../context/UserContext";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // AOS styles
-import { use } from "react";
 
 function Friends() {
   const { user } = useContext(UserContext);
