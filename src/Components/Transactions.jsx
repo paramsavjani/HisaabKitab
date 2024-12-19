@@ -55,6 +55,27 @@ const Transactions = () => {
 
   const groupedTransactions = groupTransactionsByDate(transactions);
 
+
+  const SkeletonCard = () => (
+    <div className="bg-gray-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 animate-pulse">
+      <div className="flex flex-col space-y-2">
+        <div className="h-4 w-16 bg-gray-600 rounded"></div>
+        <div className="h-6 w-24 bg-gray-600 rounded"></div>
+      </div>
+      <div className="h-4 w-48 bg-gray-600 rounded"></div>
+    </div>
+  );
+
+  const SkeletonTransactions = () => (
+    <div className="space-y-4">
+      {Array(5)
+        .fill(0)
+        .map((_, index) => (
+          <SkeletonCard key={index} />
+        ))}
+    </div>
+  );
+
   const TransactionCard = ({ transaction }) => (
     <div className="bg-gray-800 rounded-lg p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0">
       <div>
@@ -78,12 +99,6 @@ const Transactions = () => {
     </div>
   );
 
-  const LoadingState = () => (
-    <div className="flex justify-center items-center h-32">
-      <div className="loader border-4 border-t-4 border-blue-500 w-12 h-12 rounded-full animate-spin"></div>
-      <span className="ml-4 text-lg">Loading transactions...</span>
-    </div>
-  );
 
   const ErrorState = () => (
     <div className="text-red-500 text-center text-lg">{error}</div>
@@ -118,7 +133,7 @@ const Transactions = () => {
 
       {/* Transactions Section */}
       <div className="flex-1 max-w-3xl mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
-        {loading && <LoadingState />}
+        {loading && <SkeletonTransactions />}
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
           <div className="space-y-6">
