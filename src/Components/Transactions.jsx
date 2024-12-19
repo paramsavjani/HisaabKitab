@@ -188,53 +188,21 @@ const Transactions = () => {
         {loading && <SkeletonTransactions />}
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
-          <>
-            <div className="space-y-6">
-              {Object.keys(groupedTransactions).map((date) => (
-                <div key={date}>
-                  <div className="text-gray-400 text-sm mb-2">{date}</div>
-                  <div className="space-y-4">
-                    {groupedTransactions[date].map((transaction) => (
-                      <TransactionCard
-                        key={transaction.transactionId}
-                        transaction={transaction}
-                      />
-                    ))}
-                  </div>
+          <div className="space-y-6">
+            {Object.keys(groupedTransactions).map((date) => (
+              <div key={date}>
+                <div className="text-gray-400 text-sm mb-2">{date}</div>
+                <div className="space-y-4">
+                  {groupedTransactions[date].map((transaction) => (
+                    <TransactionCard
+                      key={transaction.transactionId}
+                      transaction={transaction}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className="space-y-6">
-              {Object.keys(groupedTransactions).map((date) => (
-                <div key={date}>
-                  <div className="text-gray-400 text-sm mb-2">{date}</div>
-                  <div className="space-y-4">
-                    {groupedTransactions[date].map((transaction) => (
-                      <TransactionCard
-                        key={transaction.transactionId}
-                        transaction={transaction}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-6">
-              {Object.keys(groupedTransactions).map((date) => (
-                <div key={date}>
-                  <div className="text-gray-400 text-sm mb-2">{date}</div>
-                  <div className="space-y-4">
-                    {groupedTransactions[date].map((transaction) => (
-                      <TransactionCard
-                        key={transaction.transactionId}
-                        transaction={transaction}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
+              </div>
+            ))}
+          </div>
         )}
         {!loading && !error && transactions.length === 0 && <EmptyState />}
       </div>
