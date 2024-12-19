@@ -10,6 +10,7 @@ const Transactions = () => {
   const [friend, setFriend] = useState(null);
 
   const friendId = chatId.split("--")[1];
+  const userUsername = chatId.split("--")[0];
 
   useEffect(() => {
     document.title = "Transactions";
@@ -33,6 +34,7 @@ const Transactions = () => {
 
         const data = await res.json();
         setTransactions(data.transactions);
+        console.log(data.transactions);
         for (let transaction of data.transactions) {
           if (transaction.status === "completed") {
             setTotal((prevTotal) => prevTotal + transaction.amount);
@@ -48,6 +50,15 @@ const Transactions = () => {
 
     fetchTransactions();
   }, [friendId]);
+
+  useEffect(() => {
+    setTotal(() => 0);
+    for (let transaction of transactions) {
+      if (transaction.status === "completed") {
+        setTotal((prevTotal) => prevTotal + transaction.amount);
+      }
+    }
+  }, [transactions]);
 
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
@@ -77,7 +88,75 @@ const Transactions = () => {
     </div>
   );
 
-  const TransactionCard = ({ transaction, onAccept, onReject }) => {
+  const AcceptTransaction = async (transactionId) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+        return;
+      }
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction.transactionId === transactionId) {
+            return {
+              ...prevTransaction,
+              status: "completed",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const DenyTransaction = async (transactionId) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/reject`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+        return;
+      }
+
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction.transactionId === transactionId) {
+            return {
+              ...prevTransaction,
+              status: "rejected",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const TransactionCard = ({ transaction }) => {
     const { createdAt, amount, description, status, transactionId } =
       transaction;
 
@@ -106,13 +185,13 @@ const Transactions = () => {
 
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => onAccept(transactionId)}
+                    onClick={() => AcceptTransaction(transactionId)}
                     className="bg-green-600 hover:bg-green-700 text-white md:px-4 md:py-2 px-2 py-1 rounded-md shadow-md font-medium transition-all duration-200"
                   >
                     Accept
                   </button>
                   <button
-                    onClick={() => onReject(transactionId)}
+                    onClick={() => DenyTransaction(transactionId)}
                     className="bg-red-600 hover:bg-red-700 text-white md:px-4 md:py-2 px-2 py-1 rounded-md shadow-md font-medium transition-all duration-200"
                   >
                     Reject
@@ -133,8 +212,11 @@ const Transactions = () => {
               <p
                 className={`text-xl font-bold ${
                   status === "rejected"
-                    ? "text-red-600 line-through"
-                    : amount > 0
+                    ? "text-red-600 font-bold line-through"
+                    : (amount > 0 &&
+                        transaction.sender.username === userUsername) ||
+                      (amount < 0 &&
+                        transaction.sender.username !== userUsername)
                     ? "text-green-400"
                     : "text-red-400"
                 }`}
