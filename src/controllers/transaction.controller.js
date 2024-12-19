@@ -139,26 +139,25 @@ const acceptTransaction = asyncHandler(async (req, res) => {
   const transaction = await Transaction.findOne({ _id: transactionId });
 
   if (!transaction) {
-    throw new ApiError(404, "Transaction not found");
+    return res.status(404).json({ message: "Transaction not found" });
   }
 
   if (transaction.receiver.toString() !== user._id.toString()) {
-    throw new ApiError(400, "You are not the receiver of this transaction");
+    return res
+      .status(400)
+      .json({ message: "You are not the receiver of this transaction" });
   }
 
   if (transaction.status !== "pending") {
-    throw new ApiError(400, "Transaction already completed or rejected");
+    return res
+      .status(400)
+      .json({ message: "Transaction already completed or rejected" });
   }
 
   transaction.status = "completed";
   await transaction.save();
 
-  const response = new ApiResponse(
-    200,
-    {},
-    "Transaction accepted successfully"
-  );
-  res.status(200).json(response);
+  return res.status(200).json({ message: "Transaction accepted successfully" });
 });
 
 const denyTransaction = asyncHandler(async (req, res) => {
@@ -171,23 +170,25 @@ const denyTransaction = asyncHandler(async (req, res) => {
   const transaction = await Transaction.findOne({ _id: transactionId });
 
   if (!transaction) {
-    throw new ApiError(404, "Transaction not found");
+    return res.status(404).json({ message: "Transaction not found" });
   }
 
   if (transaction.receiver.toString() !== user._id.toString()) {
-    throw new ApiError(400, "You are not the receiver of this transaction");
+    return res
+      .status(400)
+      .json({ message: "You are not the receiver of this transaction" });
   }
 
   if (transaction.status !== "pending") {
-    throw new ApiError(400, "Transaction already completed or rejected");
+    return res
+      .status(400)
+      .json({ message: "Transaction already completed or rejected" });
   }
 
   transaction.status = "rejected";
   await transaction.save();
 
-  const response = new ApiResponse(200, {}, "Transaction denied successfully");
-
-  res.status(200).json(response);
+  return res.status(200).json({ message: "Transaction denied successfully" });
 });
 
 const cancelTransaction = asyncHandler(async (req, res) => {
