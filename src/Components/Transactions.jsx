@@ -8,6 +8,88 @@ const Transactions = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [friend, setFriend] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [transactionType, setTransactionType] = useState(null); // 'give' or 'get'
+  const [amount, setAmount] = useState("");
+  const [description, setDescription] = useState("");
+
+  const TransactionModal = ({ onClose, onSubmit }) => (
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
+      <div className="bg-gray-800 rounded-lg p-6 w-96 space-y-4">
+        <h2 className="text-xl font-bold text-white">
+          {transactionType === "give" ? "You Gave" : "You Got"} Money
+        </h2>
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="Enter amount"
+          className="w-full p-2 bg-gray-700 text-white rounded-md outline-none"
+        />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Add a description (optional)"
+          className="w-full p-2 bg-gray-700 text-white rounded-md outline-none"
+        ></textarea>
+        <div className="flex justify-end space-x-4">
+          <button
+            onClick={onClose}
+            className="bg-red-600 px-4 py-2 rounded-md text-white hover:bg-red-700"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSubmit}
+            className="bg-green-600 px-4 py-2 rounded-md text-white hover:bg-green-700"
+          >
+            Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const handleButtonClick = (type) => {
+    setTransactionType(type);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async () => {
+    if (!amount || isNaN(amount)) {
+      alert("Please enter a valid amount.");
+      return;
+    }
+
+    try {
+      const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}/add`;
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          amount:
+            transactionType === "give" ? Math.abs(amount) : -Math.abs(amount),
+          description,
+        }),
+      });
+
+      const data = await res.json();
+      console.log(data);
+      if (!res.ok) throw new Error(data.message);
+
+      // Update transactions locally if needed
+      // setTransactions((prev) => [...prev, data.transaction]);
+      setIsModalOpen(false);
+      setAmount("");
+      setDescription("");
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
 
   const friendId = chatId.split("--")[1];
   const userUsername = chatId.split("--")[0];
@@ -291,13 +373,25 @@ const Transactions = () => {
 
       {/* Bottom Button Bar */}
       <div className="fixed bottom-0 w-full md:left-320 bg-gray-800 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
-        <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex-1">
+        <button
+          onClick={() => handleButtonClick("give")}
+          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex-1"
+        >
           You Gave
         </button>
-        <button className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex-1">
+        <button
+          onClick={() => handleButtonClick("get")}
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex-1"
+        >
           You Got
         </button>
       </div>
+      {isModalOpen && (
+        <TransactionModal
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmit}
+        />
+      )}
     </div>
   );
 };
