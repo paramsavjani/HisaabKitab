@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Accept from "../assets/icons/accept.png";
-import Deny from "../assets/icons/denied.png";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -109,13 +107,13 @@ const Transactions = () => {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => onAccept(transactionId)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
+                    className="bg-green-600 hover:bg-green-700 text-white md:px-4 md:py-2 px-2 py-1 rounded-md shadow-md font-medium transition-all duration-200"
                   >
                     Accept
                   </button>
                   <button
                     onClick={() => onReject(transactionId)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
+                    className="bg-red-600 hover:bg-red-700 text-white md:px-4 md:py-2 px-2 py-1 rounded-md shadow-md font-medium transition-all duration-200"
                   >
                     Reject
                   </button>
@@ -177,7 +175,7 @@ const Transactions = () => {
           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full"
         />
         <div className="flex-1">
-          <h1 className="text-2xl font-bold sm:text-3xl">
+          <h1 className="text-xl font-bold sm:text-3xl">
             {friend?.name || "Friend"}
           </h1>
           <span className="text-gray-400">Settled Up</span>
