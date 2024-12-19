@@ -87,7 +87,9 @@ const showTransactions = asyncHandler(async (req, res) => {
     });
   }
 
-  const friend = await User.findOne({ username: friendUsername });
+  const friend = await User.findOne({ username: friendUsername }).select(
+    "username name profilePicture email"
+  );
 
   if (!friend) {
     return res.status(402).json({ message: "Friend not found" });
@@ -123,9 +125,7 @@ const showTransactions = asyncHandler(async (req, res) => {
     };
   });
 
-  return res
-    .status(200)
-    .json({ transactions: allTransaction, friends: friend });
+  return res.status(200).json({ transactions: allTransaction, friend });
 });
 
 const acceptTransaction = asyncHandler(async (req, res) => {
@@ -304,7 +304,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
           transaction.amount;
       }
     });
-    
+
     // Calculate totalTake and totalGive
     friendIds.forEach((friendId) => {
       const amount = transactionMap[friendId] || 0;
