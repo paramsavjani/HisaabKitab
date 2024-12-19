@@ -10,23 +10,7 @@ function Transactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  if (!user) {
-    window.history.pushState({}, "", "/login");
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }
-
-  const userId = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
-
-  if (!friendId || !userId) {
-    window.history.pushState({}, "", "/dashboard");
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }
-
-  if (user?.username !== userId) {
-    window.history.pushState({}, "", "/dashboard");
-    window.dispatchEvent(new PopStateEvent("popstate"));
-  }
 
   useEffect(() => {
     document.title = "Transactions";
@@ -43,12 +27,14 @@ function Transactions() {
           }
         );
         if (!res.ok) {
-          throw new Error("Failed to fetch transactions");
+          const data = await res.json();
+          setError(data.message);
+          return;
         }
         const data = await res.json();
-        setTransactions(data.data); // Assuming data.transactions is the list
+        setTransactions(data.data);
       } catch (err) {
-        setError(err.message);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -56,11 +42,33 @@ function Transactions() {
     fetchTransactions();
   }, [user, friendId]);
 
+  const groupTransactionsByDate = (transactions) => {
+    return transactions.reduce((groups, transaction) => {
+      const date = new Date(transaction.createdAt).toLocaleDateString();
+      if (!groups[date]) {
+        groups[date] = [];
+      }
+      groups[date].push(transaction);
+      return groups;
+    }, {});
+  };
+
+  const groupedTransactions = groupTransactionsByDate(transactions);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
-      <h1 className="text-3xl font-bold mb-4 text-center">
-        Transaction History
-      </h1>
+      {/* Header Section */}
+      <div className="bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">{user.name || "Friend"}</h1>
+            <span className="text-gray-400">Settled Up</span>
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-green-400">₹0</p>
+          </div>
+        </div>
+      </div>
 
       {/* Loading State */}
       {loading && (
@@ -71,50 +79,55 @@ function Transactions() {
       )}
 
       {/* Error State */}
-      {error && (
-        <div className="text-red-500 text-center text-lg">
-          Failed to load transactions: {error}
-        </div>
-      )}
+      {error && <div className="text-red-500 text-center text-lg">{error}</div>}
 
-      {/* Transactions List */}
+      {/* Transactions Section */}
       {!loading && !error && transactions.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-center border-collapse">
-            <thead>
-              <tr className="bg-blue-600">
-                <th className="p-3">#</th>
-                <th className="p-3">Type</th>
-                <th className="p-3">Amount</th>
-                <th className="p-3">Description</th>
-                <th className="p-3">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction, index) => (
-                <tr
-                  key={transaction.id}
-                  className="border-b hover:bg-gray-700 transition-all"
-                >
-                  <td className="p-3">{index + 1}</td>
-                  <td
-                    className={`p-3 ${
-                      transaction.type === "give"
-                        ? "text-red-400"
-                        : "text-green-400"
-                    } font-semibold`}
+        <div className="space-y-6">
+          {Object.keys(groupedTransactions).map((date) => (
+            <div key={date}>
+              {/* Date Separator */}
+              <div className="text-gray-400 text-sm mb-2">
+                {date} •{" "}
+                {new Date(date).toLocaleDateString("en-US", {
+                  weekday: "long",
+                })}
+              </div>
+              {/* Transaction Entries */}
+              <div className="space-y-4">
+                {groupedTransactions[date].map((transaction) => (
+                  <div
+                    key={transaction.transactionId}
+                    className="bg-gray-800 rounded-lg p-4 flex justify-between items-center"
                   >
-                    {transaction.type === "give" ? "You Gave" : "You Took"}
-                  </td>
-                  <td className="p-3 font-medium">${transaction.amount}</td>
-                  <td className="p-3">{transaction.description || "N/A"}</td>
-                  <td className="p-3">
-                    {new Date(transaction.date).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                    <div>
+                      <p className="text-sm text-gray-400">
+                        {new Date(transaction.createdAt).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </p>
+                      <p
+                        className={`text-lg font-semibold ${
+                          transaction.amount > 0
+                            ? "text-green-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        ₹{transaction.amount}
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-300">
+                      {transaction.description || "N/A"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -124,6 +137,16 @@ function Transactions() {
           No transactions found with this user.
         </div>
       )}
+
+      {/* Bottom Buttons */}
+      <div className="fixed bottom-0 left-0 w-full bg-gray-800 p-4 flex justify-between">
+        <button className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg w-[48%]">
+          You Gave
+        </button>
+        <button className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg w-[48%]">
+          You Got
+        </button>
+      </div>
     </div>
   );
 }
