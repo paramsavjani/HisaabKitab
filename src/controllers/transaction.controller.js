@@ -123,12 +123,9 @@ const showTransactions = asyncHandler(async (req, res) => {
     };
   });
 
-  const response = new ApiResponse(
-    200,
-    allTransaction,
-    "Transactions fetched successfully"
-  );
-  res.status(200).json(response);
+  return res
+    .status(200)
+    .json({ transactions: allTransaction, friends: friend });
 });
 
 const acceptTransaction = asyncHandler(async (req, res) => {
@@ -307,7 +304,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
           transaction.amount;
       }
     });
-    console.log(transactionCounts);
+    
     // Calculate totalTake and totalGive
     friendIds.forEach((friendId) => {
       const amount = transactionMap[friendId] || 0;
