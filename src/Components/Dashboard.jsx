@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 import DashboardSkeleton from "./DashboardSkeleton";
 import "./styles.css";
+import "../loading.css";
 
 const Dashboard = () => {
   const { user, accessToken, refreshToken } = useContext(UserContext);
@@ -54,7 +55,7 @@ const Dashboard = () => {
 
   // Loading UI
   if (loading) {
-    return <DashboardSkeleton />;
+    return <div className="spinner"></div>;
   }
 
   return (
