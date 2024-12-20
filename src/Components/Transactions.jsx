@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
-import { toast } from "react-toastify";
+import TransactionSkeleton from "./TransactionSkeleton";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -82,126 +82,6 @@ const Transactions = () => {
 
   const groupedTransactions = groupTransactionsByDate(transactions);
 
-  const SkeletonCard = () => (
-    <div className="bg-gray-800 rounded-lg p-4 flex justify-between items-center animate-pulse">
-      <div className="h-4 w-16 bg-gray-600 rounded"></div>
-      <div className="h-6 w-24 bg-gray-600 rounded"></div>
-    </div>
-  );
-
-  const SkeletonTransactions = () => (
-    <div className="space-y-4">
-      {Array(5)
-        .fill(0)
-        .map((_, index) => (
-          <SkeletonCard key={index} />
-        ))}
-    </div>
-  );
-
-  const AcceptTransaction = async (transactionId) => {
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/accept`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        console.log(data.message);
-        return;
-      }
-      setTransactions((prevTransactions) =>
-        prevTransactions.map((prevTransaction) => {
-          if (prevTransaction.transactionId === transactionId) {
-            return {
-              ...prevTransaction,
-              status: "completed",
-            };
-          }
-          return prevTransaction;
-        })
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const DenyTransaction = async (transactionId) => {
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/deny`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      const data = await res.json();
-      if (!res.ok) {
-        console.log(data.message);
-        return;
-      }
-
-      setTransactions((prevTransactions) =>
-        prevTransactions.map((prevTransaction) => {
-          if (prevTransaction.transactionId === transactionId) {
-            return {
-              ...prevTransaction,
-              status: "rejected",
-            };
-          }
-          return prevTransaction;
-        })
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const CancelTransaction = async (transactionId) => {
-    try {
-      const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/cancel`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const data = await res.json();
-      console.log(data.message);
-      if (!res.ok) {
-        console.log(res);
-        return;
-      }
-      toast.success(data.message, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        theme: "colored",
-      });
-      setTransactions((prevTransactions) =>
-        prevTransactions.filter((t) => t.transactionId !== transactionId)
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   const ErrorState = () => (
     <div className="text-red-500 text-center text-lg">{error}</div>
   );
@@ -212,10 +92,14 @@ const Transactions = () => {
     </div>
   );
 
+  if (loading) {
+    return <TransactionSkeleton />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Profile Section */}
-      <div className="md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
+      <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
         <img
           src={
             friend?.profilePicture ||
@@ -230,7 +114,7 @@ const Transactions = () => {
           </h1>
         </div>
         <p
-          className={`text-2xl font-bold ${
+          className={`kranky-regular text-2xl font-bold ${
             total < 0 ? "text-red-500" : "text-green-500"
           }`}
         >
@@ -240,7 +124,6 @@ const Transactions = () => {
 
       {/* Transactions Section */}
       <div className="flex-1 pb-24 md:pb-24 pt-24 md:pt-28 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
-        {loading && <SkeletonTransactions />}
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
           <div className="space-y-6">
@@ -252,10 +135,8 @@ const Transactions = () => {
                     <TransactionCard
                       key={transaction.transactionId}
                       transaction={transaction}
-                      AcceptTransaction={AcceptTransaction}
-                      CancelTransaction={CancelTransaction}
-                      DenyTransaction={DenyTransaction}
                       userUsername={userUsername}
+                      setTransactions={setTransactions}
                     />
                   ))}
                 </div>
@@ -271,12 +152,14 @@ const Transactions = () => {
         <button
           onClick={() => handleButtonClick("give")}
           className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex-1"
+          style={{ fontFamily: "Agu Display" }}
         >
           You Gave
         </button>
         <button
           onClick={() => handleButtonClick("get")}
           className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex-1"
+          style={{ fontFamily: "Agu Display" }}
         >
           You Got
         </button>

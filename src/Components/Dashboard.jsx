@@ -4,6 +4,7 @@ import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext";
 import DashboardSkeleton from "./DashboardSkeleton";
+import "./styles.css";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -124,7 +125,7 @@ const Dashboard = () => {
 
       {/* Mobile User List */}
       <div className="block md:hidden">
-        <ul className="divide-y divide-gray-700">
+        <ul className="merienda-regular divide-y divide-gray-700">
           {friends.map((friend, index) => (
             <li
               key={friend.username}
@@ -157,7 +158,7 @@ const Dashboard = () => {
 
                 {/* Balance */}
                 <div
-                  className={`text-base font-bold ${
+                  className={`kranky-regular text-lg font-extrabold ${
                     friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
                   }`}
                 >
@@ -249,14 +250,14 @@ const Dashboard = () => {
                 </div>
 
                 {/* User Info */}
-                <div className="flex-1">
+                <div className="merienda-regular flex-1">
                   <p className="text-lg font-semibold">{friend.name}</p>
                   <p className="text-sm text-gray-400">@{friend.username}</p>
                 </div>
 
                 {/* Balance */}
                 <div
-                  className={`text-xl font-bold ${
+                  className={`text-xl kranky-regular font-bold ${
                     friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
                   }`}
                 >

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import "./styles.css";
 
 const TransactionCard = ({
   transaction,
@@ -6,6 +8,7 @@ const TransactionCard = ({
   AcceptTransaction,
   CancelTransaction,
   DenyTransaction,
+  setTransactions,
 }) => {
   const { createdAt, amount, description, status, transactionId, sender } =
     transaction;
@@ -23,7 +26,42 @@ const TransactionCard = ({
   const handleAccept = async () => {
     setLoading((prev) => ({ ...prev, accept: true }));
     try {
-      await AcceptTransaction(transactionId);
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+        return;
+      }
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction.transactionId === transactionId) {
+            return {
+              ...prevTransaction,
+              status: "completed",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+    } catch (err) {
+      console.log(err);
     } finally {
       setLoading((prev) => ({ ...prev, accept: false }));
     }
@@ -32,7 +70,44 @@ const TransactionCard = ({
   const handleReject = async () => {
     setLoading((prev) => ({ ...prev, reject: true }));
     try {
-      await DenyTransaction(transactionId);
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/deny`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+        return;
+      }
+
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction.transactionId === transactionId) {
+            return {
+              ...prevTransaction,
+              status: "rejected",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+    } catch (err) {
+      console.log(err);
     } finally {
       setLoading((prev) => ({ ...prev, reject: false }));
     }
@@ -41,7 +116,34 @@ const TransactionCard = ({
   const handleCancel = async () => {
     setLoading((prev) => ({ ...prev, cancel: true }));
     try {
-      await CancelTransaction(transactionId);
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/cancel`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+        return;
+      }
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter((t) => t.transactionId !== transactionId)
+      );
+    } catch (err) {
+      console.log(err);
     } finally {
       setLoading((prev) => ({ ...prev, cancel: false }));
     }
@@ -67,10 +169,11 @@ const TransactionCard = ({
 
         {/* Amount Section */}
         <div
-          className={`text-3xl font-mono font-extrabold mb-4 ${
+          className={`text-3xl kranky-regular font-extrabold mb-4 ${
             isSender ? "text-right" : "text-left"
           } ${
-           ( isSender && transaction.amount > 0) || (!isSender && transaction.amount < 0 )
+            (isSender && transaction.amount > 0) ||
+            (!isSender && transaction.amount < 0)
               ? "text-green-500"
               : "text-red-500"
           }`}
@@ -81,7 +184,7 @@ const TransactionCard = ({
         {/* Description Section */}
         {description && (
           <div
-            className={`text-sm italic font-mono text-gray-300 truncate ${
+            className={`text-md italic caveat-regular text-gray-300 truncate ${
               isSender ? "text-right pl-5" : "text-left pr-5"
             }`}
           >
