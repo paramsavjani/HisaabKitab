@@ -8,7 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
 
 const Layout = () => {
-  const { setUser } = useContext(UserContext);
+  const { setUser,setAccessToken,setRefreshToken } = useContext(UserContext);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -66,13 +66,16 @@ const Layout = () => {
             value: newRefreshToken,
           });
         }
+
+        setAccessToken(newAccessToken);
+        setRefreshToken(newRefreshToken);
       } catch (e) {
         console.error("Error fetching user", e);
       }
     };
 
     checkUser();
-  }, [setUser]);
+  }, [setAccessToken, setRefreshToken, setUser]);
 
   return (
     <div className="flex">
