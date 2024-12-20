@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
-import Axios from "axios";
 import { useContext } from "react";
-import UserContext from "../context/UserContext";
+import UserContext from "../context/UserContext.js";
 
 // Import PNG images
 import HomeIcon from "../assets/icons/home.png";
@@ -17,7 +16,14 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [incomingRequests, setIncomingRequests] = useState(0);
-  const { user, setUser } = useContext(UserContext);
+  const {
+    user,
+    setUser,
+    accessToken,
+    refreshToken,
+    setAccessToken,
+    setRefreshToken,
+  } = useContext(UserContext);
 
   const navRef = useRef();
   const startX = useRef(0);
@@ -26,21 +32,34 @@ function Navbar() {
   const closeY = useRef(0);
 
   useEffect(() => {
-    if (user) {
-      Axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
-        {
-          withCredentials: true,
+    async function param() {
+      if (user) {
+        try {
+          const res = await fetch(
+            `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                accessToken,
+                refreshToken,
+              }),
+            }
+          );
+          const data = await res.json();
+          console.log(data.data);
+          setIncomingRequests(data.data.senders.length);
+
+        } catch (e) {
+          console.error("Error fetching requests:", e);
         }
-      )
-        .then((response) => {
-          setIncomingRequests(response?.data?.data?.senders?.length || 0);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch incoming requests count", error);
-        });
+      }
     }
-  }, [user]);
+    param();
+  }, [user, accessToken, refreshToken]);
 
   useEffect(() => {
     const handleTouchStart = (e) => {
@@ -120,6 +139,13 @@ function Navbar() {
         {
           method: "POST",
           credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            accessToken,
+            refreshToken,
+          }),
         }
       );
 
@@ -127,7 +153,11 @@ function Navbar() {
         throw new Error("Logout failed");
       }
 
-      await Preferences.clear();
+      await Preferences.remove({ key: "accessToken" });
+      await Preferences.remove({ key: "refreshToken" });
+
+      setAccessToken(null);
+      setRefreshToken(null);
 
       setUser(null);
       window.location.reload();

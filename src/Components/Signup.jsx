@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import UserContext from "../context/UserContext";
+import UserContext from "../context/UserContext.js";
 
 const InputField = ({
   id,
@@ -34,7 +34,8 @@ const InputField = ({
 );
 
 const Signup = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, setAccessToken, setRefreshToken } =
+    useContext(UserContext);
   const [formData, setFormData] = useState({
     username: "",
     name: "",
@@ -135,6 +136,9 @@ const Signup = () => {
         setIsLoading(false);
         return;
       }
+
+      setAccessToken(data.data.accessToken);
+      setRefreshToken(data.data.refreshToken);
 
       setUser(data.data.user);
       window.history.pushState({}, "", "/friends");

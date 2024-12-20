@@ -2,12 +2,12 @@ import React, { useEffect, useContext } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
-import UserContext from "../context/UserContext";
+import UserContext from "../context/UserContext.js";
 import DashboardSkeleton from "./DashboardSkeleton";
 import "./styles.css";
 
 const Dashboard = () => {
-  const { user } = useContext(UserContext);
+  const { user, accessToken, refreshToken } = useContext(UserContext);
   const [friends, setFriends] = React.useState([]);
   const [totalGive, setTotalGive] = React.useState(0);
   const [totalTake, setTotalTake] = React.useState(0);
@@ -25,11 +25,15 @@ const Dashboard = () => {
         const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
           {
-            method: "GET",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             credentials: "include",
+            body: JSON.stringify({
+              accessToken,
+              refreshToken,
+            }),
           }
         );
         if (!res.ok) {
@@ -46,7 +50,7 @@ const Dashboard = () => {
       }
     };
     fetchFriends();
-  }, [user]);
+  }, [user, accessToken, refreshToken]);
 
   // Loading UI
   if (loading) {

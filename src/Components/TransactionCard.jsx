@@ -1,18 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { toast } from "react-toastify";
 import "./styles.css";
+import UserContext from "../context/UserContext.js";
 
-const TransactionCard = ({
-  transaction,
-  userUsername,
-  AcceptTransaction,
-  CancelTransaction,
-  DenyTransaction,
-  setTransactions,
-}) => {
+const TransactionCard = ({ transaction, userUsername, setTransactions }) => {
   const { createdAt, amount, description, status, transactionId, sender } =
     transaction;
-
+  const { accessToken, refreshToken } = useContext(UserContext);
   const isSender = sender.username === userUsername;
 
   // Loading states for buttons
@@ -34,6 +28,7 @@ const TransactionCard = ({
             "Content-Type": "application/json",
           },
           credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
         }
       );
       const data = await res.json();
@@ -78,6 +73,7 @@ const TransactionCard = ({
             "Content-Type": "application/json",
           },
           credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
         }
       );
 
@@ -119,11 +115,12 @@ const TransactionCard = ({
       const res = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/cancel`,
         {
-          method: "DELETE",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
         }
       );
       const data = await res.json();
