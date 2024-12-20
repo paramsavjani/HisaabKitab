@@ -8,10 +8,10 @@ import {
 
 const router = Router();
 
-router.route("/").get(verifyJWT, getAllFriends);
+router.route("/").post(verifyJWT, getAllFriends);
 
-router.route("/:username/delete").delete(verifyJWT, deleteFriend);
+router.route("/:username/delete").post(verifyJWT, deleteFriend);
 
-router.route("/:username").get(verifyJWT, isFriend);
+router.route("/:username").post(verifyJWT, isFriend);
 
 export default router;
