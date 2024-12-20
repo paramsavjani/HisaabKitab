@@ -115,13 +115,11 @@ const Transactions = () => {
         }
 
         const data = await res.json();
+        console.log(data.transactions);
         setTransactions(data.transactions);
         console.log(data.transactions);
-        for (let transaction of data.transactions) {
-          if (transaction.status === "completed") {
-            setTotal((prevTotal) => prevTotal + transaction.amount);
-          }
-        }
+        setTotal(() => 0);
+
         setFriend(data.friend);
       } catch (err) {
         setError(err.message);
@@ -137,10 +135,14 @@ const Transactions = () => {
     setTotal(() => 0);
     for (let transaction of transactions) {
       if (transaction.status === "completed") {
-        setTotal((prevTotal) => prevTotal + transaction.amount);
+        if (transaction.sender.username === userUsername) {
+          setTotal((prevTotal) => prevTotal + transaction.amount);
+        } else {
+          setTotal((prevTotal) => prevTotal - transaction.amount);
+        }
       }
     }
-  }, [transactions]);
+  }, [transactions, setTransactions, userUsername]);
 
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
@@ -238,81 +240,152 @@ const Transactions = () => {
     }
   };
 
-  const TransactionCard = ({ transaction }) => {
-    const { createdAt, amount, description, status, transactionId } =
+  const TransactionCard = ({ transaction, currentUser }) => {
+    const { createdAt, amount, description, status, transactionId, sender } =
       transaction;
 
+    const isSender = sender.username === userUsername;
+
     return (
-      <div className="relative bg-gray-800 rounded-lg p-4 shadow-lg overflow-hidden">
-        {status === "pending" ? (
-          <div className="relative">
-            <div className="relative z-1 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-sm text-gray-400 font-medium mb-2">
+      <>
+        {/* Mobile View */}
+        <div className="block md:hidden w-full px-2">
+          <div
+            className={`relative rounded-lg p-3 shadow-md max-w-[90%] ${
+              isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
+            }`}
+          >
+            {/* Tail */}
+            <div
+              className={`absolute top-4 ${
+                isSender ? "right-[-6px]" : "left-[-6px]"
+              }`}
+            >
+              <div
+                className={`w-3 h-3 ${
+                  isSender ? "bg-gray-800" : "bg-gray-700"
+                } transform rotate-45`}
+              ></div>
+            </div>
+
+            {/* Content */}
+            <div className="flex flex-col space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-gray-400 font-medium">
                   {new Date(createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
                   })}
                 </span>
-
-                <p className="text-sm text-gray-300 truncate max-w-xs">
-                  {description || "No Description"}
-                </p>
-              </div>
-
-              <div className="flex items-center space-x-4">
-                <p className="text-xl font-bold text-white">
+                <p
+                  className={`text-xl font-bold ${
+                    status === "rejected"
+                      ? "text-red-600 font-bold line-through"
+                      : (amount > 0 &&
+                          transaction.sender.username === userUsername) ||
+                        (amount < 0 &&
+                          transaction.sender.username !== userUsername)
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
                   ₹{Math.abs(amount)}
                 </p>
+              </div>
+              <p className="text-sm text-gray-300 truncate">
+                {description || "No Description"}
+              </p>
 
-                <div className="flex space-x-2">
+              {/* Pending Actions */}
+              {status === "pending" && isSender && (
+                <div className="flex space-x-2 mt-2">
                   <button
                     onClick={() => AcceptTransaction(transactionId)}
-                    className="bg-green-600 hover:bg-green-700 text-white md:px-4 md:py-2 px-2 py-1 rounded-md shadow-md font-medium transition-all duration-200"
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
                   >
                     Accept
                   </button>
                   <button
                     onClick={() => DenyTransaction(transactionId)}
-                    className="bg-red-600 hover:bg-red-700 text-white md:px-4 md:py-2 px-2 py-1 rounded-md shadow-md font-medium transition-all duration-200"
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
                   >
                     Reject
                   </button>
                 </div>
-              </div>
+              )}
             </div>
           </div>
-        ) : (
-          <div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-400 font-medium">
-                {new Date(createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-              <p
-                className={`text-xl font-bold ${
-                  status === "rejected"
-                    ? "text-red-600 font-bold line-through"
-                    : (amount > 0 &&
-                        transaction.sender.username === userUsername) ||
-                      (amount < 0 &&
-                        transaction.sender.username !== userUsername)
-                    ? "text-green-400"
-                    : "text-red-400"
-                }`}
-              >
-                ₹{Math.abs(amount)}
-              </p>
+        </div>
+
+        {/* Laptop/Desktop View */}
+        <div className="hidden md:block w-full px-4">
+          <div
+            className={`relative rounded-lg p-4 shadow-lg max-w-[60%] ${
+              isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
+            }`}
+          >
+            {/* Tail */}
+            <div
+              className={`absolute top-4 ${
+                isSender ? "right-[-6px]" : "left-[-6px]"
+              }`}
+            >
+              <div
+                className={`w-3 h-3 ${
+                  isSender ? "bg-gray-800" : "bg-gray-700"
+                } transform rotate-45`}
+              ></div>
             </div>
 
-            <p className="text-sm text-gray-300">
-              {description || "No Description"}
-            </p>
+            {/* Content */}
+            <div className="flex flex-col space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-400 font-medium">
+                  {new Date(createdAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+                <p
+                  className={`text-xl font-bold ${
+                    status === "rejected"
+                      ? "text-red-600 font-bold line-through"
+                      : (amount > 0 &&
+                          transaction.sender.username === userUsername) ||
+                        (amount < 0 &&
+                          transaction.sender.username !== userUsername)
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  ₹{Math.abs(amount)}
+                </p>
+              </div>
+              <p className="text-sm text-gray-300">
+                {description || "No Description"}
+              </p>
+
+              {/* Pending Actions */}
+              {status === "pending" && isSender && (
+                <div className="flex space-x-3 mt-2">
+                  <button
+                    onClick={() => AcceptTransaction(transactionId)}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => DenyTransaction(transactionId)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
+                  >
+                    Reject
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      </>
     );
   };
 
@@ -344,11 +417,17 @@ const Transactions = () => {
           </h1>
           <span className="text-gray-400">Settled Up</span>
         </div>
-        <p className="text-2xl font-bold text-green-400">₹{total}</p>
+        <p
+          className={`text-2xl font-bold ${
+            total < 0 ? "text-red-500" : "text-green-500"
+          }`}
+        >
+          ₹{Math.abs(total)}
+        </p>
       </div>
 
       {/* Transactions Section */}
-      <div className="flex-1 max-w-3xl pb-24 md:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
+      <div className="flex-1 max-w-3xl pb-24 md:pb-24 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
         {loading && <SkeletonTransactions />}
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
