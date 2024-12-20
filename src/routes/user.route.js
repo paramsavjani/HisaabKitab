@@ -23,7 +23,7 @@ router.route("/logout").post(verifyJWT, logoutUser);
 
 router.route("/refresh-token").post(refreshAccessToken);
 
-router.route("/verify").get(verifyJWT, getUser);
+router.route("/verify").post(verifyJWT, getUser);
 
 router.route("/search").get(searchUser);
 
