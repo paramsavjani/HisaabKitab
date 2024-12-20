@@ -263,7 +263,7 @@ const Transactions = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Profile Section */}
-      <div className="bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 max-w-3xl mx-auto w-full justify-start">
+      <div className="md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
         <img
           src={
             friend?.profilePicture ||
@@ -276,7 +276,6 @@ const Transactions = () => {
           <h1 className="text-xl font-bold sm:text-3xl">
             {friend?.name || "Friend"}
           </h1>
-          <span className="text-gray-400">Settled Up</span>
         </div>
         <p
           className={`text-2xl font-bold ${
@@ -288,7 +287,7 @@ const Transactions = () => {
       </div>
 
       {/* Transactions Section */}
-      <div className="flex-1 max-w-3xl pb-24 md:pb-24 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
+      <div className="flex-1 pb-24 md:pb-24 pt-24 md:pt-28 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
         {loading && <SkeletonTransactions />}
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
