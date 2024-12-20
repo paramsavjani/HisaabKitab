@@ -214,15 +214,15 @@ const cancelTransaction = asyncHandler(async (req, res) => {
   });
 
   if (!transaction) {
-    return res.status(404).json({ message: "Transaction not found" });
+    return res.status(401).json({ message: "Transaction not found" });
   }
 
   if (transaction.sender.toString() !== user._id.toString()) {
-    return res.status(400).json({ message: "You are not the sender" });
+    return res.status(402).json({ message: "You are not the sender" });
   }
 
   if (transaction.status !== "pending") {
-    return res.status(400).json({ message: "Transaction already completed" });
+    return res.status(403).json({ message: "Transaction already completed" });
   }
 
   const deleted = await Transaction.deleteOne({ _id: transactionId });
