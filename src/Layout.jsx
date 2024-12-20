@@ -6,13 +6,17 @@ import UserContext from "./context/UserContext.js";
 import { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
+import "./loading.css";
+
 
 const Layout = () => {
-  const { setUser,setAccessToken,setRefreshToken } = useContext(UserContext);
+  const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
+  const [loading, setLoading] = React.useState(true);
 
   useEffect(() => {
     const checkUser = async () => {
       try {
+        setLoading(true);
         const { value: accessToken } = await Preferences.get({
           key: "accessToken",
         });
@@ -71,6 +75,8 @@ const Layout = () => {
         setRefreshToken(newRefreshToken);
       } catch (e) {
         console.error("Error fetching user", e);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -78,30 +84,36 @@ const Layout = () => {
   }, [setAccessToken, setRefreshToken, setUser]);
 
   return (
-    <div className="flex">
-      {/* Navbar */}
-      <Navbar />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        limit={10}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss={false}
-        draggable
-        pauseOnHover
-        theme="colored"
-      />
+    <>
+      {loading ? (
+        <div className="spinner"></div>
+      ) : (
+        <div className="flex">
+          {/* Navbar */}
+          <Navbar />
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            limit={10}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick={false}
+            rtl={false}
+            pauseOnFocusLoss={false}
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
 
-      {/* Main Content */}
-      <div className="flex-1 md:ml-80 w-full h-full">
-        <Outlet />
+          {/* Main Content */}
+          <div className="flex-1 md:ml-80 w-full h-full">
+            <Outlet />
 
-        {/* <Footer /> */}
-      </div>
-    </div>
+            {/* <Footer /> */}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
