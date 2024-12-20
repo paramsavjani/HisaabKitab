@@ -13,60 +13,12 @@ const Transactions = () => {
   const [friend, setFriend] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState(null); // 'give' or 'get'
-  const [amount, setAmount] = useState("");
-  const [description, setDescription] = useState("");
   const userUsername = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
     setIsModalOpen(true);
-  };
-
-  const handleSubmit = async () => {
-    if (!amount || isNaN(amount)) {
-      alert("Please enter a valid amount.");
-      return;
-    }
-
-    try {
-      const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}/add`;
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          amount:
-            transactionType === "give" ? Math.abs(amount) : -Math.abs(amount),
-          description,
-        }),
-      });
-
-      const data = await res.json();
-      console.log(data);
-      if (!res.ok) {
-        toast.error(data.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          theme: "colored",
-        });
-      }
-
-      // Update transactions locally if needed
-      // setTransactions((prev) => [...prev, data.transaction]);
-      setIsModalOpen(false);
-      setAmount("");
-      setDescription("");
-    } catch (err) {
-      console.error(err.message);
-    }
   };
 
   useEffect(() => {
@@ -331,13 +283,11 @@ const Transactions = () => {
       </div>
       {isModalOpen && (
         <TransactionModal
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleSubmit}
           transactionType={transactionType}
-          amount={amount}
-          setAmount={setAmount}
-          setDescription={setDescription}
-          description={description}
+          friendId={friendId}
+          setIsModalOpen={setIsModalOpen}
+          transactions={transactions}
+          setTransactions={setTransactions}
         />
       )}
     </div>
