@@ -18,7 +18,7 @@ const addTransaction = asyncHandler(async (req, res) => {
     });
   }
 
-  const friend = await User.findOne({ username: friendUsername });
+  const friend = await User.findOne({ username: friendUsername }).select("username name profilePicture email");
 
   if (!friend) {
     return res.status(402).json({ message: "Friend not found" });
@@ -60,6 +60,8 @@ const addTransaction = asyncHandler(async (req, res) => {
     status: amount < 0 ? "completed" : "pending",
   });
 
+  console.log(isAdded)
+
   if (!isAdded) {
     return res.status(500).json({ message: "Transaction failed" });
   }
@@ -68,7 +70,7 @@ const addTransaction = asyncHandler(async (req, res) => {
   friendship.isActive = true;
   await friendship.save();
 
-  return res.status(200).json({ message: "Transaction added successfully" });
+  return res.status(200).json({ message: "Transaction added successfully",transaction:{...isAdded,sender:friend} });
 });
 
 const showTransactions = asyncHandler(async (req, res) => {
