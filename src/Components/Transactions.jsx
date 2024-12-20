@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
 import TransactionSkeleton from "./TransactionSkeleton";
+import { toast } from "react-toastify";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -98,6 +99,21 @@ const Transactions = () => {
   );
 
   if (loading) {
+    return <TransactionSkeleton />;
+  }
+  if(error)
+  {
+    toast.error(error,
+      {
+        position: "top-right",
+        autoClose: 7000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined
+      }
+    );
     return <TransactionSkeleton />;
   }
 
