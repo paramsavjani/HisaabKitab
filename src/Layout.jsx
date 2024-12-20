@@ -5,70 +5,75 @@ import { Outlet } from "react-router-dom";
 import UserContext from "./context/UserContext";
 import { useContext } from "react";
 import { ToastContainer } from "react-toastify";
-import { Storage } from "@capacitor/storage";
+import { Preferences } from "@capacitor/preferences";
 
 const Layout = () => {
   const { setUser } = useContext(UserContext);
 
-useEffect(() => {
-  const checkUser = async () => {
-    try {
-      const { value: accessToken } = await Storage.get({ key: "accessToken" });
-      const { value: refreshToken } = await Storage.get({
-        key: "refreshToken",
-      });
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { value: accessToken } = await Preferences.get({
+          key: "accessToken",
+        });
+        const { value: refreshToken } = await Preferences.get({
+          key: "refreshToken",
+        });
 
-      if (refreshToken) {
-        document.cookie = `refreshToken=${refreshToken}; path=/; secure; samesite=None`;
-      }
-
-      if (accessToken) {
-        document.cookie = `accessToken=${accessToken}; path=/; secure; samesite=None`;
-      }
-
-      const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/verify`,
-        {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+        if (refreshToken) {
+          document.cookie = `refreshToken=${refreshToken}; path=/; secure; samesite=None`;
         }
-      );
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status}`);
+        if (accessToken) {
+          document.cookie = `accessToken=${accessToken}; path=/; secure; samesite=None`;
+        }
+
+        const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/verify`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ accessToken, refreshToken }),
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        setUser(data.user);
+
+        // Update tokens in Capacitor Storage
+        const newAccessToken = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("accessToken="))
+          ?.split("=")[1];
+        const newRefreshToken = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith("refreshToken="))
+          ?.split("=")[1];
+
+        if (newAccessToken) {
+          await Preferences.set({ key: "accessToken", value: newAccessToken });
+        }
+
+        if (newRefreshToken) {
+          await Preferences.set({
+            key: "refreshToken",
+            value: newRefreshToken,
+          });
+        }
+      } catch (e) {
+        console.error("Error fetching user", e);
       }
+    };
 
-      const data = await res.json();
-      setUser(data.user);
-
-      // Update tokens in Capacitor Storage
-      const newAccessToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("accessToken="))
-        ?.split("=")[1];
-      const newRefreshToken = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("refreshToken="))
-        ?.split("=")[1];
-
-      if (newAccessToken) {
-        await Storage.set({ key: "accessToken", value: newAccessToken });
-      }
-
-      if (newRefreshToken) {
-        await Storage.set({ key: "refreshToken", value: newRefreshToken });
-      }
-    } catch (e) {
-      console.error("Error fetching user", e);
-    }
-  };
-
-  checkUser();
-}, [setUser]);
-
+    checkUser();
+  }, [setUser]);
 
   return (
     <div className="flex">

@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import UserContext from "../context/UserContext";
-import { Storage } from "@capacitor/storage";
+import { Preferences } from "@capacitor/preferences";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -62,11 +62,11 @@ const Login = () => {
         console.log(data);
         setUser(data.data.user);
 
-        await Storage.set({
+        await Preferences.set({
           key: "accessToken",
           value: data.data.accessToken,
         });
-        await Storage.set({
+        await Preferences.set({
           key: "refreshToken",
           value: data.data.refreshToken,
         });
