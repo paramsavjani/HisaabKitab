@@ -1,3 +1,5 @@
+import React from "react";
+
 const TransactionCard = ({
   transaction,
   userUsername,
@@ -11,167 +13,77 @@ const TransactionCard = ({
   const isSender = sender.username === userUsername;
 
   return (
-    <>
-      {/* Mobile View */}
-      <div className="block md:hidden w-full px-2">
+    <div
+      className={`w-full px-4 py-2 flex ${
+        isSender ? "justify-end" : "justify-start"
+      }`}
+    >
+      <div
+        className={`relative p-4 rounded-xl shadow-md min-w-[200px] max-w-[75%] ${
+          isSender ? "bg-gray-700" : "bg-gray-800"
+        }`}
+      >
+        {/* Header Section */}
+        <div className="flex justify-between items-center mb-2">
+          <p className="text-xs text-gray-400">
+            {new Date(createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        </div>
+
+        {/* Amount Section */}
         <div
-          className={`relative rounded-lg p-3 shadow-md max-w-[80%] ${
-            isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
+          className={`text-2xl font-semibold ${
+            isSender ? "text-gray-300" : "text-red-400"
           }`}
         >
-          {/* Tail */}
-          <div
-            className={`absolute top-4 ${
-              isSender ? "right-[-6px]" : "left-[-6px]"
-            }`}
-          >
-            <div
-              className={`w-3 h-3 ${
-                isSender ? "bg-gray-800" : "bg-gray-700"
-              } transform rotate-45`}
-            ></div>
-          </div>
+          ₹{Math.abs(amount)}
+        </div>
 
-          {/* Content */}
-          <div className="flex flex-col space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-400 font-medium">
-                {new Date(createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-              <p
-                className={`text-xl font-bold ${
-                  status === "rejected"
-                    ? "text-red-600 font-bold line-through"
-                    : (amount > 0 &&
-                        transaction.sender.username === userUsername) ||
-                      (amount < 0 &&
-                        transaction.sender.username !== userUsername)
-                    ? "text-green-400"
-                    : "text-red-400"
-                }`}
+        {/* Description Section */}
+        {description && (
+          <p className="text-sm text-gray-300 mt-2 truncate">{description}</p>
+        )}
+
+        {/* Action Buttons */}
+        {status === "pending" && (
+          <div className="flex space-x-2 mt-3">
+            {isSender ? (
+              <button
+                onClick={() => CancelTransaction(transactionId)}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-md text-sm"
               >
-                ₹{Math.abs(amount)}
-              </p>
-            </div>
-            <p className="text-sm text-gray-300 truncate">
-              {description ||""}
-            </p>
-
-            {/* Pending Actions */}
-            {status === "pending" && isSender ? (
-              <div className="flex space-x-2 mt-2">
-                <button
-                  onClick={() => CancelTransaction(transactionId)}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
-                >
-                  Cancel
-                </button>
-              </div>
+                Cancel
+              </button>
             ) : (
-              status === "pending" &&
-              !isSender && (
-                <div className="flex space-x-2 mt-2">
-                  <button
-                    onClick={() => AcceptTransaction(transactionId)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => DenyTransaction(transactionId)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )
+              <>
+                <button
+                  onClick={() => AcceptTransaction(transactionId)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => DenyTransaction(transactionId)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm"
+                >
+                  Reject
+                </button>
+              </>
             )}
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Laptop/Desktop View */}
-      <div className="hidden md:block w-full px-4">
+        {/* Tail Design */}
         <div
-          className={`relative rounded-lg p-4 shadow-lg max-w-[60%] ${
-            isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
-          }`}
-        >
-          {/* Tail */}
-          <div
-            className={`absolute top-4 ${
-              isSender ? "right-[-6px]" : "left-[-6px]"
-            }`}
-          >
-            <div
-              className={`w-3 h-3 ${
-                isSender ? "bg-gray-800" : "bg-gray-700"
-              } transform rotate-45`}
-            ></div>
-          </div>
-
-          {/* Content */}
-          <div className="flex flex-col space-y-3">
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-400 font-medium">
-                {new Date(createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </span>
-              <p
-                className={`text-xl font-bold ${
-                  status === "rejected"
-                    ? "text-red-600 font-bold line-through"
-                    : (amount > 0 &&
-                        transaction.sender.username === userUsername) ||
-                      (amount < 0 &&
-                        transaction.sender.username !== userUsername)
-                    ? "text-green-400"
-                    : "text-red-400"
-                }`}
-              >
-                ₹{Math.abs(amount)}
-              </p>
-            </div>
-            <p className="text-sm text-gray-300">{description || ""}</p>
-
-            {/* Pending Actions */}
-            {status === "pending" && isSender ? (
-              <div className="flex space-x-3 mt-2">
-                <button
-                  onClick={() => CancelTransaction(transactionId)}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              status === "pending" &&
-              !isSender && (
-                <div className="flex space-x-3 mt-2">
-                  <button
-                    onClick={() => AcceptTransaction(transactionId)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => DenyTransaction(transactionId)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )
-            )}
-          </div>
-        </div>
+          className={`absolute w-4 h-4 ${
+            isSender ? "bg-gray-700 right-[-8px]" : "bg-gray-800 left-[-8px]"
+          } top-4 rotate-45`}
+        ></div>
       </div>
-    </>
+    </div>
   );
 };
 

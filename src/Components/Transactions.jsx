@@ -135,7 +135,7 @@ const Transactions = () => {
   const DenyTransaction = async (transactionId) => {
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/reject`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/deny`,
         {
           method: "POST",
           headers: {
@@ -247,7 +247,7 @@ const Transactions = () => {
             {Object.keys(groupedTransactions).map((date) => (
               <div key={date}>
                 <div className="text-gray-400 text-sm mb-2">{date}</div>
-                <div className="space-y-4">
+                <div className="space-y-0">
                   {groupedTransactions[date].map((transaction) => (
                     <TransactionCard
                       key={transaction.transactionId}
