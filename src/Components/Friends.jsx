@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useContext } from "react";
-import UserContext from "../context/UserContext";
+import UserContext from "../context/UserContext.js";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // AOS styles
 
 function Friends() {
-  const { user } = useContext(UserContext);
+  const { user, accessToken, refreshToken } = useContext(UserContext);
   const [friends, setFriends] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
@@ -19,8 +19,13 @@ function Friends() {
       // Fetch friends list
       setLoading(true); // Set loading to true when the request starts
       fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/friends`, {
-        method: "GET",
+        method: "POST",
         credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        }),
       })
         .then((response) => {
           if (!response.ok) {
@@ -43,7 +48,7 @@ function Friends() {
     } else {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, accessToken, refreshToken]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black py-10 px-4">
@@ -94,7 +99,11 @@ function Friends() {
           {friends.length > 0 ? (
             <ul className="space-y-4">
               {friends.map((friend, index) => (
-                <Link to={`/transactions/${user.username}--${friend.username}`} className="" key={index}>
+                <Link
+                  to={`/transactions/${user.username}--${friend.username}`}
+                  className=""
+                  key={index}
+                >
                   <li
                     className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
                     data-aos="zoom-in"

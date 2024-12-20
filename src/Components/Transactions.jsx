@@ -4,6 +4,7 @@ import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
 import TransactionSkeleton from "./TransactionSkeleton";
 import { toast } from "react-toastify";
+import UserContext from "../context/UserContext.js";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -17,6 +18,7 @@ const Transactions = () => {
   const userUsername = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
   const lastTransactionRef = useRef(null); // Ref for the last transaction
+  const { accessToken, refreshToken } = React.useContext(UserContext);
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
@@ -30,11 +32,15 @@ const Transactions = () => {
         const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}`,
           {
-            method: "GET",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             credentials: "include",
+            body: JSON.stringify({
+              accessToken,
+              refreshToken,
+            }),
           }
         );
 
@@ -54,7 +60,7 @@ const Transactions = () => {
     };
 
     fetchTransactions();
-  }, [friendId]);
+  }, [accessToken, friendId, refreshToken]);
 
   useEffect(() => {
     setTotal(() => 0);
@@ -101,19 +107,16 @@ const Transactions = () => {
   if (loading) {
     return <TransactionSkeleton />;
   }
-  if(error)
-  {
-    toast.error(error,
-      {
-        position: "top-right",
-        autoClose: 7000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined
-      }
-    );
+  if (error) {
+    toast.error(error, {
+      position: "top-right",
+      autoClose: 7000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
     return <TransactionSkeleton />;
   }
 

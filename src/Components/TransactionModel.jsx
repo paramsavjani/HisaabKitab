@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
+import UserContext from "../context/UserContext.js";
 
 const TransactionModal = ({
   transactionType,
@@ -9,6 +10,7 @@ const TransactionModal = ({
 }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const { accessToken, refreshToken } = React.useContext(UserContext);
   const handleSubmit = async () => {
     if (!amount || isNaN(amount)) {
       toast.error("Please enter a valid amount", {
@@ -36,6 +38,8 @@ const TransactionModal = ({
           amount:
             transactionType === "give" ? Math.abs(amount) : -Math.abs(amount),
           description,
+          accessToken,
+          refreshToken,
         }),
       });
 

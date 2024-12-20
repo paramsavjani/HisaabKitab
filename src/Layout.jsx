@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Navbar from "./Components/Navbar";
 import { Outlet } from "react-router-dom";
 // import Footer from "./Components/Footer";
-import UserContext from "./context/UserContext";
+import UserContext from "./context/UserContext.js";
 import { useContext } from "react";
 import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
@@ -47,7 +47,6 @@ const Layout = () => {
         const data = await res.json();
         setUser(data.user);
 
-        // Update tokens in Capacitor Storage
         const newAccessToken = document.cookie
           .split("; ")
           .find((row) => row.startsWith("accessToken="))

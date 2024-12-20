@@ -1,61 +1,64 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { FaExclamationTriangle } from "react-icons/fa"; // Error icon
 import { FaSpinner } from "react-icons/fa"; // Spinner icon
 import { Link } from "react-router-dom";
+import UserContext from "../context/UserContext.js";
 
 function IncomingRequests() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false); // State for loading spinner
   const [errorMessage, setErrorMessage] = useState(""); // Error state
+  const { accessToken, refreshToken } = React.useContext(UserContext);
 
   // Fetch incoming requests from the backend
   useEffect(() => {
     setLoading(true); // Set loading state to true when starting the fetch request
-    axios
-      .get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
-        { withCredentials: true }
-      )
-      .then((response) => {
-        console.log(response.data.data.senders);
-        setRequests(response.data.data.senders); // Assuming the backend returns an array of requests
-        setLoading(false); // Reset loading state after response
+    fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken, refreshToken }),
+      }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setRequests(data.data.senders);
+        setLoading(false); // Reset loading state after successful fetch
       })
       .catch((error) => {
         setLoading(false); // Reset loading state after error
         setErrorMessage("Failed to load incoming requests. Please try again.");
         console.error("Error fetching requests:", error);
       });
-  }, []);
+  }, [accessToken, refreshToken]);
 
   const handleRequest = async (id, action) => {
     // Handle request action (accept or deny)
 
     setLoading(true);
-    await axios.post(
+    const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/${action}`,
-      {},
-      { withCredentials: true }
+      {
+        credentials: "include",
+        method: "POST",
+        body: JSON.stringify({ accessToken, refreshToken }),
+        headers: { "Content-Type": "application/json" },
+      }
     );
 
-    // Fetch updated requests after accepting/denying
-    axios
-      .get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
-        { withCredentials: true }
-      )
-      .then((response) => {
-        setRequests(response.data.data.senders);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setErrorMessage("Failed to load incoming requests. Please try again.");
-        console.error("Error fetching requests:", error);
-      });
+    if (!res.ok) {
+      const data = await res.json();
+      setErrorMessage(
+        data.message || "Failed to handle request. Please try again."
+      );
+      setLoading(false);
+      return;
+    }
 
-    // Implement the API call to accept/deny request here
+    setRequests(requests.filter((request) => request.requestId !== id));
+    setLoading(false);
   };
 
   return (

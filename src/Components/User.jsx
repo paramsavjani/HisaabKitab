@@ -4,11 +4,11 @@ import { FaSpinner } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify"; // Importing toast
 import "react-toastify/dist/ReactToastify.css"; // Importing styles
 
-import UserContext from "../context/UserContext";
+import UserContext from "../context/UserContext.js";
 import UserNotFound from "./UserNotFound";
 
 const User = () => {
-  const { user } = useContext(UserContext);
+  const { user, accessToken, refreshToken } = useContext(UserContext);
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,8 +52,12 @@ const User = () => {
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/friends/${id}`,
           {
-            method: "GET",
+            method: "POST",
             credentials: "include",
+            body: JSON.stringify({
+              accessToken,
+              refreshToken,
+            }),
           }
         );
         if (response.ok) {
@@ -68,7 +72,14 @@ const User = () => {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/alreadyRequested`,
-          { method: "GET", credentials: "include" }
+          {
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify({
+              accessToken,
+              refreshToken,
+            }),
+          }
         );
         if (response.ok) {
           const data = await response.json();
@@ -82,29 +93,7 @@ const User = () => {
     fetchFriendStatus();
     fetchRequestStatus();
     setLoading(false);
-  }, [profile, id]);
-
-  // Fetch if a request was already sent
-  useEffect(() => {
-    if (!profile) return;
-    const fetchRequestStatus = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/alreadyRequested`,
-          { method: "GET", credentials: "include" }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setRequestId(data.data.requestId);
-          setIsRequestSent(true);
-        }
-      } catch (error) {
-        toast.error("Error fetching request status!");
-      }
-    };
-
-    fetchRequestStatus();
-  }, [profile, id]);
+  }, [profile, id, accessToken, refreshToken]);
 
   // Send friend request
   const addFriend = async () => {
@@ -112,7 +101,11 @@ const User = () => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${profile.username}/send`,
-        { method: "POST", credentials: "include" }
+        {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
+        }
       );
       if (response.ok) {
         const data = await response.json();
@@ -136,7 +129,11 @@ const User = () => {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${requestId}/cancel`,
-          { method: "DELETE", credentials: "include" }
+          {
+            method: "POST",
+            credentials: "include",
+            body: JSON.stringify({ accessToken, refreshToken }),
+          }
         );
         if (response.ok) {
           setIsRequestSent(false);

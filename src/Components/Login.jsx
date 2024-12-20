@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
-import UserContext from "../context/UserContext";
+import UserContext from "../context/UserContext.js";
 import { Preferences } from "@capacitor/preferences";
 
 const Login = () => {
@@ -8,7 +8,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, setRefreshToken, setAccessToken } =
+    useContext(UserContext);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -70,6 +71,9 @@ const Login = () => {
           key: "refreshToken",
           value: data.data.refreshToken,
         });
+
+        setAccessToken(data.data.accessToken);
+        setRefreshToken(data.data.refreshToken);
 
         window.history.pushState({}, "", "/dashboard");
         window.dispatchEvent(new PopStateEvent("popstate"));
