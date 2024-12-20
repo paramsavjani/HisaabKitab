@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import TransactionCard from "./TransactionCard";
+import TransactionModal from "./TransactionModel";
+import { toast } from "react-toastify";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -12,43 +15,8 @@ const Transactions = () => {
   const [transactionType, setTransactionType] = useState(null); // 'give' or 'get'
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-
-  const TransactionModal = ({ onClose, onSubmit }) => (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg p-6 w-96 space-y-4">
-        <h2 className="text-xl font-bold text-white">
-          {transactionType === "give" ? "You Gave" : "You Got"} Money
-        </h2>
-        <input
-          type="number"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="Enter amount"
-          className="w-full p-2 bg-gray-700 text-white rounded-md outline-none"
-        />
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Add a description (optional)"
-          className="w-full p-2 bg-gray-700 text-white rounded-md outline-none"
-        ></textarea>
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={onClose}
-            className="bg-red-600 px-4 py-2 rounded-md text-white hover:bg-red-700"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSubmit}
-            className="bg-green-600 px-4 py-2 rounded-md text-white hover:bg-green-700"
-          >
-            Submit
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  const userUsername = chatId.split("--")[0];
+  const friendId = chatId.split("--")[1];
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
@@ -79,7 +47,17 @@ const Transactions = () => {
 
       const data = await res.json();
       console.log(data);
-      if (!res.ok) throw new Error(data.message);
+      if (!res.ok) {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+      }
 
       // Update transactions locally if needed
       // setTransactions((prev) => [...prev, data.transaction]);
@@ -90,9 +68,6 @@ const Transactions = () => {
       console.error(err.message);
     }
   };
-
-  const friendId = chatId.split("--")[1];
-  const userUsername = chatId.split("--")[0];
 
   useEffect(() => {
     document.title = "Transactions";
@@ -240,153 +215,39 @@ const Transactions = () => {
     }
   };
 
-  const TransactionCard = ({ transaction, currentUser }) => {
-    const { createdAt, amount, description, status, transactionId, sender } =
-      transaction;
-
-    const isSender = sender.username === userUsername;
-
-    return (
-      <>
-        {/* Mobile View */}
-        <div className="block md:hidden w-full px-2">
-          <div
-            className={`relative rounded-lg p-3 shadow-md max-w-[90%] ${
-              isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
-            }`}
-          >
-            {/* Tail */}
-            <div
-              className={`absolute top-4 ${
-                isSender ? "right-[-6px]" : "left-[-6px]"
-              }`}
-            >
-              <div
-                className={`w-3 h-3 ${
-                  isSender ? "bg-gray-800" : "bg-gray-700"
-                } transform rotate-45`}
-              ></div>
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-col space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-gray-400 font-medium">
-                  {new Date(createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-                <p
-                  className={`text-xl font-bold ${
-                    status === "rejected"
-                      ? "text-red-600 font-bold line-through"
-                      : (amount > 0 &&
-                          transaction.sender.username === userUsername) ||
-                        (amount < 0 &&
-                          transaction.sender.username !== userUsername)
-                      ? "text-green-400"
-                      : "text-red-400"
-                  }`}
-                >
-                  ₹{Math.abs(amount)}
-                </p>
-              </div>
-              <p className="text-sm text-gray-300 truncate">
-                {description || "No Description"}
-              </p>
-
-              {/* Pending Actions */}
-              {status === "pending" && isSender && (
-                <div className="flex space-x-2 mt-2">
-                  <button
-                    onClick={() => AcceptTransaction(transactionId)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => DenyTransaction(transactionId)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md shadow-sm text-sm transition-all duration-200"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Laptop/Desktop View */}
-        <div className="hidden md:block w-full px-4">
-          <div
-            className={`relative rounded-lg p-4 shadow-lg max-w-[60%] ${
-              isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
-            }`}
-          >
-            {/* Tail */}
-            <div
-              className={`absolute top-4 ${
-                isSender ? "right-[-6px]" : "left-[-6px]"
-              }`}
-            >
-              <div
-                className={`w-3 h-3 ${
-                  isSender ? "bg-gray-800" : "bg-gray-700"
-                } transform rotate-45`}
-              ></div>
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-col space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400 font-medium">
-                  {new Date(createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-                <p
-                  className={`text-xl font-bold ${
-                    status === "rejected"
-                      ? "text-red-600 font-bold line-through"
-                      : (amount > 0 &&
-                          transaction.sender.username === userUsername) ||
-                        (amount < 0 &&
-                          transaction.sender.username !== userUsername)
-                      ? "text-green-400"
-                      : "text-red-400"
-                  }`}
-                >
-                  ₹{Math.abs(amount)}
-                </p>
-              </div>
-              <p className="text-sm text-gray-300">
-                {description || "No Description"}
-              </p>
-
-              {/* Pending Actions */}
-              {status === "pending" && isSender && (
-                <div className="flex space-x-3 mt-2">
-                  <button
-                    onClick={() => AcceptTransaction(transactionId)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
-                  >
-                    Accept
-                  </button>
-                  <button
-                    onClick={() => DenyTransaction(transactionId)}
-                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md font-medium transition-all duration-200"
-                  >
-                    Reject
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </>
-    );
+  const CancelTransaction = async (transactionId) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/cancel`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const data = await res.json();
+      console.log(data.message);
+      if (!res.ok) {
+        console.log(res);
+        return;
+      }
+      toast.success(data.message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        theme: "colored",
+      });
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter((t) => t.transactionId !== transactionId)
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const ErrorState = () => (
@@ -440,6 +301,10 @@ const Transactions = () => {
                     <TransactionCard
                       key={transaction.transactionId}
                       transaction={transaction}
+                      AcceptTransaction={AcceptTransaction}
+                      CancelTransaction={CancelTransaction}
+                      DenyTransaction={DenyTransaction}
+                      userUsername={userUsername}
                     />
                   ))}
                 </div>
@@ -469,6 +334,11 @@ const Transactions = () => {
         <TransactionModal
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
+          transactionType={transactionType}
+          amount={amount}
+          setAmount={setAmount}
+          setDescription={setDescription}
+          description={description}
         />
       )}
     </div>
