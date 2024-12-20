@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import UserContext from "../context/UserContext";
+import { Storage } from "@capacitor/storage";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -58,7 +59,18 @@ const Login = () => {
         setErrorMessage(data.message.message);
         setLoading(false);
       } else {
+        console.log(data);
         setUser(data.data.user);
+
+        await Storage.set({
+          key: "accessToken",
+          value: data.data.accessToken,
+        });
+        await Storage.set({
+          key: "refreshToken",
+          value: data.data.refreshToken,
+        });
+
         window.history.pushState({}, "", "/dashboard");
         window.dispatchEvent(new PopStateEvent("popstate"));
       }
