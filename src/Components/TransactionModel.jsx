@@ -56,6 +56,7 @@ const TransactionModal = ({
 
       // Update transactions locally if needed
       setTransactions((prev) => [
+        ...prev,
         {
           amount: data.transaction._doc.amount,
           description: data.transaction._doc.description,
@@ -64,7 +65,6 @@ const TransactionModal = ({
           status: data.transaction._doc.status,
           sender: data.transaction.sender,
         },
-        ...prev,
       ]);
       setIsModalOpen(false);
       setAmount("");

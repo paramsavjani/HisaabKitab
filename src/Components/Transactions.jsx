@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
@@ -15,6 +15,7 @@ const Transactions = () => {
   const [transactionType, setTransactionType] = useState(null); // 'give' or 'get'
   const userUsername = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
+  const lastTransactionRef = useRef(null); // Ref for the last transaction
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
@@ -42,11 +43,7 @@ const Transactions = () => {
         }
 
         const data = await res.json();
-        console.log(data.transactions);
-        setTransactions(data.transactions);
-        console.log(data.transactions);
-        setTotal(() => 0);
-
+        setTransactions(data.transactions.reverse()); // No need to reverse, just set the data
         setFriend(data.friend);
       } catch (err) {
         setError(err.message);
@@ -69,7 +66,7 @@ const Transactions = () => {
         }
       }
     }
-  }, [transactions, setTransactions, userUsername]);
+  }, [transactions, userUsername]);
 
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
@@ -81,7 +78,15 @@ const Transactions = () => {
   };
   const groupedTransactions = groupTransactionsByDate(transactions);
 
-  console.log(groupedTransactions)
+  // Scroll to the bottom whenever transactions are updated
+  useEffect(() => {
+    if (lastTransactionRef.current) {
+      lastTransactionRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
+  }, [transactions]); // Trigger scroll when transactions update
 
   const ErrorState = () => (
     <div className="text-red-500 text-center text-lg">{error}</div>
@@ -124,37 +129,47 @@ const Transactions = () => {
       </div>
 
       {/* Transactions Section */}
-      <div className="flex-1 pb-24 md:pb-24 pt-24 md:pt-28 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
+      <div className="flex-1 pt-24 md:pt-28 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
           <div className="space-y-6">
-            {Object.keys(groupedTransactions).map((date) => (
-              <div key={date}>
-                <div className="flex justify-center items-center">
-                  <div className="flex justify-center items-center bg-gray-800 text-gray-400 text-sm h-8 w-36 rounded shadow-lg">
-                    {new Date(groupedTransactions[date][0].createdAt).toLocaleDateString(
-                      "en-US",
-                      {
+            {Object.keys(groupedTransactions)
+              .sort((a, b) => new Date(b) - new Date(a)) // Sort dates in descending order
+              .map((date) => (
+                <div key={date}>
+                  <div className="flex justify-center items-center">
+                    <div className="flex justify-center items-center bg-gray-800 text-gray-400 text-sm h-8 w-36 rounded shadow-lg">
+                      {new Date(
+                        groupedTransactions[date][0].createdAt
+                      ).toLocaleDateString("en-US", {
                         day: "numeric",
-                        month: "long", // Use 'short' for abbreviated month names
+                        month: "long",
                         year: "numeric",
-                      }
-                    )}
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="space-y-0">
+                    {groupedTransactions[date].map((transaction, index) => (
+                      <div
+                        ref={
+                          index === groupedTransactions[date].length - 1
+                            ? lastTransactionRef
+                            : null
+                        }
+                        className={`${index === groupedTransactions[date].length - 1 ? "md:pb-20 pb-20" : ""}`}
+                        key={transaction.transactionId}
+                      >
+                        <TransactionCard
+                          transaction={transaction}
+                          userUsername={userUsername}
+                          setTransactions={setTransactions}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
-
-                <div className="space-y-0">
-                  {groupedTransactions[date].map((transaction) => (
-                    <TransactionCard
-                      key={transaction.transactionId}
-                      transaction={transaction}
-                      userUsername={userUsername}
-                      setTransactions={setTransactions}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
         {!loading && !error && transactions.length === 0 && <EmptyState />}
@@ -177,6 +192,7 @@ const Transactions = () => {
           You Got
         </button>
       </div>
+
       {isModalOpen && (
         <TransactionModal
           transactionType={transactionType}
