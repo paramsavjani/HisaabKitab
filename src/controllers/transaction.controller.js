@@ -72,7 +72,7 @@ const addTransaction = asyncHandler(async (req, res) => {
 
   return res.status(200).json({
     message: "Transaction added successfully",
-    transaction: { ...isAdded, sender: friend },
+    transaction: { ...isAdded, sender: user },
   });
 });
 
