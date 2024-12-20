@@ -62,8 +62,6 @@ const addTransaction = asyncHandler(async (req, res) => {
     status: amount < 0 ? "completed" : "pending",
   });
 
-  console.log(isAdded);
-
   if (!isAdded) {
     return res.status(500).json({ message: "Transaction failed" });
   }
