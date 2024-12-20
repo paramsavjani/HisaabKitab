@@ -79,8 +79,9 @@ const Transactions = () => {
       return groups;
     }, {});
   };
-
   const groupedTransactions = groupTransactionsByDate(transactions);
+
+  console.log(groupedTransactions)
 
   const ErrorState = () => (
     <div className="text-red-500 text-center text-lg">{error}</div>
@@ -129,7 +130,19 @@ const Transactions = () => {
           <div className="space-y-6">
             {Object.keys(groupedTransactions).map((date) => (
               <div key={date}>
-                <div className="text-gray-400 text-sm mb-2">{date}</div>
+                <div className="flex justify-center items-center">
+                  <div className="flex justify-center items-center bg-gray-800 text-gray-400 text-sm h-8 w-36 rounded shadow-lg">
+                    {new Date(groupedTransactions[date][0].createdAt).toLocaleDateString(
+                      "en-US",
+                      {
+                        day: "numeric",
+                        month: "long", // Use 'short' for abbreviated month names
+                        year: "numeric",
+                      }
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-0">
                   {groupedTransactions[date].map((transaction) => (
                     <TransactionCard
