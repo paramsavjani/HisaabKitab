@@ -12,6 +12,17 @@ const Layout = () => {
   useEffect(() => {
     const checkUser = async () => {
       try {
+        const AccessToken = localStorage.getItem("accessToken");
+        const RefreshToken = localStorage.getItem("refreshToken");
+
+        if (RefreshToken) {
+          document.cookie = `refreshToken=${RefreshToken}; path=/; secure; samesite=None`;
+        }
+
+        if (AccessToken) {
+          document.cookie = `accessToken=${AccessToken}; path=/; secure; samesite=None`;
+        }
+
         const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/verify`,
           {
@@ -25,6 +36,19 @@ const Layout = () => {
         if (res.ok) {
           const data = await res.json();
           setUser(data.user);
+          const accessToken = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("accessToken="))
+            ?.split("=")[1];
+          const refreshToken = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("refreshToken="))
+            ?.split("=")[1];
+
+          if (accessToken && refreshToken) {
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+          }
         }
       } catch (e) {
         console.error("Error fetching user", e);
