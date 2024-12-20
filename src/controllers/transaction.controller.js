@@ -18,7 +18,9 @@ const addTransaction = asyncHandler(async (req, res) => {
     });
   }
 
-  const friend = await User.findOne({ username: friendUsername }).select("username name profilePicture email");
+  const friend = await User.findOne({ username: friendUsername }).select(
+    "username name profilePicture email"
+  );
 
   if (!friend) {
     return res.status(402).json({ message: "Friend not found" });
@@ -60,7 +62,7 @@ const addTransaction = asyncHandler(async (req, res) => {
     status: amount < 0 ? "completed" : "pending",
   });
 
-  console.log(isAdded)
+  console.log(isAdded);
 
   if (!isAdded) {
     return res.status(500).json({ message: "Transaction failed" });
@@ -70,7 +72,12 @@ const addTransaction = asyncHandler(async (req, res) => {
   friendship.isActive = true;
   await friendship.save();
 
-  return res.status(200).json({ message: "Transaction added successfully",transaction:{...isAdded,sender:friend} });
+  return res
+    .status(200)
+    .json({
+      message: "Transaction added successfully",
+      transaction: { ...isAdded, sender: friend },
+    });
 });
 
 const showTransactions = asyncHandler(async (req, res) => {
@@ -199,7 +206,7 @@ const cancelTransaction = asyncHandler(async (req, res) => {
   const user = await User.findOne({ _id: userId });
   const transactionId = req.params.transactioinId;
   if (!transactionId.match(/^[0-9a-fA-F]{24}$/)) {
-    throw new ApiError(400, "Invalid transaction ID");
+    return res.status(400).json({ message: "Invalid transaction ID" });
   }
 
   const transaction = await Transaction.findOne({
@@ -207,29 +214,26 @@ const cancelTransaction = asyncHandler(async (req, res) => {
   });
 
   if (!transaction) {
-    throw new ApiError(404, "Transaction not found");
+    return res.status(404).json({ message: "Transaction not found" });
   }
 
   if (transaction.sender.toString() !== user._id.toString()) {
-    throw new ApiError(400, "You are not the sender of this transaction");
+    return res.status(400).json({ message: "You are not the sender" });
   }
 
   if (transaction.status !== "pending") {
-    throw new ApiError(400, "Transaction already completed or rejected");
+    return res.status(400).json({ message: "Transaction already completed" });
   }
 
   const deleted = await Transaction.deleteOne({ _id: transactionId });
 
   if (!deleted) {
-    throw new ApiError(500, "Transaction cancelation failed");
+    return res.status(500).json({ message: "Transaction cancel failed" });
   }
 
-  const response = new ApiResponse(
-    200,
-    {},
-    "Transaction canceled successfully"
-  );
-  res.status(200).json(response);
+  return res
+    .status(200)
+    .json({ message: "Transaction cancelled successfully" });
 });
 
 const getActiveFriends = asyncHandler(async (req, res) => {
