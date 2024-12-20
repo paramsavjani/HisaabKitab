@@ -71,8 +71,8 @@ const TransactionCard = ({
             isSender ? "text-right" : "text-left"
           } ${
            ( isSender && transaction.amount > 0) || (!isSender && transaction.amount < 0 )
-              ? "text-green-400"
-              : "text-red-400"
+              ? "text-green-500"
+              : "text-red-500"
           }`}
         >
           ₹{Math.abs(amount)}
@@ -82,7 +82,7 @@ const TransactionCard = ({
         {description && (
           <div
             className={`text-sm italic font-mono text-gray-300 truncate ${
-              isSender ? "text-right pl-10" : "text-left pr-10"
+              isSender ? "text-right pl-5" : "text-left pr-5"
             }`}
           >
             {description}
@@ -99,7 +99,7 @@ const TransactionCard = ({
             {isSender ? (
               <button
                 onClick={handleCancel}
-                className="bg-yellow-600 hover:bg-yellow-700 border-2 border-yellow-400 text-white px-3 py-1 w-1/2 rounded-md text-sm flex items-center justify-center"
+                className="bg-yellow-600 hover:bg-yellow-700 border-2 border-yellow-400 text-white px-3 py-1 w-full rounded-md text-sm flex items-center justify-center"
                 disabled={loading.cancel}
               >
                 {loading.cancel ? (
