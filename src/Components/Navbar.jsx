@@ -11,6 +11,7 @@ import SearchIcon from "../assets/icons/search.png";
 import AddTransactionIcon from "../assets/icons/transfer1.png";
 import SplitExpenseIcon from "../assets/icons/group.png";
 import SettingIcon from "../assets/icons/gear1.png";
+import { Preferences } from "@capacitor/preferences";
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -125,6 +126,8 @@ function Navbar() {
       if (!response.ok) {
         throw new Error("Logout failed");
       }
+
+      await Preferences.clear();
 
       setUser(null);
       window.location.reload();
