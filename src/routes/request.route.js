@@ -14,16 +14,16 @@ const router = Router();
 
 router.route("/:username/send").post(verifyJWT, sendRequest);
 
-router.route("/receivedAll").get(verifyJWT, receivedAll);
+router.route("/receivedAll").post(verifyJWT, receivedAll);
 
 router.route("/:requestId/accept").post(verifyJWT, acceptRequest);
 
 router.route("/:requestId/deny").post(verifyJWT, denyRequest);
 
-router.route("/sendAll").get(verifyJWT, sendAll);
+router.route("/sendAll").post(verifyJWT, sendAll);
 
-router.route("/:requestId/cancel").delete(verifyJWT, cancelRequest);
+router.route("/:requestId/cancel").post(verifyJWT, cancelRequest);
 
-router.route("/:username/alreadyRequested").get(verifyJWT, alreadyRequested);
+router.route("/:username/alreadyRequested").post(verifyJWT, alreadyRequested);
 
 export default router;
