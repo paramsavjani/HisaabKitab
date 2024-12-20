@@ -15,7 +15,7 @@ const TransactionCard = ({
       {/* Mobile View */}
       <div className="block md:hidden w-full px-2">
         <div
-          className={`relative rounded-lg p-3 shadow-md max-w-[90%] ${
+          className={`relative rounded-lg p-3 shadow-md max-w-[80%] ${
             isSender ? "ml-auto bg-gray-800" : "mr-auto bg-gray-700"
           }`}
         >
@@ -57,7 +57,7 @@ const TransactionCard = ({
               </p>
             </div>
             <p className="text-sm text-gray-300 truncate">
-              {description || "No Description"}
+              {description ||""}
             </p>
 
             {/* Pending Actions */}
