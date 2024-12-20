@@ -90,7 +90,7 @@ const registerUser = asyncHandler(async (req, res) => {
   );
 
   const options = {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite: "None",
   };
@@ -145,7 +145,7 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 
   const options = {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite: "None",
   };
@@ -173,7 +173,7 @@ const logoutUser = asyncHandler(async (req, res) => {
   );
 
   const option = {
-    httpOnly: true, // Prevents client-side access
+    httpOnly: false, // Prevents client-side access
     secure: true,
     sameSite: "None", // Needed for cross-origin cookies in production
   };
@@ -222,7 +222,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     }
 
     const options = {
-      httpOnly: true, // Prevents client-side access
+      httpOnly: false, // Prevents client-side access
       secure: true,
       sameSite: "None", // Needed for cross-origin cookies in production
     };
