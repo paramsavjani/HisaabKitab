@@ -31,7 +31,7 @@ const Layout = () => {
         const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/verify`,
           {
-            method: "GET",
+            method: "POST",
             credentials: "include",
             headers: {
               "Content-Type": "application/json",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
 import TransactionSkeleton from "./TransactionSkeleton";
@@ -82,7 +82,6 @@ const Transactions = () => {
   useEffect(() => {
     if (lastTransactionRef.current) {
       lastTransactionRef.current.scrollIntoView({
-        behavior: "smooth",
         block: "end",
       });
     }
@@ -114,11 +113,11 @@ const Transactions = () => {
           alt="Profile"
           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full"
         />
-        <div className="flex-1">
+        <Link to={`/users/${friend.username}`} className="flex-1">
           <h1 className="text-xl font-bold sm:text-3xl">
             {friend?.name || "Friend"}
           </h1>
-        </div>
+        </Link>
         <p
           className={`kranky-regular text-2xl font-bold ${
             total < 0 ? "text-red-500" : "text-green-500"
@@ -129,7 +128,7 @@ const Transactions = () => {
       </div>
 
       {/* Transactions Section */}
-      <div className="flex-1 pt-24 md:pt-28 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
+      <div className="flex-1 pt-24 md:pt-28 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
         {error && <ErrorState />}
         {!loading && !error && transactions.length > 0 && (
           <div className="space-y-6">
@@ -157,7 +156,11 @@ const Transactions = () => {
                             ? lastTransactionRef
                             : null
                         }
-                        className={`${index === groupedTransactions[date].length - 1 ? "md:pb-20 pb-20" : ""}`}
+                        className={`${
+                          index === groupedTransactions[date].length - 1
+                            ? "md:pb-20 pb-20"
+                            : ""
+                        }`}
                         key={transaction.transactionId}
                       >
                         <TransactionCard

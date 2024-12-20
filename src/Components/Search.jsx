@@ -52,7 +52,7 @@ const Search = () => {
       }
     };
     temp();
-  }, [query, search]);
+  }, [search]);
 
   const handleSearch = async (e) => {
     document.activeElement.blur();
