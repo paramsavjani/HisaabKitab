@@ -82,7 +82,6 @@ const Search = () => {
 
       const data = await response.json();
 
-      console.log("hii i am main");
 
       if (!response.ok) {
         const errorMessage = data.message || "An unknown error occurred.";

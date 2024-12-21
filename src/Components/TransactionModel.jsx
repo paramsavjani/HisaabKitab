@@ -44,8 +44,6 @@ const TransactionModal = ({
       });
 
       const data = await res.json();
-      console.log(data.transaction.sender);
-      console.log(data.transaction._doc);
       if (!res.ok) {
         toast.error(data.message, {
           position: "top-right",

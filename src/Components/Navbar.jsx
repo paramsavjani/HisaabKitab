@@ -50,7 +50,6 @@ function Navbar() {
             }
           );
           const data = await res.json();
-          console.log(data.data);
           setIncomingRequests(data.data.senders.length);
         } catch (e) {
           console.error("Error fetching requests:", e);

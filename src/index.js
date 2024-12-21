@@ -31,7 +31,6 @@ App.addListener("backButton", ({ canGoBack }) => {
       App.exitApp();
     }
     window.history.back();
-    console.log(window.history.back());
   } else {
     App.exitApp();
   }

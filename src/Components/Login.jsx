@@ -89,7 +89,6 @@ const Login = () => {
         setErrorMessage(data.message.message);
         setLoading(false);
       } else {
-        console.log(data);
         setUser(data.data.user);
 
         await Preferences.set({
