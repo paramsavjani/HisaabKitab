@@ -181,7 +181,7 @@ const TransactionCard = ({ transaction, userUsername, setTransactions }) => {
         {/* Description Section */}
         {description && (
           <div
-            className={`text-md italic caveat-regular text-gray-300 truncate ${
+            className={`text-lg italic caveat-regular text-gray-300 truncate ${
               isSender ? "text-right pl-5" : "text-left pr-5"
             }`}
           >

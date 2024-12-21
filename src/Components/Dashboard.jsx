@@ -59,19 +59,17 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 md:bg-gray-950 bg-slate-900 min-h-screen text-white">
+    <div className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white">
       {/* Header Section */}
-      <div className="pb-2 text-center mb-2 pt-1">
-        <h1
-          className="text-3xl font-bold pl-7"
-          style={{
-            background: "linear-gradient(to right, #00B4DB, #00FF94)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
+      <div className="flex items-center justify-center pb-3">
+        <img src="/logo.png" className="w-14 h-14" alt="CashTrack Logo" />
+        <Link
+          to="/"
+          className="text-4xl px-1 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
+          aria-label="Navigate to CashTrack homepage"
         >
-          Transaction Summary
-        </h1>
+          Cash<span className="text-white">Track</span>
+        </Link>
       </div>
 
       <div className="md:hidden p-4 px-0">

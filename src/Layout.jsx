@@ -85,7 +85,11 @@ const Layout = () => {
   return (
     <>
       {loading ? (
-        <div className="spinner"></div>
+        <div class="loader">
+          <div class="inner one"></div>
+          <div class="inner two"></div>
+          <div class="inner three"></div>
+        </div>
       ) : (
         <div className="flex">
           {/* Navbar */}
