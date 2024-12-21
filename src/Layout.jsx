@@ -8,10 +8,8 @@ import useDashboardContext from "./context/DashboardContext.js";
 import "./loading.css";
 
 const Layout = () => {
-  const { user, setUser, setAccessToken, setRefreshToken } =
-    useContext(UserContext);
-  const { setTotalGive, setTotalTake, setActiveFriends } =
-    useDashboardContext();
+  const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
+  const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
 
   const getTokenFromCookies = (key) =>
@@ -105,10 +103,8 @@ const Layout = () => {
         throw new Error("Failed to fetch dashboard data");
       }
 
-      const { friends, totalGive, totalTake } = await dashboardResponse.json();
+      const { friends} = await dashboardResponse.json();
       setActiveFriends(() => friends);
-      setTotalGive(() => totalGive);
-      setTotalTake(() => totalTake);
 
       // Push to dashboard after all data is loaded
       window.history.pushState({}, "", "/dashboard");
@@ -122,7 +118,7 @@ const Layout = () => {
 
   useEffect(() => {
     initializeApp();
-  }, []);
+  }, [setAccessToken]);
 
   return (
     <>

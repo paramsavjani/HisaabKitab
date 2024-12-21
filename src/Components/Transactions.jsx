@@ -5,6 +5,7 @@ import TransactionModal from "./TransactionModel";
 import TransactionSkeleton from "./TransactionSkeleton";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
+import useDashboardContext from "../context/DashboardContext.js";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -17,8 +18,9 @@ const Transactions = () => {
   const [transactionType, setTransactionType] = useState(null); // 'give' or 'get'
   const userUsername = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
-  const lastTransactionRef = useRef(null); // Ref for the last transaction
+  const lastTransactionRef = useRef(null);
   const { accessToken, refreshToken } = React.useContext(UserContext);
+  const { setActiveFriends } = useDashboardContext();
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
@@ -63,16 +65,32 @@ const Transactions = () => {
   }, [accessToken, friendId, refreshToken]);
 
   useEffect(() => {
-    setTotal(() => 0);
+    let accumulatedTotal = 0;
+
     for (let transaction of transactions) {
       if (transaction.status === "completed") {
         if (transaction.sender.username === userUsername) {
-          setTotal((prevTotal) => prevTotal + transaction.amount);
+          accumulatedTotal += transaction.amount; // Amount to totalGive
         } else {
-          setTotal((prevTotal) => prevTotal - transaction.amount);
+          accumulatedTotal -= transaction.amount; // Amount to totalTake
         }
       }
     }
+
+    setActiveFriends((prevActiveFriends) => {
+      const updatedActiveFriends = prevActiveFriends.map((friend) => {
+        if (friend.username === friendId) {
+          return {
+            ...friend,
+            totalAmount: accumulatedTotal,
+          };
+        }
+        return friend;
+      });
+      return updatedActiveFriends;
+    });
+
+    setTotal(() => accumulatedTotal);
   }, [transactions, userUsername]);
 
   const groupTransactionsByDate = (transactions) => {

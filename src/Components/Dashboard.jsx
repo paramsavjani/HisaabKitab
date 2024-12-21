@@ -11,7 +11,22 @@ import useDashboardContext from "../context/DashboardContext.js";
 const Dashboard = () => {
   const { user } = useContext(UserContext);
   // friend:{username,name,lastTransactionTime,profilePicture}
-  const { totalGive, totalTake, activeFriends } = useDashboardContext();
+  const { activeFriends } = useDashboardContext();
+
+  const [totalTake, setTotalTake] = React.useState(0);
+  const [totalGive, setTotalGive] = React.useState(0);
+
+  useEffect(() => {
+    setTotalTake(() => 0);
+    setTotalGive(() => 0);
+    activeFriends.forEach((friend) => {
+      if (friend.totalAmount < 0) {
+        setTotalGive((prev) => prev + friend.totalAmount);
+      } else {
+        setTotalTake((prev) => prev + friend.totalAmount);
+      }
+    });
+  }, [activeFriends]);
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
@@ -20,39 +35,6 @@ const Dashboard = () => {
       window.location.href = "/login";
     }
   }, [user]);
-
-  // useEffect(() => {
-  //   const fetchFriends = async () => {
-  //     try {
-  //       const res = await fetch(
-  //         `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
-  //         {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           credentials: "include",
-  //           body: JSON.stringify({
-  //             accessToken,
-  //             refreshToken,
-  //           }),
-  //         }
-  //       );
-  //       if (!res.ok) {
-  //         throw new Error("Failed to fetch friends");
-  //       }
-  //       const data = await res.json();
-  //       setFriends(data.friends);
-  //       setTotalGive(data.totalGive);
-  //       setTotalTake(data.totalTake);
-  //     } catch (err) {
-  //       console.error(err);
-  //     } finally {
-  //       if (user) setLoading(false);
-  //     }
-  //   };
-  //   fetchFriends();
-  // }, [user, accessToken, refreshToken]);
 
   return (
     <div className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white">

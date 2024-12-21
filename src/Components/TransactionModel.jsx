@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
 
+
 const TransactionModal = ({
   transactionType,
   friendId,

@@ -12,7 +12,7 @@ const Login = () => {
   const { user, setUser, setRefreshToken, setAccessToken } =
     useContext(UserContext);
   const [isMobile, setIsMobile] = useState(false);
-  const { setTotalGive, setTotalTake, setActiveFriends } = useDashboardContext();
+  const { setActiveFriends } = useDashboardContext();
 
   useEffect(() => {
     if (user) {
@@ -45,10 +45,8 @@ const Login = () => {
         throw new Error("Failed to fetch dashboard data");
       }
 
-      const { friends, totalGive, totalTake } = await response.json();
+      const { friends } = await response.json();
       setActiveFriends(friends);
-      setTotalGive(totalGive);
-      setTotalTake(totalTake);
       
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
