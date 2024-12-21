@@ -14,6 +14,7 @@ import Search from "./Components/Search";
 import User from "./Components/User";
 import IncomingRequests from "./Components/IncomingRequests";
 import Transactions from "./Components/Transactions";
+import DashboardContextProvider from "./context/DashboardContextProvider";
 
 import {
   createBrowserRouter,
@@ -23,16 +24,14 @@ import {
 } from "react-router-dom";
 import Dashboard from "./Components/Dashboard";
 
-
 import { App } from "@capacitor/app";
 App.addListener("backButton", ({ canGoBack }) => {
   if (canGoBack) {
-    if(window.location.pathname === "/dashboard")
-    {
+    if (window.location.pathname === "/dashboard") {
       App.exitApp();
     }
     window.history.back();
-    console.log(window.history.back())
+    console.log(window.history.back());
   } else {
     App.exitApp();
   }
@@ -61,7 +60,9 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
     <UserContextProvider>
-      <RouterProvider router={router} />
+      <DashboardContextProvider>
+        <RouterProvider router={router} />
+      </DashboardContextProvider>
     </UserContextProvider>
   </>
 );

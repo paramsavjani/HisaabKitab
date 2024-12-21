@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import UserContext from "../context/UserContext.js";
 import { Preferences } from "@capacitor/preferences";
+import useDashboardContext from "../context/DashboardContext.js";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -11,6 +12,7 @@ const Login = () => {
   const { user, setUser, setRefreshToken, setAccessToken } =
     useContext(UserContext);
   const [isMobile, setIsMobile] = useState(false);
+  const { setTotalGive, setTotalTake, setActiveFriends } = useDashboardContext();
 
   useEffect(() => {
     if (user) {
@@ -25,6 +27,33 @@ const Login = () => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Fetch dashboard data
+  const fetchDashboardData = async (accessToken, refreshToken) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accessToken, refreshToken }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch dashboard data");
+      }
+
+      const { friends, totalGive, totalTake } = await response.json();
+      setActiveFriends(friends);
+      setTotalGive(totalGive);
+      setTotalTake(totalTake);
+      
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,12 +104,17 @@ const Login = () => {
         setAccessToken(data.data.accessToken);
         setRefreshToken(data.data.refreshToken);
 
-        window.history.pushState({}, "", "/dashboard");
+        // Fetch dashboard data after successful login
+        await fetchDashboardData(data.data.accessToken, data.data.refreshToken);
+
+        window.history.pushState({}, "", "/");
         window.dispatchEvent(new PopStateEvent("popstate"));
       }
     } catch (e) {
       console.error("Network or server error", e);
       setErrorMessage("Failed to connect to the server. Please try again.");
+      setLoading(false);
+    } finally {
       setLoading(false);
     }
   };

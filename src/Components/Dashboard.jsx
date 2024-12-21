@@ -6,57 +6,53 @@ import UserContext from "../context/UserContext.js";
 // import DashboardSkeleton from "./DashboardSkeleton";
 import "./styles.css";
 import "../loading.css";
+import useDashboardContext from "../context/DashboardContext.js";
 
 const Dashboard = () => {
-  const { user, accessToken, refreshToken } = useContext(UserContext);
-  const [friends, setFriends] = React.useState([]);
-  const [totalGive, setTotalGive] = React.useState(0);
-  const [totalTake, setTotalTake] = React.useState(0);
-  const [loading, setLoading] = React.useState(true);
+  const { user } = useContext(UserContext);
   // friend:{username,name,lastTransactionTime,profilePicture}
+  const { totalGive, totalTake, activeFriends } = useDashboardContext();
 
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
     document.title = "Dashboard";
-  }, []);
+    if (!user) {
+      window.location.href = "/login";
+    }
+  }, [user]);
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              accessToken,
-              refreshToken,
-            }),
-          }
-        );
-        if (!res.ok) {
-          throw new Error("Failed to fetch friends");
-        }
-        const data = await res.json();
-        setFriends(data.friends);
-        setTotalGive(data.totalGive);
-        setTotalTake(data.totalTake);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (user) setLoading(false);
-      }
-    };
-    fetchFriends();
-  }, [user, accessToken, refreshToken]);
-
-  // Loading UI
-  if (loading) {
-    return <div className="spinner"></div>;
-  }
+  // useEffect(() => {
+  //   const fetchFriends = async () => {
+  //     try {
+  //       const res = await fetch(
+  //         `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           credentials: "include",
+  //           body: JSON.stringify({
+  //             accessToken,
+  //             refreshToken,
+  //           }),
+  //         }
+  //       );
+  //       if (!res.ok) {
+  //         throw new Error("Failed to fetch friends");
+  //       }
+  //       const data = await res.json();
+  //       setFriends(data.friends);
+  //       setTotalGive(data.totalGive);
+  //       setTotalTake(data.totalTake);
+  //     } catch (err) {
+  //       console.error(err);
+  //     } finally {
+  //       if (user) setLoading(false);
+  //     }
+  //   };
+  //   fetchFriends();
+  // }, [user, accessToken, refreshToken]);
 
   return (
     <div className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white">
@@ -100,7 +96,7 @@ const Dashboard = () => {
               Total Owe
             </p>
             <p className="text-xl font-bold text-red-400 ">
-              ₹{Math.abs(totalGive)}
+              ₹{totalGive ? Math.abs(totalGive) : 0}
             </p>
           </div>
 
@@ -121,7 +117,9 @@ const Dashboard = () => {
             >
               Total Receive
             </p>
-            <p className="text-xl font-bold text-green-400 ">₹{totalTake}</p>
+            <p className="text-xl font-bold text-green-400 ">
+              ₹{totalTake ? totalTake : 0}
+            </p>
           </div>
         </div>
       </div>
@@ -129,47 +127,48 @@ const Dashboard = () => {
       {/* Mobile User List */}
       <div className="block md:hidden">
         <ul className="merienda-regular divide-y divide-gray-700">
-          {friends.map((friend, index) => (
-            <li
-              key={friend.username}
-              data-aos="fade-up"
-              data-aos-delay={index * 100} // Staggered animations
-            >
-              <Link
-                to={`/transactions/${user.username}--${friend.username}`}
-                className="flex items-center space-x-4 p-3"
+          {activeFriends &&
+            activeFriends.map((friend, index) => (
+              <li
+                key={friend.username}
+                data-aos="fade-up"
+                data-aos-delay={index * 100} // Staggered animations
               >
-                {/* Profile Picture */}
-                <div className="w-12 h-12">
-                  <img
-                    src={
-                      friend.profilePicture ||
-                      "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
-                    }
-                    alt={friend.username}
-                    className="w-full h-full rounded-full object-cover"
-                  />
-                </div>
-
-                {/* User Info */}
-                <div className="flex-1">
-                  <p className="text-base font-semibold">{friend.name}</p>
-                  <p className="text-sm text-gray-400">
-                    {"@" + friend.username}
-                  </p>
-                </div>
-
-                {/* Balance */}
-                <div
-                  className={`kranky-regular text-lg font-extrabold ${
-                    friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
-                  }`}
+                <Link
+                  to={`/transactions/${user?.username}--${friend.username}`}
+                  className="flex items-center space-x-4 p-3"
                 >
-                  ₹{Math.abs(friend.totalAmount)}
-                </div>
-              </Link>
-            </li>
-          ))}
+                  {/* Profile Picture */}
+                  <div className="w-12 h-12">
+                    <img
+                      src={
+                        friend.profilePicture ||
+                        "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                      }
+                      alt={friend.username}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  </div>
+
+                  {/* User Info */}
+                  <div className="flex-1">
+                    <p className="text-base font-semibold">{friend.name}</p>
+                    <p className="text-sm text-gray-400">
+                      {"@" + friend.username}
+                    </p>
+                  </div>
+
+                  {/* Balance */}
+                  <div
+                    className={`kranky-regular text-lg font-extrabold ${
+                      friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
+                    }`}
+                  >
+                    ₹{Math.abs(friend.totalAmount)}
+                  </div>
+                </Link>
+              </li>
+            ))}
         </ul>
       </div>
 
@@ -229,7 +228,7 @@ const Dashboard = () => {
         {/* User List */}
         {/* Desktop User List */}
         <ul className="space-y-3">
-          {friends.map((friend, index) => (
+          {activeFriends.map((friend, index) => (
             <li
               key={friend.username}
               className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
@@ -237,7 +236,7 @@ const Dashboard = () => {
               data-aos-delay={index * 100}
             >
               <Link
-                to={`/transactions/${user.username}--${friend.username}`}
+                to={`/transactions/${user?.username}--${friend.username}`}
                 className="flex items-center space-x-4 p-4 pr-6"
               >
                 {/* Profile Picture */}
