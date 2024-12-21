@@ -77,7 +77,7 @@ const Dashboard = () => {
             >
               Total Owe
             </p>
-            <p className="text-xl font-bold text-red-400 ">
+            <p className="text-xl kranky-regular font-bold text-red-400 ">
               ₹{totalGive ? Math.abs(totalGive) : 0}
             </p>
           </div>
@@ -99,7 +99,7 @@ const Dashboard = () => {
             >
               Total Receive
             </p>
-            <p className="text-xl font-bold text-green-400 ">
+            <p className="text-xl kranky-regular font-bold text-green-400 ">
               ₹{totalTake ? totalTake : 0}
             </p>
           </div>
@@ -177,7 +177,7 @@ const Dashboard = () => {
             >
               Total Owe
             </p>
-            <p className="text-3xl font-bold text-red-400 mt-2">
+            <p className="kranky-regular text-3xl font-bold text-red-400 mt-2">
               ₹{Math.abs(totalGive)}
             </p>
           </div>
@@ -201,7 +201,7 @@ const Dashboard = () => {
             >
               Total Receive
             </p>
-            <p className="text-3xl font-bold text-green-400 mt-2">
+            <p className="kranky-regular text-3xl font-bold text-green-400 mt-2">
               ₹{totalTake}
             </p>
           </div>
