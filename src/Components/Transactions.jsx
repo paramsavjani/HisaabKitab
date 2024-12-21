@@ -20,7 +20,7 @@ const Transactions = () => {
   const friendId = chatId.split("--")[1];
   const lastTransactionRef = useRef(null);
   const { accessToken, refreshToken } = React.useContext(UserContext);
-  const { setActiveFriends } = useDashboardContext();
+  const { activeFriends, setActiveFriends } = useDashboardContext();
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
@@ -53,13 +53,14 @@ const Transactions = () => {
 
         const data = await res.json();
         setTransactions(data.transactions.reverse()); // No need to reverse, just set the data
-        setFriend(data.friend);
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
+
+    setFriend(activeFriends.find((friend) => friend.username === friendId));
 
     fetchTransactions();
   }, [accessToken, friendId, refreshToken]);
