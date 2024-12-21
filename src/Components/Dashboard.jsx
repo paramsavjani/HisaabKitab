@@ -68,14 +68,14 @@ const Dashboard = () => {
             }}
           >
             <p
-              className="text-base font-semibold"
+              className="text-lg font-semibold lobster-regular"
               style={{
                 background: "linear-gradient(to right, #FF7A7A, #FF4B4B)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Total Owe
+              Pay Up!
             </p>
             <p className="text-xl kranky-regular font-bold text-red-400 ">
               ₹{totalGive ? Math.abs(totalGive) : 0}
@@ -90,14 +90,14 @@ const Dashboard = () => {
             }}
           >
             <p
-              className="text-base font-semibold"
+              className="text-lg font-semibold lobster-regular"
               style={{
                 background: "linear-gradient(to right, #77FFD9, #45FF8F)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
             >
-              Total Receive
+              Cash Incoming!
             </p>
             <p className="text-xl kranky-regular font-bold text-green-400 ">
               ₹{totalTake ? totalTake : 0}
