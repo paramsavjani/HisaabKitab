@@ -205,7 +205,7 @@ function Navbar() {
           <img src="/logo.png" className="w-14 h-14" alt="CashTrack Logo" />
           <Link
             to="/"
-            className="text-4xl px-1 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
+            className=" frijole-regular text-3xl px-1 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
             aria-label="Navigate to CashTrack homepage"
           >
             Cash<span className="text-white">Track</span>
