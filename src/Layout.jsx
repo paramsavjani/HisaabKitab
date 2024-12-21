@@ -8,7 +8,6 @@ import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
 import "./loading.css";
 
-
 const Layout = () => {
   const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
   const [loading, setLoading] = React.useState(true);

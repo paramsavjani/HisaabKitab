@@ -23,6 +23,21 @@ import {
 } from "react-router-dom";
 import Dashboard from "./Components/Dashboard";
 
+
+import { App } from "@capacitor/app";
+App.addListener("backButton", ({ canGoBack }) => {
+  if (canGoBack) {
+    if(window.location.pathname === "/dashboard")
+    {
+      App.exitApp();
+    }
+    window.history.back();
+    console.log(window.history.back())
+  } else {
+    App.exitApp();
+  }
+});
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<Layout />}>
