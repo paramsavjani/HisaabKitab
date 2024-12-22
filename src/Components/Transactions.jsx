@@ -6,6 +6,7 @@ import TransactionSkeleton from "./TransactionSkeleton";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
 import useDashboardContext from "../context/DashboardContext.js";
+import "./styles.css"
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -226,18 +227,16 @@ const Transactions = () => {
       )}
 
       {/* Bottom Button Bar */}
-      <div className="fixed bottom-0 w-full md:left-320 bg-gray-800 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
+      <div className="merienda-regular fixed bottom-0 w-full md:left-320 bg-gray-900 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
         <button
           onClick={() => handleButtonClick("give")}
-          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg flex-1"
-          style={{ fontFamily: "Agu Display" }}
+          className="bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-pink-600 hover:via-red-600 hover:to-yellow-600 text-white py-2 px-4 rounded-lg flex-1 shadow-lg transform hover:scale-105 transition duration-300"
         >
           You Gave
         </button>
         <button
           onClick={() => handleButtonClick("get")}
-          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg flex-1"
-          style={{ fontFamily: "Agu Display" }}
+          className="bg-gradient-to-r from-green-500 via-green-600 to-green-500 hover:from-green-500 hover:via-teal-600 hover:to-cyan-600 text-white py-2 px-4 rounded-lg flex-1 shadow-lg transform hover:scale-105 transition duration-300"
         >
           You Got
         </button>

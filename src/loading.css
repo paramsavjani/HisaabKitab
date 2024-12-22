@@ -8,6 +8,10 @@
   perspective: 800px;
 }
 
+body{
+  background: black;
+}
+
 .inner {
   position: absolute;
   box-sizing: border-box;
