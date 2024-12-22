@@ -24,12 +24,12 @@ function Home() {
       <section className="text-center max-w-5xl mx-auto mb-20">
         {/* Logo */}
         <div className="flex justify-center items-center mb-10">
-          <img src="/logo.png" alt="CashTrack Logo" className="w-40 h-40" />
+          <img src="/logo.png" alt="HisaabKitab Logo" className="w-40 h-40" />
         </div>
 
         {/* Hero Text */}
         <h1 className="text-6xl md:text-7xl font-extrabold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-green-400">
-          CashTrack
+          HisaabKitab
         </h1>
         <p className="text-2xl md:text-3xl text-gray-300 mb-10 leading-relaxed font-light">
           Track expenses, synchronize transactions, and share costs
@@ -47,13 +47,13 @@ function Home() {
         </div>
       </section>
 
-      {/* Why CashTrack Section */}
+      {/* Why HisaabKitab Section */}
       <section className="w-full bg-black py-16 rounded-lg shadow-xl mb-16">
         <h2
           className="text-5xl font-bold mb-12 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-400"
           data-aos="fade-up"
         >
-          Why CashTrack?
+          Why HisaabKitab?
         </h2>
         {/* Grid Layout for Features */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 px-8">
