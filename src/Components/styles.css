@@ -1,4 +1,38 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Frijole&family=Kranky&family=Lobster&family=Merienda:wght@300..900&family=Mystery+Quest&family=Pacifico&family=Ponnala&family=Teko:wght@300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Agu+Display&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Agu+Display&family=Fredericka+the+Great&family=Griffy&family=Henny+Penny&family=Princess+Sofia&display=swap");
+
+.agu-display-regular {
+  font-family: "Agu Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "MORF" 0;
+}
+
+.fredericka-the-great-regular {
+  font-family: "Fredericka the Great", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.henny-penny-regular {
+  font-family: "Henny Penny", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.princess-sofia-regular {
+  font-family: "Princess Sofia", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.griffy-regular {
+  font-family: "Griffy", serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
 .lobster-regular {
   font-family: "Lobster", serif;

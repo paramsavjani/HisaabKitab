@@ -39,13 +39,13 @@ const Dashboard = () => {
   return (
     <div className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white">
       {/* Header Section */}
-      <div className="flex items-center justify-center pb-3">
+      <div className=" flex items-center justify-center pb-3">
         <Link
           to="/"
-          className="frijole-regular text-4xl px-1 pt-2 pl-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
+          className="henny-penny-regular text-4xl px-1 pt-2 pl-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
           aria-label="Navigate to CashTrack homepage"
         >
-          Cash<span className="frijole-regular text-white">Track</span>
+          Hisaab <span className="text-white">Kitab</span>
         </Link>
       </div>
 
