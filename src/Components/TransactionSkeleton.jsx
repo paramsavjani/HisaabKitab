@@ -43,11 +43,11 @@ function TransactionSkeleton() {
 
   return (
     <>
-      <SkeletonProfile />
+      {/* <SkeletonProfile /> */}
       <div className="flex-1 mt-10 pb-24 md:pb-24 pt-24 md:pt-28 sm:pb-24 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900">
         <SkeletonChatList />
       </div>
-      <SkeletonButtons />
+      {/* <SkeletonButtons /> */}
     </>
   );
 }
