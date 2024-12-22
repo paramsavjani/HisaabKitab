@@ -68,6 +68,9 @@ const Transactions = () => {
   }, [accessToken, friendId, refreshToken]);
 
   useEffect(() => {
+    if (error || loading) {
+      return;
+    }
     let accumulatedTotal = 0;
 
     for (let transaction of transactions) {
@@ -125,9 +128,7 @@ const Transactions = () => {
     </div>
   );
 
-  // if (loading) {
-  //   return <TransactionSkeleton />;
-  // }
+
   if (error) {
     toast.error(error, {
       position: "top-right",

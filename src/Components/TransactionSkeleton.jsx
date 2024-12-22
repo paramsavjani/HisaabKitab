@@ -1,25 +1,25 @@
 import React from "react";
 
 function TransactionSkeleton() {
-  const SkeletonProfile = () => (
-    <div className="bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
-      {/* Circular skeleton for profile picture */}
-      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-600 rounded-full animate-pulse"></div>
-      {/* Rectangular skeletons for name and total */}
-      <div className="flex-1 space-y-2">
-        <div className="h-6 w-24 bg-gray-600 rounded animate-pulse"></div>
-        <div className="h-4 w-16 bg-gray-600 rounded animate-pulse"></div>
-      </div>
-      <div className="h-8 w-20 bg-gray-600 rounded animate-pulse"></div>
-    </div>
-  );
+  // const SkeletonProfile = () => (
+  //   <div className="bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
+  //     {/* Circular skeleton for profile picture */}
+  //     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-600 rounded-full animate-pulse"></div>
+  //     {/* Rectangular skeletons for name and total */}
+  //     <div className="flex-1 space-y-2">
+  //       <div className="h-6 w-24 bg-gray-600 rounded animate-pulse"></div>
+  //       <div className="h-4 w-16 bg-gray-600 rounded animate-pulse"></div>
+  //     </div>
+  //     <div className="h-8 w-20 bg-gray-600 rounded animate-pulse"></div>
+  //   </div>
+  // );
 
-  const SkeletonButtons = () => (
-    <div className="fixed bottom-0 w-full md:left-320 bg-gray-800 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
-      <div className="bg-gray-600 h-10 w-1/2 rounded-lg animate-pulse"></div>
-      <div className="bg-gray-600 h-10 w-1/2 rounded-lg animate-pulse"></div>
-    </div>
-  );
+  // const SkeletonButtons = () => (
+  //   <div className="fixed bottom-0 w-full md:left-320 bg-gray-800 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
+  //     <div className="bg-gray-600 h-10 w-1/2 rounded-lg animate-pulse"></div>
+  //     <div className="bg-gray-600 h-10 w-1/2 rounded-lg animate-pulse"></div>
+  //   </div>
+  // );
 
   const SkeletonChatBox = ({ isLeft }) => (
     <div className={`flex ${isLeft ? "justify-start" : "justify-end"}`}>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
 
-
 const TransactionModal = ({
   transactionType,
   friendId,
@@ -25,6 +24,8 @@ const TransactionModal = ({
       });
       return;
     }
+
+    setIsModalOpen(false);
 
     try {
       const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}/add`;
@@ -69,7 +70,6 @@ const TransactionModal = ({
           sender: data.transaction.sender,
         },
       ]);
-      setIsModalOpen(false);
       setAmount("");
       setDescription("");
     } catch (err) {
