@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import "./styles.css";
 import UserContext from "../context/UserContext.js";
 import socket from "../socket.js";
+import rejectedIcon from "../assets/icons/rejected.png";
 
 const TransactionCard = ({
   transaction,
@@ -160,7 +161,9 @@ const TransactionCard = ({
       }`}
     >
       <div
-        className={`relative p-5 pb-10 rounded-xl shadow-md min-w-[200px] md:min-w-[300px] max-w-[200px] ${
+        className={`relative p-5 pb-10 ${
+          status === "rejected" ? "pb-4" : ""
+        } rounded-xl shadow-md min-w-[200px] md:min-w-[300px] max-w-[200px] ${
           isSender ? "bg-gray-700" : "bg-gray-800"
         }`}
       >
@@ -174,13 +177,13 @@ const TransactionCard = ({
         {/* Amount Section */}
         <div
           className={`text-3xl kranky-regular font-extrabold mb-4 ${
-            isSender ? "text-right" : "text-left"
-          } ${
+            status === "rejected" ? "mb-0" : ""
+          } ${isSender ? "text-right" : "text-left"} ${
             (isSender && transaction.amount > 0) ||
             (!isSender && transaction.amount < 0)
               ? "text-green-500"
               : "text-red-500"
-          }`}
+          } ${status === "rejected" ? "line-through text-white" : ""}`}
         >
           ₹{Math.abs(amount)}
         </div>
@@ -193,6 +196,19 @@ const TransactionCard = ({
             }`}
           >
             {description}
+          </div>
+        )}
+        {status === "rejected" && (
+          <div
+            className={`relative w-20 h-20`} // Using relative for the parent div to position child absolutely
+          >
+            <img
+              src={rejectedIcon}
+              alt=""
+              className={`absolute top-0 ${
+                isSender ? "right-0" : "left-14"
+              } w-20 h-20`} // Position based on isSender
+            />
           </div>
         )}
 

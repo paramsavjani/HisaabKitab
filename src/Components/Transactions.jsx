@@ -44,6 +44,7 @@ const Transactions = () => {
       setPrevTransactionCount(() => transactions.length);
     });
 
+
     return () => {
       socket.off("newTransaction");
       socket.off("acceptTransaction");
