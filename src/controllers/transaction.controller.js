@@ -51,6 +51,19 @@ const addTransaction = asyncHandler(async (req, res) => {
   if (isNaN(amount)) {
     return res.status(405).json({ message: "Amount should be a number" });
   }
+
+  if (amount < 0) {
+    return res
+      .status(405)
+      .json({ message: "Amount should be a positive number" });
+  }
+
+  if (amount > 10000000) {
+    return res
+      .status(405)
+      .json({ message: "Amount should be less than 10000000" });
+  }
+
   const roundedAmount = Math.round(amount * 100) / 100;
   if (roundedAmount < 1 && roundedAmount > -1) {
     return res.status(406).json({ message: "Amount should be greater than 1" });

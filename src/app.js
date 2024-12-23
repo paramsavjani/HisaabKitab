@@ -78,13 +78,21 @@ io.on("connection", (socket) => {
   onlineUsers.set(socket.user.username, socket.id);
 
   socket.on("newTransaction", (transaction) => {
-    console.log(transaction);
     const receiverSocketId = onlineUsers.get(transaction.friendUsername);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newTransaction", {
         ...transaction,
         friendUsername: null,
       });
+    } else {
+      console.log("user is offline");
+    }
+  });
+
+  socket.on("acceptTransaction", ({ friendUsername, transactionId }) => {
+    const receiverSocketId = onlineUsers.get(friendUsername);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("acceptTransaction",transactionId);
     } else {
       console.log("user is offline");
     }
