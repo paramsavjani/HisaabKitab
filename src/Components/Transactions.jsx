@@ -98,7 +98,15 @@ const Transactions = () => {
 
         if (!res.ok) {
           const data = await res.json();
-          throw new Error(data.message || "Failed to fetch transactions");
+          toast.error(data.message, {
+            position: "top-right",
+            autoClose: 7000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
         }
 
         const data = await res.json();
