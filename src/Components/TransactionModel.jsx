@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
+import socket from "../socket.js";
 
 const TransactionModal = ({
   transactionType,
@@ -24,8 +25,6 @@ const TransactionModal = ({
       });
       return;
     }
-
-    setIsModalOpen(false);
 
     try {
       const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}/add`;
@@ -58,7 +57,18 @@ const TransactionModal = ({
         });
       }
 
-      // Update transactions locally if needed
+      setIsModalOpen(false);
+
+      socket.emit("newTransaction", {
+        amount: data.transaction._doc.amount,
+        description: data.transaction._doc.description,
+        transactionId: data.transaction._doc._id,
+        createdAt: data.transaction._doc.createdAt,
+        status: data.transaction._doc.status,
+        sender: data.transaction.sender,
+        friendUsername: friendId,
+      });
+
       setTransactions((prev) => [
         ...prev,
         {
@@ -70,6 +80,7 @@ const TransactionModal = ({
           sender: data.transaction.sender,
         },
       ]);
+
       setAmount("");
       setDescription("");
     } catch (err) {

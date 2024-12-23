@@ -6,7 +6,8 @@ import TransactionSkeleton from "./TransactionSkeleton";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
 import useDashboardContext from "../context/DashboardContext.js";
-import "./styles.css"
+import "./styles.css";
+import socket from "../socket.js";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -22,6 +23,19 @@ const Transactions = () => {
   const lastTransactionRef = useRef(null);
   const { accessToken, refreshToken } = React.useContext(UserContext);
   const { activeFriends, setActiveFriends } = useDashboardContext();
+
+  useEffect(() => {
+    socket.on("newTransaction", (newTransaction) => {
+      setTransactions((prevTransactions) => [
+        ...prevTransactions,
+        newTransaction,
+      ]);
+    });
+
+    return () => {
+      socket.off("newTransaction");
+    };
+  }, []);
 
   const handleButtonClick = (type) => {
     setTransactionType(type);
@@ -128,7 +142,6 @@ const Transactions = () => {
       No transactions found with this user.
     </div>
   );
-
 
   if (error) {
     toast.error(error, {

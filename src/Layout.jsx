@@ -6,9 +6,11 @@ import { Preferences } from "@capacitor/preferences";
 import UserContext from "./context/UserContext.js";
 import useDashboardContext from "./context/DashboardContext.js";
 import "./loading.css";
+import { io, Socket } from "socket.io-client";
 
 const Layout = () => {
-  const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
+  const { user, setUser, setAccessToken, setRefreshToken } =
+    useContext(UserContext);
   const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
 
@@ -103,7 +105,7 @@ const Layout = () => {
         throw new Error("Failed to fetch dashboard data");
       }
 
-      const { friends} = await dashboardResponse.json();
+      const { friends } = await dashboardResponse.json();
       setActiveFriends(() => friends);
 
       // Push to dashboard after all data is loaded
