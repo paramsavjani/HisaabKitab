@@ -3,6 +3,7 @@ import UserContext from "../context/UserContext.js";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // AOS styles
+import { Capacitor } from "@capacitor/core";
 
 function Friends() {
   const { user, accessToken, refreshToken } = useContext(UserContext);
@@ -112,10 +113,11 @@ function Friends() {
                     <div className="w-12 h-12">
                       {/* Profile Picture */}
                       <img
-                        src={
-                          friend.profilePicture ||
-                          "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
-                        }
+                        src={Capacitor.convertFileSrc(
+                          friend.profilePicture
+                            ? friend.profilePicture
+                            : "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        )}
                         alt={friend.username}
                         className="w-full h-full rounded-full object-cover"
                         data-aos="flip-left"
