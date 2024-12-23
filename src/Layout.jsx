@@ -115,6 +115,7 @@ const Layout = () => {
       console.error("Initialization Error:", error);
     } finally {
       setLoading(false);
+      console.log(`wss://${process.env.REACT_APP_BACKEND_URL.split("//")[1]}`);
     }
   };
 
