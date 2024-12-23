@@ -92,7 +92,25 @@ io.on("connection", (socket) => {
   socket.on("acceptTransaction", ({ friendUsername, transactionId }) => {
     const receiverSocketId = onlineUsers.get(friendUsername);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("acceptTransaction",transactionId);
+      io.to(receiverSocketId).emit("acceptTransaction", transactionId);
+    } else {
+      console.log("user is offline");
+    }
+  });
+
+  socket.on("rejectTransaction", ({ friendUsername, transactionId }) => {
+    const receiverSocketId = onlineUsers.get(friendUsername);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("rejectTransaction", transactionId);
+    } else {
+      console.log("user is offline");
+    }
+  });
+
+  socket.on("cancelTransaction", ({ friendUsername, transactionId }) => {
+    const receiverSocketId = onlineUsers.get(friendUsername);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("cancelTransaction", transactionId);
     } else {
       console.log("user is offline");
     }
