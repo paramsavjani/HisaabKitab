@@ -34,6 +34,7 @@ import userRouter from "./routes/user.route.js";
 import friendRequestRouter from "./routes/request.route.js";
 import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
+import { tr } from "@faker-js/faker";
 
 // Routes
 app.get("/", (req, res) => {
@@ -80,7 +81,10 @@ io.on("connection", (socket) => {
     console.log(transaction);
     const receiverSocketId = onlineUsers.get(transaction.friendUsername);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("newTransaction", transaction);
+      io.to(receiverSocketId).emit("newTransaction", {
+        ...transaction,
+        friendUsername: null,
+      });
     } else {
       console.log("user is offline");
     }
