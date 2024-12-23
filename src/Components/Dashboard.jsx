@@ -7,6 +7,7 @@ import UserContext from "../context/UserContext.js";
 import "./styles.css";
 import "../loading.css";
 import useDashboardContext from "../context/DashboardContext.js";
+import addFriend from "../assets/icons/user.png";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -250,6 +251,12 @@ const Dashboard = () => {
             </li>
           ))}
         </ul>
+      </div>
+      <div class="md:hidden container-eg-btn-4 uf-border fixed bottom-0 right-0 z-10">
+        <Link to="/friends" class="md:hidden button button-9 flex rounded-full">
+         <img src={addFriend} alt="Add friend" class="invert w-6 h-6 mr-2" />
+         <span className="items-center content-center">Add Friend</span>
+        </Link>
       </div>
     </div>
   );
