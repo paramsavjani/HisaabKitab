@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.Cashtrack.app',
-  appName: 'Cash Track',
+  appId: 'com.hisaabkitab.app',
+  appName: 'Hisaab Kitab',
   webDir: 'build'
 };
 
