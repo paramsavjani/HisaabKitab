@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
 import socket from "../socket.js";
@@ -11,7 +11,18 @@ const TransactionModal = ({
 }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Loading state for the submit button
   const { accessToken, refreshToken } = React.useContext(UserContext);
+
+  const amountInputRef = useRef(null);
+
+  useEffect(() => {
+    // Focus on the amount input when the modal opens
+    if (amountInputRef.current) {
+      amountInputRef.current.focus();
+    }
+  }, []);
+
   const handleSubmit = async () => {
     if (!amount || isNaN(amount)) {
       toast.error("Please enter a valid amount", {
@@ -25,6 +36,8 @@ const TransactionModal = ({
       });
       return;
     }
+
+    setIsLoading(true); // Set loading state to true when submitting
 
     try {
       const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}/add`;
@@ -85,6 +98,16 @@ const TransactionModal = ({
       setDescription("");
     } catch (err) {
       console.error(err.message);
+    } finally {
+      setIsLoading(false); // Set loading state back to false after submit is complete
+    }
+  };
+
+  // Handle "Enter" key press to submit the form
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent the default behavior of moving to the next field
+      handleSubmit(); // Directly submit the form
     }
   };
 
@@ -96,9 +119,11 @@ const TransactionModal = ({
         </h2>
 
         <input
+          ref={amountInputRef} // Reference for auto-focus
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+          onKeyDown={handleKeyDown} // Submit the form on Enter
           placeholder="Enter amount"
           className="w-full p-3 bg-gray-700 text-white rounded-md outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-300"
         />
@@ -119,9 +144,40 @@ const TransactionModal = ({
           </button>
           <button
             onClick={handleSubmit}
-            className="w-1/2 ml-2 bg-green-600 px-4 py-3 rounded-md text-white text-lg font-semibold hover:bg-green-700 transition duration-300"
+            disabled={isLoading} // Disable button while loading
+            className={`w-1/2 ml-2 ${
+              isLoading ? "bg-green-800" : "bg-green-600"
+            } px-4 py-3 rounded-md text-white text-lg font-semibold hover:${
+              isLoading ? "" : "bg-green-700"
+            } transition duration-300`}
           >
-            Submit
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                Adding...
+              </span>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </div>
