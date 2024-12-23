@@ -8,7 +8,9 @@ import { Friend } from "../models/Friend.model.js";
 const addTransaction = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  const user = await User.findOne({ _id: userId });
+  const user = await User.findOne({ _id: userId }).select(
+    "username name profilePicture email"
+  );
 
   const friendUsername = req.params.username;
 
