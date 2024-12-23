@@ -85,6 +85,8 @@ const TransactionCard = ({
         }
       );
 
+
+
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.message, {
@@ -98,6 +100,7 @@ const TransactionCard = ({
         });
         return;
       }
+      socket.emit("rejectTransaction", { transactionId, friendUsername });
 
       setTransactions((prevTransactions) =>
         prevTransactions.map((prevTransaction) => {
@@ -144,6 +147,7 @@ const TransactionCard = ({
         });
         return;
       }
+      socket.emit("cancelTransaction", { transactionId, friendUsername });
       setTransactions((prevTransactions) =>
         prevTransactions.filter((t) => t.transactionId !== transactionId)
       );

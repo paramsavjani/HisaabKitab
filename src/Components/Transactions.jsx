@@ -44,10 +44,31 @@ const Transactions = () => {
       setPrevTransactionCount(() => transactions.length);
     });
 
+    socket.on("rejectTransaction", (id) => {
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((transaction) =>
+          transaction.transactionId === id
+            ? { ...transaction, status: "rejected" }
+            : transaction
+        )
+      );
+      setPrevTransactionCount(() => transactions.length);
+    });
+
+    socket.on("cancelTransaction", (id) => {
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter(
+          (transaction) => transaction.transactionId !== id
+        )
+      );
+      setPrevTransactionCount(() => transactions.length);
+    });
 
     return () => {
       socket.off("newTransaction");
       socket.off("acceptTransaction");
+      socket.off("rejectTransaction");
+      socket.off("cancelTransaction");
     };
   }, []);
 
