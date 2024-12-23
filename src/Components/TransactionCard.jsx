@@ -2,8 +2,14 @@ import React, { useState, useContext } from "react";
 import { toast } from "react-toastify";
 import "./styles.css";
 import UserContext from "../context/UserContext.js";
+import socket from "../socket.js";
 
-const TransactionCard = ({ transaction, userUsername, setTransactions }) => {
+const TransactionCard = ({
+  transaction,
+  userUsername,
+  setTransactions,
+  friendUsername,
+}) => {
   const { createdAt, amount, description, status, transactionId, sender } =
     transaction;
   const { accessToken, refreshToken } = useContext(UserContext);
@@ -44,6 +50,7 @@ const TransactionCard = ({ transaction, userUsername, setTransactions }) => {
         });
         return;
       }
+      socket.emit("acceptTransaction", { transactionId, friendUsername });
       setTransactions((prevTransactions) =>
         prevTransactions.map((prevTransaction) => {
           if (prevTransaction.transactionId === transactionId) {

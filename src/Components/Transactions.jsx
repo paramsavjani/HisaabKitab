@@ -13,6 +13,7 @@ const Transactions = () => {
   const { chatId } = useParams();
   const [total, setTotal] = useState(null);
   const [transactions, setTransactions] = useState([]);
+  const [prevTransactionCount, setPrevTransactionCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [friend, setFriend] = useState(null);
@@ -32,8 +33,20 @@ const Transactions = () => {
       ]);
     });
 
+    socket.on("acceptTransaction", (id) => {
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((transaction) =>
+          transaction.transactionId === id
+            ? { ...transaction, status: "accepted" }
+            : transaction
+        )
+      );
+      setPrevTransactionCount(() => transactions.length);
+    });
+
     return () => {
       socket.off("newTransaction");
+      socket.off("acceptTransaction");
     };
   }, []);
 
@@ -67,15 +80,14 @@ const Transactions = () => {
         }
 
         const data = await res.json();
-        setTransactions(data.transactions.reverse()); // No need to reverse, just set the data
+        setTransactions(data.transactions.reverse());
+        setPrevTransactionCount(data.transactions.length - 1);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    console.log(activeFriends.find((f) => f.username === friendId));
 
     setFriend(activeFriends.find((friend) => friend.username === friendId));
 
@@ -112,7 +124,7 @@ const Transactions = () => {
     });
 
     setTotal(() => accumulatedTotal);
-  }, [transactions, userUsername]);
+  }, [transactions, userUsername, setTransactions]);
 
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
@@ -126,7 +138,10 @@ const Transactions = () => {
 
   // Scroll to the bottom whenever transactions are updated
   useEffect(() => {
-    if (lastTransactionRef.current) {
+    if (
+      lastTransactionRef.current &&
+      transactions.length !== prevTransactionCount
+    ) {
       lastTransactionRef.current.scrollIntoView({
         block: "end",
       });
@@ -227,6 +242,7 @@ const Transactions = () => {
                             transaction={transaction}
                             userUsername={userUsername}
                             setTransactions={setTransactions}
+                            friendUsername={friendId}
                           />
                         </div>
                       ))}
