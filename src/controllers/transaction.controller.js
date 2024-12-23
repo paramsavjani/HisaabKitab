@@ -52,13 +52,7 @@ const addTransaction = asyncHandler(async (req, res) => {
     return res.status(405).json({ message: "Amount should be a number" });
   }
 
-  if (amount < 0) {
-    return res
-      .status(405)
-      .json({ message: "Amount should be a positive number" });
-  }
-
-  if (amount > 10000000) {
+  if (amount > 10000000 || amount < -10000000) {
     return res
       .status(405)
       .json({ message: "Amount should be less than 10000000" });
