@@ -89,7 +89,7 @@ const Layout = () => {
         setRefreshToken(updatedRefreshToken);
       }
 
-      setIsAuthenticated(true);
+      setIsAuthenticated(() => true);
 
       // Fetch Dashboard Data
       const dashboardResponse = await fetch(
@@ -134,21 +134,24 @@ const Layout = () => {
       PushNotifications.addListener("registration", async (token) => {
         console.log("FCM Token:", token.value);
         setToken(token.value);
-        const accessToken = await Preferences.get({ key: "accessToken" }).value;
-        const refreshToken = await Preferences.get({ key: "refreshToken" })
-          .value;
+        const { value: storedAccessToken } = await Preferences.get({
+          key: "accessToken",
+        });
+        const { value: storedRefreshToken } = await Preferences.get({
+          key: "refreshToken",
+        });
         const res = await fetch(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/fcm`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${storedAccessToken}`,
             },
             body: JSON.stringify({
               fcmToken: token.value,
-              accessToken,
-              refreshToken,
+              storedAccessToken,
+              storedRefreshToken,
             }),
             credentials: "include",
           }
