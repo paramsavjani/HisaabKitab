@@ -93,11 +93,10 @@ io.on("connection", (socket) => {
         let messageBody;
 
         if (transaction.amount < 0) {
-          // Positive transaction: money received
           messageTitle = "Money Received!";
           messageBody = `You have received ₹${transaction.amount} from ${transaction.friendName}.`;
         } else if (transaction.amount > 0) {
-          // Negative transaction: money requested
+          
           messageTitle = "Money Requested!";
           messageBody = `${transaction.friendName} has requested ₹${Math.abs(
             transaction.amount
@@ -105,7 +104,7 @@ io.on("connection", (socket) => {
         }
 
         const notificationColor =
-          transaction.amount < 0 ? "#4CAF50" : "#FF5722"; // Green for positive, Red for negative
+          transaction.amount < 0 ? "#4CAF50" : "#FF5722"; 
 
         const message = {
           notification: {
@@ -113,17 +112,17 @@ io.on("connection", (socket) => {
             body: messageBody,
           },
           data: {
-            transactionId: transaction.transactionId, // Pass the transaction ID for reference
-            actionType: "transaction", // Custom action type
+            transactionId: transaction.transactionId,
+            actionType: "transaction",
             friendUsername: transaction.friendUsername,
           },
           android: {
             notification: {
-              clickAction: "OPEN_TRANSACTION_DETAILS", // Intent/action in your app
-              color: notificationColor, // Add color for Android notifications
+              clickAction: "OPEN_APP",
+              color: notificationColor,
             },
           },
-          token: fcmToken, // FCM token for the recipient
+          token: fcmToken,
         };
 
         sendPushNotification(message);
