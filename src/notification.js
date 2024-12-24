@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 
 const serviceAccount = JSON.parse(
   readFileSync(
-    "../src/hisaab--kitab-firebase-adminsdk-k7ftp-f4b43bba48.json",
+    "../hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json",
     "utf8"
   )
 );
@@ -31,5 +31,12 @@ const sendPushNotification = (fcmToken, title, body) => {
       console.error("Error sending notification:", error);
     });
 };
+
+sendPushNotification(
+  "cDCIafHCTFKZYjBzNGVhxw:APA91bFDbexTrmN4Gl1HeLanrEZZBMIVm-6-wDQ8ydg9P55_jGi9hQ9sIWW7V_bZLyIyVQVg5GsNJh5YwzdvLEAYOijei9G_zEolsI3yF6p4AAqub9-YLec",
+  "title",
+  "body"
+);
+
 
 export { sendPushNotification };
