@@ -28,6 +28,6 @@ router.route("/search").get(searchUser);
 
 router.route("/get/:username").get(userInfo);
 
-router.route("/fcm").post(verifyJWT, fcmtoken);
+router.route("/fcm").post(fcmtoken);
 
 export default router;
