@@ -3,8 +3,11 @@ import { io } from "socket.io-client";
 
 const socket = io(`wss://${process.env.REACT_APP_BACKEND_URL.split("//")[1]}`, {
   auth: async (cb) => {
+    const { value: storedAccessToken } = await Preferences.get({
+      key: "accessToken",
+    });
     cb({
-      accessToken: (await Preferences.get({ key: "accessToken" })).value,
+      accessToken: storedAccessToken,
     });
   },
   transports: ["websocket"],
