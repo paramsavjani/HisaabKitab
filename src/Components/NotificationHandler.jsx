@@ -1,10 +1,10 @@
 import { PushNotifications } from "@capacitor/push-notifications";
 import { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 const NotificationHandler = () => {
-  const history = useHistory();
+  const history = useNavigate();
 
   useEffect(() => {
     PushNotifications.addListener(
