@@ -35,6 +35,7 @@ import userRouter from "./routes/user.route.js";
 import friendRequestRouter from "./routes/request.route.js";
 import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
+import { fr } from "@faker-js/faker";
 
 // Routes
 app.get("/", (req, res) => {
@@ -79,7 +80,6 @@ io.on("connection", (socket) => {
 
   socket.on("newTransaction", (transaction) => {
     const receiverSocketId = onlineUsers.get(transaction.friendUsername);
-    console.log(transaction);
 
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newTransaction", {
@@ -92,11 +92,11 @@ io.on("connection", (socket) => {
         let messageTitle;
         let messageBody;
 
-        if (transaction.amount > 0) {
+        if (transaction.amount < 0) {
           // Positive transaction: money received
           messageTitle = "Money Received!";
           messageBody = `You have received ₹${transaction.amount} from ${transaction.friendName}.`;
-        } else if (transaction.amount < 0) {
+        } else if (transaction.amount > 0) {
           // Negative transaction: money requested
           messageTitle = "Money Requested!";
           messageBody = `${transaction.friendName} has requested ₹${Math.abs(
@@ -105,7 +105,7 @@ io.on("connection", (socket) => {
         }
 
         const notificationColor =
-          transaction.amount > 0 ? "#4CAF50" : "#FF5722"; // Green for positive, Red for negative
+          transaction.amount < 0 ? "#4CAF50" : "#FF5722"; // Green for positive, Red for negative
 
         const message = {
           notification: {
@@ -115,7 +115,7 @@ io.on("connection", (socket) => {
           data: {
             transactionId: transaction.transactionId, // Pass the transaction ID for reference
             actionType: "transaction", // Custom action type
-            transactionAmount: `${transaction.amount}`, // Include the amount for detailed processing
+            friendUsername: transaction.friendUsername,
           },
           android: {
             notification: {
