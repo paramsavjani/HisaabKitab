@@ -90,7 +90,7 @@ io.on("connection", (socket) => {
       const fcmToken = transaction.fcmToken;
       if (fcmToken) {
         const messageTitle = "New Transaction";
-        const messageBody = `You have received a new transaction of ${transaction.amount} from ${transaction.username}`;
+        const messageBody = `You have received a new transaction of ${transaction.amount} from ${transaction.friendName}`;
         sendPushNotification(fcmToken, messageTitle, messageBody);
       }
     }
