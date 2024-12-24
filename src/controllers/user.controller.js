@@ -313,9 +313,6 @@ const fcmtoken = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   user.fcmToken = fcmToken;
   await user.save();
-  console.log("the fcm is getting updated");
-  console.log(fcmToken);
-  console.log();
   return res.status(200).json({
     status: "success",
     message: "FCM token updated successfully",

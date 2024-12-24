@@ -136,7 +136,6 @@ io.on("connection", (socket) => {
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("acceptTransaction", transactionId);
     } else {
-      console.log("user is offline");
     }
   });
 
@@ -145,7 +144,6 @@ io.on("connection", (socket) => {
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("rejectTransaction", transactionId);
     } else {
-      console.log("user is offline");
     }
   });
 
@@ -154,7 +152,6 @@ io.on("connection", (socket) => {
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("cancelTransaction", transactionId);
     } else {
-      console.log("user is offline");
     }
   });
 
