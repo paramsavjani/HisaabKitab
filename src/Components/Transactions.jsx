@@ -273,7 +273,6 @@ const Transactions = () => {
                             userUsername={userUsername}
                             setTransactions={setTransactions}
                             friendUsername={friendId}
-                            friend={friend}
                           />
                         </div>
                       ))}
@@ -309,6 +308,7 @@ const Transactions = () => {
           setIsModalOpen={setIsModalOpen}
           transactions={transactions}
           setTransactions={setTransactions}
+          friend={friend}
         />
       )}
     </div>
