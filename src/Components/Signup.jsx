@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import UserContext from "../context/UserContext.js";
+import { Preferences } from "@capacitor/preferences";
 
 const InputField = ({
   id,
@@ -140,9 +141,19 @@ const Signup = () => {
       setAccessToken(data.data.accessToken);
       setRefreshToken(data.data.refreshToken);
 
+      await Preferences.set({
+        key: "accessToken",
+        value: data.data.accessToken,
+      });
+
+      await Preferences.set({
+        key: "refreshToken",
+        value: data.data.refreshToken,
+      });
+
       setUser(data.data.user);
-      window.history.pushState({}, "", "/friends");
-      window.dispatchEvent(new PopStateEvent("popstate"));
+
+      window.location.href = "/friends";
     } catch (error) {
       setGeneralError("Failed to register. Please try again.");
       console.error(error);

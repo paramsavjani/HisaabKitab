@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Navbar from "./Components/Navbar";
 import { Outlet } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
 import UserContext from "./context/UserContext.js";
 import useDashboardContext from "./context/DashboardContext.js";
@@ -13,7 +13,6 @@ const Layout = () => {
   const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
   const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(1);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const getTokenFromCookies = (key) =>
@@ -133,7 +132,6 @@ const Layout = () => {
 
       PushNotifications.addListener("registration", async (token) => {
         console.log("FCM Token:", token.value);
-        setToken(token.value);
         const { value: storedAccessToken } = await Preferences.get({
           key: "accessToken",
         });
@@ -156,12 +154,6 @@ const Layout = () => {
             credentials: "include",
           }
         );
-        // const data = await res.json();
-        // if (!res.ok) {
-        //   // toast.error(data.message);
-        // } else {
-        //   // toast.success(data.message);
-        // }
       });
 
       PushNotifications.addListener(
@@ -207,7 +199,6 @@ const Layout = () => {
 
           {/* Main Content */}
           <div className="flex-1 md:ml-80 w-full h-full">
-            <div className="text-white">{token}</div>
             <Outlet />
           </div>
         </div>

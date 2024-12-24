@@ -47,7 +47,6 @@ const Login = () => {
 
       const { friends } = await response.json();
       setActiveFriends(friends);
-      
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }
@@ -104,8 +103,7 @@ const Login = () => {
         // Fetch dashboard data after successful login
         await fetchDashboardData(data.data.accessToken, data.data.refreshToken);
 
-        window.history.pushState({}, "", "/");
-        window.dispatchEvent(new PopStateEvent("popstate"));
+        window.location.href = "/";
       }
     } catch (e) {
       console.error("Network or server error", e);
