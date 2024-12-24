@@ -8,6 +8,7 @@ const TransactionModal = ({
   friendId,
   setIsModalOpen,
   setTransactions,
+  friend,
 }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -80,6 +81,7 @@ const TransactionModal = ({
         status: data.transaction._doc.status,
         sender: data.transaction.sender,
         friendUsername: friendId,
+        fcmToken: friend.fcmToken,
       });
 
       setTransactions((prev) => [

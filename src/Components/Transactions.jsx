@@ -273,6 +273,7 @@ const Transactions = () => {
                             userUsername={userUsername}
                             setTransactions={setTransactions}
                             friendUsername={friendId}
+                            friend={friend}
                           />
                         </div>
                       ))}
