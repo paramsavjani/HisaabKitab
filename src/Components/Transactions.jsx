@@ -166,7 +166,6 @@ const Transactions = () => {
   };
   const groupedTransactions = groupTransactionsByDate(transactions);
 
-  // Scroll to the bottom whenever transactions are updated
   useEffect(() => {
     if (
       lastTransactionRef.current &&
@@ -176,7 +175,7 @@ const Transactions = () => {
         block: "end",
       });
     }
-  }, [transactions]); // Trigger scroll when transactions update
+  }, [transactions]);
 
   const ErrorState = () => (
     <div className="text-red-500 text-center text-lg">{error}</div>
