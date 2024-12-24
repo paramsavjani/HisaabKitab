@@ -134,9 +134,12 @@ const Layout = () => {
         }
       });
 
-      PushNotifications.addListener("registration", (token) => {
+      PushNotifications.addListener("registration", async (token) => {
         console.log("FCM Token:", token.value);
         setToken(token.value);
+        const accessToken = await Preferences.get({ key: "accessToken" }).value;
+        const refreshToken = await Preferences.get({ key: "refreshToken" })
+          .value;
         fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/fcm`, {
           method: "POST",
           headers: {
@@ -145,6 +148,8 @@ const Layout = () => {
           },
           body: JSON.stringify({
             fcmToken: token.value,
+            accessToken,
+            refreshToken,
           }),
           credentials: "include",
         });
