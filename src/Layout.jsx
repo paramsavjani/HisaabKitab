@@ -156,12 +156,12 @@ const Layout = () => {
             credentials: "include",
           }
         );
-        const data = await res.json();
-        if (!res.ok) {
-          toast.error(data.message);
-        } else {
-          toast.success(data.message);
-        }
+        // const data = await res.json();
+        // if (!res.ok) {
+        //   // toast.error(data.message);
+        // } else {
+        //   // toast.success(data.message);
+        // }
       });
 
       PushNotifications.addListener(
@@ -171,7 +171,7 @@ const Layout = () => {
         }
       );
     }
-  }, [isAuthenticated, loading]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     initializeApp();
