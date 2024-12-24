@@ -122,7 +122,7 @@ const Layout = () => {
     }
   };
 
-  useEffect(() => {
+  const PushNotificationsInit = async () => {
     if (Capacitor.getPlatform() !== "web" && isAuthenticated) {
       PushNotifications.requestPermissions().then(({ receive }) => {
         if (receive === "granted") {
@@ -163,10 +163,11 @@ const Layout = () => {
         }
       );
     }
-  }, [isAuthenticated]);
+  };
 
   useEffect(() => {
     initializeApp();
+    PushNotificationsInit();
   }, [setAccessToken]);
 
   return (
