@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import Navbar from "./Components/Navbar";
 import { Outlet } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
 import UserContext from "./context/UserContext.js";
 import useDashboardContext from "./context/DashboardContext.js";
@@ -123,11 +123,7 @@ const Layout = () => {
   };
 
   useEffect(() => {
-    if (
-      Capacitor.getPlatform() !== "web" &&
-      loading === false &&
-      isAuthenticated
-    ) {
+    if (Capacitor.getPlatform() !== "web" && isAuthenticated) {
       PushNotifications.requestPermissions().then(({ receive }) => {
         if (receive === "granted") {
           PushNotifications.register();
@@ -140,19 +136,28 @@ const Layout = () => {
         const accessToken = await Preferences.get({ key: "accessToken" }).value;
         const refreshToken = await Preferences.get({ key: "refreshToken" })
           .value;
-        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/fcm`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token.value}`,
-          },
-          body: JSON.stringify({
-            fcmToken: token.value,
-            accessToken,
-            refreshToken,
-          }),
-          credentials: "include",
-        });
+        const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/fcm`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              fcmToken: token.value,
+              accessToken,
+              refreshToken,
+            }),
+            credentials: "include",
+          }
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.message);
+        } else {
+          toast.success(data.message);
+        }
       });
 
       PushNotifications.addListener(
