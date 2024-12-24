@@ -89,8 +89,20 @@ io.on("connection", (socket) => {
     } else {
       const fcmToken = transaction.fcmToken;
       if (fcmToken) {
-        const messageTitle = "New Transaction";
-        const messageBody = `You have received a new transaction of ${transaction.amount} from ${transaction.friendName}`;
+        let messageTitle;
+        let messageBody;
+
+        if (transaction.amount > 0) {
+          // Positive transaction: money received
+          messageTitle = "Money Received!";
+          messageBody = `You have received ₹${transaction.amount} from ${transaction.friendName}.`;
+        } else if (transaction.amount < 0) {
+          // Negative transaction: money requested
+          messageTitle = "Money Requested!";
+          messageBody = `${transaction.friendName} has requested ₹${Math.abs(
+            transaction.amount
+          )} from you.`;
+        }
         sendPushNotification(fcmToken, messageTitle, messageBody);
       }
     }
