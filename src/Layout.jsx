@@ -6,13 +6,15 @@ import { Preferences } from "@capacitor/preferences";
 import UserContext from "./context/UserContext.js";
 import useDashboardContext from "./context/DashboardContext.js";
 import "./loading.css";
-import { io, Socket } from "socket.io-client";
+import { PushNotifications } from "@capacitor/push-notifications";
+import { Capacitor } from "@capacitor/core";
 
 const Layout = () => {
-  const { user, setUser, setAccessToken, setRefreshToken } =
-    useContext(UserContext);
+  const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
   const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(1);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const getTokenFromCookies = (key) =>
     document.cookie
@@ -67,6 +69,7 @@ const Layout = () => {
       }
 
       setUser(() => verifiedUser);
+      setIsAuthenticated(true);
 
       // Update tokens in storage
       const updatedAccessToken = getTokenFromCookies("accessToken");
@@ -120,6 +123,43 @@ const Layout = () => {
   };
 
   useEffect(() => {
+    if (
+      Capacitor.getPlatform() !== "web" &&
+      loading === false &&
+      isAuthenticated
+    ) {
+      PushNotifications.requestPermissions().then(({ receive }) => {
+        if (receive === "granted") {
+          PushNotifications.register();
+        }
+      });
+
+      PushNotifications.addListener("registration", (token) => {
+        console.log("FCM Token:", token.value);
+        setToken(token.value);
+        fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/fcm`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token.value}`,
+          },
+          body: JSON.stringify({
+            fcmToken: token.value,
+          }),
+          credentials: "include",
+        });
+      });
+
+      PushNotifications.addListener(
+        "pushNotificationReceived",
+        (notification) => {
+          console.log("Notification received:", notification);
+        }
+      );
+    }
+  }, [isAuthenticated, loading]);
+
+  useEffect(() => {
     initializeApp();
   }, [setAccessToken]);
 
@@ -153,6 +193,7 @@ const Layout = () => {
 
           {/* Main Content */}
           <div className="flex-1 md:ml-80 w-full h-full">
+            <div className="text-white">{token}</div>
             <Outlet />
           </div>
         </div>
