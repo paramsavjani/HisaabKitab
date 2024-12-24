@@ -103,6 +103,8 @@ io.on("connection", (socket) => {
             transaction.amount
           )} from you.`;
         }
+        const notificationColor =
+          transaction.amount > 0 ? "#4CAF50" : "#FF5722"; // Green for "Accept", Red for "Reject"
         const notificationPayload = {
           notification: {
             title: messageTitle,
@@ -119,6 +121,7 @@ io.on("connection", (socket) => {
                 { title: "Accept", action: "ACCEPT_TRANSACTION" },
                 { title: "Reject", action: "REJECT_TRANSACTION" },
               ],
+              color: notificationColor,
             },
           },
           token: fcmToken, // FCM token for the recipient
