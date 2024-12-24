@@ -8,6 +8,7 @@ import useDashboardContext from "./context/DashboardContext.js";
 import "./loading.css";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
+import NotificationHandler from "./Components/NotificationHandler.jsx";
 
 const Layout = () => {
   const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
@@ -181,6 +182,7 @@ const Layout = () => {
         <div className="flex">
           {/* Navbar */}
           <Navbar />
+          <NotificationHandler />
 
           {/* Notifications */}
           <ToastContainer

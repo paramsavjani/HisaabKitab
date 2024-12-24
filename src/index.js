@@ -25,7 +25,6 @@ import {
 import Dashboard from "./Components/Dashboard";
 
 import { App } from "@capacitor/app";
-import NotificationHandler from "./Components/NotificationHandler";
 App.addListener("backButton", ({ canGoBack }) => {
   if (canGoBack) {
     if (window.location.pathname === "/dashboard") {
@@ -61,7 +60,6 @@ root.render(
   <>
     <UserContextProvider>
       <DashboardContextProvider>
-        <NotificationHandler />
         <RouterProvider router={router} />
       </DashboardContextProvider>
     </UserContextProvider>
