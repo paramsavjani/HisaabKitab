@@ -92,42 +92,41 @@ io.on("connection", (socket) => {
         let messageTitle;
         let messageBody;
 
-        if (transaction.amount < 0) {
+        if (transaction.amount > 0) {
           // Positive transaction: money received
           messageTitle = "Money Received!";
           messageBody = `You have received ₹${transaction.amount} from ${transaction.friendName}.`;
-        } else if (transaction.amount > 0) {
+        } else if (transaction.amount < 0) {
           // Negative transaction: money requested
           messageTitle = "Money Requested!";
           messageBody = `${transaction.friendName} has requested ₹${Math.abs(
             transaction.amount
           )} from you.`;
         }
+
         const notificationColor =
-          transaction.amount > 0 ? "#4CAF50" : "#FF5722"; // Green for "Accept", Red for "Reject"
-        const notificationPayload = {
+          transaction.amount > 0 ? "#4CAF50" : "#FF5722"; // Green for positive, Red for negative
+
+        const message = {
           notification: {
             title: messageTitle,
             body: messageBody,
           },
           data: {
             transactionId: transaction.transactionId, // Pass the transaction ID for reference
-            actionType: "transaction", // Custom action
+            actionType: "transaction", // Custom action type
+            transactionAmount: `${transaction.amount}`, // Include the amount for detailed processing
           },
           android: {
             notification: {
               clickAction: "OPEN_TRANSACTION_DETAILS", // Intent/action in your app
-              actions: [
-                { title: "Accept", action: "ACCEPT_TRANSACTION" },
-                { title: "Reject", action: "REJECT_TRANSACTION" },
-              ],
-              color: notificationColor,
+              color: notificationColor, // Add color for Android notifications
             },
           },
           token: fcmToken, // FCM token for the recipient
         };
 
-        sendPushNotification(notificationPayload);
+        sendPushNotification(message);
       }
     }
   });
