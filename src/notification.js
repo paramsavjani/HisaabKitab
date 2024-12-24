@@ -1,10 +1,9 @@
 import admin from "firebase-admin";
 import { readFileSync } from "fs";
-// import "./hisaab--kitab-firebase-adminsdk-k7ftp-f4b43bba48.json"
 
 const serviceAccount = JSON.parse(
   readFileSync(
-    "./src/hisaab--kitab-firebase-adminsdk-k7ftp-f4b43bba48.json",
+    "../src/hisaab--kitab-firebase-adminsdk-k7ftp-f4b43bba48.json",
     "utf8"
   )
 );
