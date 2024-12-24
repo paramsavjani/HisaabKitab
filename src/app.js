@@ -5,6 +5,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import { sendPushNotification } from "./notification.js";
 
 // Initialize Express app
 const app = express();
@@ -34,7 +35,6 @@ import userRouter from "./routes/user.route.js";
 import friendRequestRouter from "./routes/request.route.js";
 import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
-import { tr } from "@faker-js/faker";
 
 // Routes
 app.get("/", (req, res) => {
@@ -79,13 +79,20 @@ io.on("connection", (socket) => {
 
   socket.on("newTransaction", (transaction) => {
     const receiverSocketId = onlineUsers.get(transaction.friendUsername);
+    console.log(transaction);
+
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("newTransaction", {
         ...transaction,
         friendUsername: null,
       });
     } else {
-      console.log("user is offline");
+      const fcmToken = transaction.fcmToken;
+      if (fcmToken) {
+        const messageTitle = "New Transaction";
+        const messageBody = `You have received a new transaction of ${transaction.amount} from ${transaction.username}`;
+        sendPushNotification(fcmToken, messageTitle, messageBody);
+      }
     }
   });
 

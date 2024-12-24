@@ -1,5 +1,4 @@
 import admin from "firebase-admin";
-import { User } from "./models/User.model.js";
 import { readFileSync } from "fs";
 // import "./hisaab--kitab-firebase-adminsdk-k7ftp-f4b43bba48.json"
 
@@ -34,3 +33,4 @@ const sendPushNotification = (fcmToken, title, body) => {
     });
 };
 
+export { sendPushNotification };

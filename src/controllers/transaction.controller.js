@@ -1,8 +1,6 @@
 import asyncHandler from "../utils/asyncHandler.js";
-import ApiError from "../utils/ApiError.js";
 import { User } from "../models/User.model.js";
 import { Transaction } from "../models/Transaction.model.js";
-import ApiResponse from "../utils/ApiResponse.js";
 import { Friend } from "../models/Friend.model.js";
 
 const addTransaction = asyncHandler(async (req, res) => {
@@ -88,7 +86,7 @@ const addTransaction = asyncHandler(async (req, res) => {
 const showTransactions = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const user = await User.findOne({ _id: userId }).select(
-    "username name profilePicture email"
+    "username name profilePicture email fcmToken"
   );
 
   if (!user) {
@@ -104,7 +102,7 @@ const showTransactions = asyncHandler(async (req, res) => {
   }
 
   const friend = await User.findOne({ username: friendUsername }).select(
-    "username name profilePicture email"
+    "username name profilePicture email fcmToken"
   );
 
   if (!friend) {
@@ -285,6 +283,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
         username: 1,
         name: 1,
         profilePicture: 1,
+        fcmToken: 1,
       }
     ).lean();
 
@@ -338,6 +337,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
         username: friend.username,
         name: friend.name,
         profilePicture: friend.profilePicture,
+        fcmToken: friend.fcmToken,
         lastTransactionTime: friendMap[friend._id.toString()],
         totalAmount: totalAmount, // Add total transaction amount
       };
