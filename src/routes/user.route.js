@@ -7,14 +7,14 @@ import {
   getUser,
   searchUser,
   userInfo,
+  fcmtoken,
 } from "../controllers/user.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
-
 const router = Router();
 
-router.route("/register").post(upload.single("profilePicture"),registerUser);
+router.route("/register").post(upload.single("profilePicture"), registerUser);
 
 router.route("/login").post(loginUser);
 
@@ -27,5 +27,7 @@ router.route("/verify").post(verifyJWT, getUser);
 router.route("/search").get(searchUser);
 
 router.route("/get/:username").get(userInfo);
+
+router.route("/fcm").post(verifyJWT, fcmtoken);
 
 export default router;

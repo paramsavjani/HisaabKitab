@@ -2,7 +2,6 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/User.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -309,6 +308,17 @@ const userInfo = asyncHandler(async (req, res) => {
   });
 });
 
+const fcmtoken = asyncHandler(async (req, res) => {
+  const { fcmToken } = req.body;
+  const user = await User.findById(req.user._id);
+  user.fcmToken = fcmToken;
+  await user.save();
+  return res.status(200).json({
+    status: "success",
+    message: "FCM token updated successfully",
+  });
+});
+
 export {
   registerUser,
   loginUser,
@@ -317,4 +327,5 @@ export {
   getUser,
   searchUser,
   userInfo,
+  fcmtoken,
 };
