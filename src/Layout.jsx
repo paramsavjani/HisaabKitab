@@ -69,7 +69,6 @@ const Layout = () => {
       }
 
       setUser(() => verifiedUser);
-      setIsAuthenticated(true);
 
       // Update tokens in storage
       const updatedAccessToken = getTokenFromCookies("accessToken");
@@ -89,6 +88,8 @@ const Layout = () => {
         });
         setRefreshToken(updatedRefreshToken);
       }
+
+      setIsAuthenticated(true);
 
       // Fetch Dashboard Data
       const dashboardResponse = await fetch(
