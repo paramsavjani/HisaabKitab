@@ -82,6 +82,7 @@ const TransactionModal = ({
         sender: data.transaction.sender,
         friendUsername: friendId,
         fcmToken: friend.fcmToken,
+        friendName: friend.name,
       });
 
       setTransactions((prev) => [
