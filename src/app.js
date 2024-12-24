@@ -92,18 +92,39 @@ io.on("connection", (socket) => {
         let messageTitle;
         let messageBody;
 
-        if (transaction.amount > 0) {
+        if (transaction.amount < 0) {
           // Positive transaction: money received
           messageTitle = "Money Received!";
           messageBody = `You have received ₹${transaction.amount} from ${transaction.friendName}.`;
-        } else if (transaction.amount < 0) {
+        } else if (transaction.amount > 0) {
           // Negative transaction: money requested
           messageTitle = "Money Requested!";
           messageBody = `${transaction.friendName} has requested ₹${Math.abs(
             transaction.amount
           )} from you.`;
         }
-        sendPushNotification(fcmToken, messageTitle, messageBody);
+        const notificationPayload = {
+          notification: {
+            title: messageTitle,
+            body: messageBody,
+          },
+          data: {
+            transactionId: transaction.transactionId, // Pass the transaction ID for reference
+            actionType: "transaction", // Custom action
+          },
+          android: {
+            notification: {
+              clickAction: "OPEN_TRANSACTION_DETAILS", // Intent/action in your app
+              actions: [
+                { title: "Accept", action: "ACCEPT_TRANSACTION" },
+                { title: "Reject", action: "REJECT_TRANSACTION" },
+              ],
+            },
+          },
+          token: fcmToken, // FCM token for the recipient
+        };
+
+        sendPushNotification(notificationPayload);
       }
     }
   });

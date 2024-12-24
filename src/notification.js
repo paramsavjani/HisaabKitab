@@ -12,15 +12,7 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const sendPushNotification = (fcmToken, title, body) => {
-  const message = {
-    notification: {
-      title,
-      body,
-    },
-    token: fcmToken,
-  };
-
+const sendPushNotification = (message) => {
   admin
     .messaging()
     .send(message)
@@ -31,11 +23,5 @@ const sendPushNotification = (fcmToken, title, body) => {
       console.error("Error sending notification:", error);
     });
 };
-
-sendPushNotification(
-  "cDCIafHCTFKZYjBzNGVhxw:APA91bFDbexTrmN4Gl1HeLanrEZZBMIVm-6-wDQ8ydg9P55_jGi9hQ9sIWW7V_bZLyIyVQVg5GsNJh5YwzdvLEAYOijei9G_zEolsI3yF6p4AAqub9-YLec",
-  "title",
-  "body"
-);
 
 export { sendPushNotification };
