@@ -2,6 +2,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { User } from "../models/User.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
+import { Friend } from "../models/Friend.model.js";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -290,22 +291,68 @@ const searchUser = asyncHandler(async (req, res) => {
 const userInfo = asyncHandler(async (req, res) => {
   const username = req.params.username;
 
-  const user = await User.findOne({ username: username }).select(
+  // Fetch user details
+  const user = await User.findOne({ username }).select(
     "username email name profilePicture"
   );
 
   if (!user) {
-    res.status(410).json({
+    return res.status(410).json({
       status: "error",
       message: "User not found",
     });
-    return;
   }
 
-  return res.status(200).json({
-    status: "success",
-    user,
-  });
+  // Get access token
+  const accessToken =
+    req.body.accessToken ||
+    req.cookies.accessToken ||
+    req.header("Authorization")?.split(" ")[1];
+
+  // Return basic user info if no access token
+  if (!accessToken) {
+    return res.status(200).json({ user, status: "success" });
+  }
+
+  try {
+    // Decode token
+    const decodedToken = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    const userId = decodedToken._id;
+    const targetUserId = user._id;
+
+    // Check friendship or request status in one query
+    const [friendship, request] = await Promise.all([
+      Friend.findOne({
+        $or: [
+          { user: userId, friend: targetUserId },
+          { user: targetUserId, friend: userId },
+        ],
+      }),
+      Request.findOne({
+        $or: [
+          { sender: userId, receiver: targetUserId },
+          { sender: targetUserId, receiver: userId },
+        ],
+        status: "pending",
+      }),
+    ]);
+
+    // Respond with friendship/request status
+    return res.status(200).json({
+      status: "success",
+      user,
+      friendship: !!friendship,
+      requested: !!request,
+      request: request || null,
+    });
+  } catch (error) {
+    // Fallback for invalid tokens
+    return res.status(202).json({ user, status: "success" });
+  }
 });
 
 const fcmtoken = asyncHandler(async (req, res) => {

@@ -93,10 +93,11 @@ io.on("connection", (socket) => {
         let messageBody;
 
         if (transaction.amount < 0) {
-          messageTitle = "Money Received!";
-          messageBody = `You have received ₹${transaction.amount} from ${transaction.friendName}.`;
+          messageTitle = "You Will Receive Money!";
+          messageBody = `You will receive ₹${Math.abs(
+            transaction.amount
+          )} from ${transaction.friendName}.`;
         } else if (transaction.amount > 0) {
-          
           messageTitle = "Money Requested!";
           messageBody = `${transaction.friendName} has requested ₹${Math.abs(
             transaction.amount
@@ -104,7 +105,7 @@ io.on("connection", (socket) => {
         }
 
         const notificationColor =
-          transaction.amount < 0 ? "#4CAF50" : "#FF5722"; 
+          transaction.amount < 0 ? "#4CAF50" : "#FF5722";
 
         const message = {
           notification: {
