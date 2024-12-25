@@ -303,6 +303,12 @@ const userInfo = asyncHandler(async (req, res) => {
     });
   }
 
+  const totalFriends = await Friend.find({
+    $or: [{ user: user._id }, { friend: user._id }],
+  }).countDocuments();
+
+  user.totalFriends = totalFriends;
+
   // Get access token
   const accessToken =
     req.body.accessToken ||
