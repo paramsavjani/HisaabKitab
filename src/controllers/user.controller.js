@@ -346,7 +346,7 @@ const userInfo = asyncHandler(async (req, res) => {
 
     return res.status(200).json({
       status: "success",
-      user,
+      user: { ...user, totalFriends },
       friendship: !!friendship,
       requested: !!request,
       request: request || null,
