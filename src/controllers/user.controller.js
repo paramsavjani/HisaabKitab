@@ -309,19 +309,16 @@ const userInfo = asyncHandler(async (req, res) => {
 
   user.totalFriends = totalFriends;
 
-  // Get access token
   const accessToken =
     req.body.accessToken ||
     req.cookies.accessToken ||
     req.header("Authorization")?.split(" ")[1];
 
-  // Return basic user info if no access token
   if (!accessToken) {
     return res.status(200).json({ user, status: "success" });
   }
 
   try {
-    // Decode token
     const decodedToken = jwt.verify(
       accessToken,
       process.env.ACCESS_TOKEN_SECRET
