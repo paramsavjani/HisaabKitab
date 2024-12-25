@@ -112,14 +112,10 @@ const Layout = () => {
       const { friends } = await dashboardResponse.json();
       setActiveFriends(() => friends);
 
-      // Push to dashboard after all data is loaded
-      window.history.pushState({}, "", "/dashboard");
-      window.dispatchEvent(new PopStateEvent("popstate"));
     } catch (error) {
       console.error("Initialization Error:", error);
     } finally {
       setLoading(false);
-      console.log(`wss://${process.env.REACT_APP_BACKEND_URL.split("//")[1]}`);
     }
   };
 
@@ -132,7 +128,6 @@ const Layout = () => {
       });
 
       PushNotifications.addListener("registration", async (token) => {
-        console.log("FCM Token:", token.value);
         const { value: storedAccessToken } = await Preferences.get({
           key: "accessToken",
         });

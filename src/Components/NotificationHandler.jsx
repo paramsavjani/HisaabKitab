@@ -22,7 +22,7 @@ const NotificationHandler = () => {
     }
   }, [history]);
 
-  return null; // This is a utility component, so it doesn't render anything
+  return null;
 };
 
 export default NotificationHandler;

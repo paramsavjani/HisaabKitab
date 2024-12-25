@@ -113,7 +113,6 @@ const Transactions = () => {
         setTransactions(data.transactions.reverse());
         setPrevTransactionCount(data.transactions.length - 1);
       } catch (err) {
-        setError(err.message);
       } finally {
         setLoading(false);
       }
