@@ -3,6 +3,7 @@ import { User } from "../models/User.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { Friend } from "../models/Friend.model.js";
+import { Request } from "../models/Request.model.js";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -291,10 +292,9 @@ const searchUser = asyncHandler(async (req, res) => {
 const userInfo = asyncHandler(async (req, res) => {
   const username = req.params.username;
 
-  // Fetch user details
-  const user = await User.findOne({ username }).select(
-    "username email name profilePicture"
-  );
+  const user = await User.findOne({ username })
+    .select("username email name profilePicture")
+    .lean();
 
   if (!user) {
     return res.status(410).json({
@@ -304,10 +304,8 @@ const userInfo = asyncHandler(async (req, res) => {
   }
 
   const totalFriends = await Friend.find({
-    $or: [{ user: user._id }, { friend: user._id }],
+    $or: [{ userId: user._id }, { friendId: user._id }],
   }).countDocuments();
-
-  user.totalFriends = totalFriends;
 
   const accessToken =
     req.body.accessToken ||
@@ -315,7 +313,10 @@ const userInfo = asyncHandler(async (req, res) => {
     req.header("Authorization")?.split(" ")[1];
 
   if (!accessToken) {
-    return res.status(200).json({ user, status: "success" });
+    return res.status(201).json({
+      user: { ...user, totalFriends },
+      status: "success",
+    });
   }
 
   try {
@@ -327,12 +328,11 @@ const userInfo = asyncHandler(async (req, res) => {
     const userId = decodedToken._id;
     const targetUserId = user._id;
 
-    // Check friendship or request status in one query
     const [friendship, request] = await Promise.all([
       Friend.findOne({
         $or: [
-          { user: userId, friend: targetUserId },
-          { user: targetUserId, friend: userId },
+          { userId: userId, friendId: targetUserId },
+          { userId: targetUserId, friendId: userId },
         ],
       }),
       Request.findOne({
@@ -344,7 +344,6 @@ const userInfo = asyncHandler(async (req, res) => {
       }),
     ]);
 
-    // Respond with friendship/request status
     return res.status(200).json({
       status: "success",
       user,
@@ -353,8 +352,11 @@ const userInfo = asyncHandler(async (req, res) => {
       request: request || null,
     });
   } catch (error) {
-    // Fallback for invalid tokens
-    return res.status(202).json({ user, status: "success" });
+    console.log(error);
+    return res.status(201).json({
+      user: { ...user, totalFriends },
+      status: "success",
+    });
   }
 });
 

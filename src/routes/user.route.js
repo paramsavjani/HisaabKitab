@@ -26,7 +26,7 @@ router.route("/verify").post(verifyJWT, getUser);
 
 router.route("/search").get(searchUser);
 
-router.route("/get/:username").get(userInfo);
+router.route("/get/:username").post(userInfo);
 
 router.route("/fcm").post(verifyJWT, fcmtoken);
 
