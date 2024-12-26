@@ -79,7 +79,11 @@ const Transactions = () => {
 
   useEffect(() => {
     document.title = "Transactions";
-    if (user.username !== userUsername) {
+    if (!user) {
+      window.location.replace("/login");
+      return;
+    }
+    if (user?.username !== userUsername) {
       window.location.replace(
         "/transactions/" + user.username + "--" + friendId
       );
