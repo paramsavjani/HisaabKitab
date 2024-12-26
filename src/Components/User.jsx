@@ -52,7 +52,6 @@ const User = () => {
           if (data?.friendship) {
             setIsFriend(true);
           }
-          console.log(data);
         }
       } catch (error) {
         console.error(error);

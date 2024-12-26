@@ -192,8 +192,6 @@ const Layout = () => {
           ...prev,
           { totalAmount: 0, isActive: false, ...extra },
         ]);
-        console.log("Active Friends:", activeFriends);
-        console.log("extra:", extra);
       }
     });
 
