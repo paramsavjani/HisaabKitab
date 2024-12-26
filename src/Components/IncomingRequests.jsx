@@ -42,9 +42,7 @@ function IncomingRequests() {
     const { email, ...extra } = user;
     socket.emit("actionOnFriendRequest", { id, action, extra, senderUsername });
 
-    setIncomingRequests(
-      incomingRequests.filter((request) => request.requestId !== id)
-    );
+    setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
   };
 

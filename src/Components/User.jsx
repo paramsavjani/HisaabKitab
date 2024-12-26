@@ -9,7 +9,8 @@ import socket from "../socket.js";
 import { Preferences } from "@capacitor/preferences";
 
 const User = () => {
-  const { user, accessToken, refreshToken } = useContext(UserContext);
+  const { user, accessToken, refreshToken, setIncomingRequests } =
+    useContext(UserContext);
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -116,7 +117,6 @@ const User = () => {
           request: { requestId: data.data.requestId, ...user },
           receiver: profile.username,
         });
-        console.log(user);
       } else {
         const data = await response.json();
         toast.error(data.message || "Error adding friend!");
@@ -147,6 +147,11 @@ const User = () => {
         if (response.ok) {
           setIsRequestSent(false);
           setIsFriend(false);
+
+          socket.emit("cancelFriendRequest", {
+            requestId,
+            receiver: profile.username,
+          });
         } else {
           const data = await response.json();
           toast.error(data.message || "Error canceling request!");
@@ -159,7 +164,7 @@ const User = () => {
     }
   };
 
-  const handleRequest = async (id, action) => {
+  const handleRequest = async (id, action, senderUsername) => {
     setIsAccepting(action === "accept");
     setIsRejecting(action === "deny");
 
@@ -178,8 +183,20 @@ const User = () => {
       toast.error(
         data.message || "Failed to handle request. Please try again."
       );
+      setIsAccepting(false);
+      setIsRejecting(false);
       return;
     }
+    const { email, ...extra } = user;
+    socket.emit("actionOnFriendRequest", {
+      id,
+      action,
+      extra,
+      senderUsername,
+    });
+
+    setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
+
     if (action === "accept") {
       setIsFriend(true);
     }
