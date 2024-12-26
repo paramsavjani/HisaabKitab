@@ -98,6 +98,10 @@ const User = () => {
           method: "POST",
           credentials: "include",
           body: JSON.stringify({ accessToken, refreshToken }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
       if (response.ok) {
