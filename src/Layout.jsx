@@ -127,7 +127,7 @@ const Layout = () => {
         }
       );
       const data = await res.json();
-      setIncomingRequests(data.data.senders);
+      setIncomingRequests(data?.data?.senders || []);
     } catch (error) {
       console.error("Initialization Error:", error);
     } finally {
