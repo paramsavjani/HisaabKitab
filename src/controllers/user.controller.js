@@ -256,7 +256,7 @@ const getUser = asyncHandler(async (req, res) => {
   const username = req.user?.username;
 
   const user = await User.findOne({ username }).select(
-    "username email name profilePicture"
+    "username email name profilePicture fcmToken"
   );
 
   if (!user) {
