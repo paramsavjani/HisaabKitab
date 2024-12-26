@@ -182,6 +182,14 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("cancelFriendRequest", ({ requestId, receiver, senderName }) => {
+    const receiverSocketId = onlineUsers.get(receiver);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("cancelFriendRequest", requestId);
+    } else {
+    }
+  });
+
   socket.on("disconnect", () => {
     onlineUsers.delete(socket.user.username);
     console.log(`A user disconnected: ${socket.user.username}`);
