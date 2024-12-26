@@ -7,6 +7,7 @@ function IncomingRequests() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false); // State for loading spinner
   const [errorMessage, setErrorMessage] = useState(""); // Error state
+  const [buttonLoading, setButtonLoading] = useState({}); // Individual button loading state
   const { accessToken, refreshToken } = React.useContext(UserContext);
 
   // Fetch incoming requests from the backend
@@ -34,7 +35,7 @@ function IncomingRequests() {
   }, [accessToken, refreshToken]);
 
   const handleRequest = async (id, action) => {
-    setLoading(true);
+    setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/${action}`,
       {
@@ -50,17 +51,17 @@ function IncomingRequests() {
       setErrorMessage(
         data.message || "Failed to handle request. Please try again."
       );
-      setLoading(false);
+      setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
       return;
     }
 
     setRequests(requests.filter((request) => request.requestId !== id));
-    setLoading(false);
+    setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 py-6 px-4 sm:px-6 lg:px-8">
-      <div className="bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-2xl">
+    <div className="min-h-screen flex items-center justify-center bg-gray-950 py-6 px-4 sm:px-6 lg:px-8">
+      <div className="bg-gray-900 p-6 rounded-xl shadow-2xl w-full max-w-2xl">
         <h2 className="text-2xl font-bold text-white text-center mb-6">
           Incoming Friend Requests
         </h2>
@@ -81,7 +82,7 @@ function IncomingRequests() {
             requests.map((request) => (
               <div
                 key={request._id}
-                className="flex flex-col sm:flex-row justify-between items-center bg-gray-700 p-4 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300"
+                className="flex flex-col sm:flex-row justify-between items-center bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300"
               >
                 <Link
                   to={`/users/${request.username}`}
@@ -102,15 +103,25 @@ function IncomingRequests() {
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleRequest(request.requestId, "accept")}
-                    className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm"
+                    className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm flex items-center"
+                    disabled={buttonLoading[`${request.requestId}-accept`]}
                   >
-                    Accept
+                    {buttonLoading[`${request.requestId}-accept`] ? (
+                      <FaSpinner className="animate-spin mr-2" />
+                    ) : (
+                      "Accept"
+                    )}
                   </button>
                   <button
                     onClick={() => handleRequest(request.requestId, "deny")}
-                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm flex items-center"
+                    disabled={buttonLoading[`${request.requestId}-deny`]}
                   >
-                    Deny
+                    {buttonLoading[`${request.requestId}-deny`] ? (
+                      <FaSpinner className="animate-spin mr-2" />
+                    ) : (
+                      "Deny"
+                    )}
                   </button>
                 </div>
               </div>
