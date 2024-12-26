@@ -62,6 +62,7 @@ const onlineUsers = new Map();
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.accessToken;
+    console.log(token);
     if (!token) {
       throw new Error("Token not provided");
     }
