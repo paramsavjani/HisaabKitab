@@ -23,12 +23,9 @@ function IncomingRequests() {
         credentials: "include",
         method: "POST",
         body: JSON.stringify({ accessToken, refreshToken }),
-        
-        headers
-        : {
+        headers: {
           "Content-Type": "application/json",
         },
-
       }
     );
 

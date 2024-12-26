@@ -126,6 +126,9 @@ const Signup = () => {
           method: "POST",
           body: formDataToSend,
           credentials: "include",
+          headers: {
+            Accept: "application/json",
+          },
         }
       );
       const data = await response.json();
