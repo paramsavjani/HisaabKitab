@@ -7,7 +7,6 @@ import useDashboardContext from "../context/DashboardContext.js";
 
 function Friends() {
   const { user } = useContext(UserContext);
-  const [error, setError] = useState(null);
   const { activeFriends } = useDashboardContext();
 
   useEffect(() => {
@@ -20,7 +19,7 @@ function Friends() {
         Your Friends
       </h2>
 
-      {/* Error Handling */}
+      {/* Error Handling
       {error && (
         <div
           className="bg-red-500 text-white p-4 rounded-md mb-6 max-w-xl w-full"
@@ -28,7 +27,7 @@ function Friends() {
         >
           <strong>Error:</strong> {error}
         </div>
-      )}
+      )} */}
 
       {
         // Friend List
