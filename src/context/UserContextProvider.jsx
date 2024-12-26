@@ -6,6 +6,7 @@ const UserContextProvider = ({ children }) => {
   const [accessToken, setAccessToken] = React.useState(null);
   const [refreshToken, setRefreshToken] = React.useState(null);
   const [incomingRequests, setIncomingRequests] = React.useState([]);
+  const [sentRequests, setSentRequests] = React.useState([]);
   return (
     <UserContext.Provider
       value={{
@@ -17,6 +18,8 @@ const UserContextProvider = ({ children }) => {
         setRefreshToken,
         incomingRequests,
         setIncomingRequests,
+        sentRequests,
+        setSentRequests,
       }}
     >
       {children}

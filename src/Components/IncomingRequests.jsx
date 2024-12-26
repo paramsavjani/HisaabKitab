@@ -3,6 +3,7 @@ import { FaExclamationTriangle, FaSpinner } from "react-icons/fa"; // Error and 
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 import socket from "../socket.js";
+import useDashboardContext from "../context/DashboardContext.js";
 
 function IncomingRequests() {
   const [errorMessage, setErrorMessage] = useState(""); // Error state
@@ -14,35 +15,61 @@ function IncomingRequests() {
     incomingRequests,
     setIncomingRequests,
   } = React.useContext(UserContext);
-
+  const { setActiveFriends } = useDashboardContext();
 
   const handleRequest = async (id, action, senderUsername) => {
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/${action}`,
-      {
-        credentials: "include",
-        method: "POST",
-        body: JSON.stringify({ accessToken, refreshToken }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    if (!res.ok) {
-      const data = await res.json();
-      setErrorMessage(
-        data.message || "Failed to handle request. Please try again."
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/${action}`,
+        {
+          credentials: "include",
+          method: "POST",
+          body: JSON.stringify({ accessToken, refreshToken }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorMessage(
+          data.message || "Failed to handle request. Please try again."
+        );
+        setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
+        return;
+      }
+
+      const { _id: userId, email, ...extra } = user;
+      socket.emit("actionOnFriendRequest", {
+        id,
+        action,
+        extra,
+        senderUsername,
+      });
+
+      const sender = incomingRequests.find(
+        (request) => request.requestId === id
+      );
+      const { requestId, _id, ...rest } = sender;
+
+      if (action === "accept") {
+        setActiveFriends((prev) => [
+          ...prev,
+          { totalAmount: 0, isActive: false, ...rest },
+        ]);
+      }
+
+      setIncomingRequests((p) =>
+        p.filter((request) => request.requestId !== id)
+      );
+      setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
+    } catch (err) {
+      setErrorMessage("Failed to handle request. Please try again.");
       setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
       return;
     }
-    const { email, ...extra } = user;
-    socket.emit("actionOnFriendRequest", { id, action, extra, senderUsername });
-
-    setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
-    setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
   };
 
   return (
@@ -53,7 +80,7 @@ function IncomingRequests() {
         </h2>
         <div className="space-y-4">
           {errorMessage && (
-            <div className="flex items-center text-red-500 p-3 rounded-lg bg-red-800">
+            <div className="flex items-center text-white p-3 rounded-lg bg-red-600">
               <FaExclamationTriangle className="mr-3 text-xl" />
               <p className="text-sm">{errorMessage}</p>
             </div>

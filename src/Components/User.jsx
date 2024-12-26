@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, act } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -7,16 +7,19 @@ import UserContext from "../context/UserContext.js";
 import UserNotFound from "./UserNotFound";
 import socket from "../socket.js";
 import { Preferences } from "@capacitor/preferences";
+import useDashboardContext from "../context/DashboardContext.js";
 
 const User = () => {
   const {
     user,
     accessToken,
     refreshToken,
-    setActiveFriends,
     incomingRequests,
     setIncomingRequests,
+    setSentRequests,
+    sentRequests,
   } = useContext(UserContext);
+  const { setActiveFriends, activeFriends } = useDashboardContext();
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,46 +75,36 @@ const User = () => {
   }, [id]);
 
   useEffect(() => {
-    socket.on("actionOnFRForProfileView", ({ action, extra }) => {
-      if (action === "accept") {
-        if (extra.username === profile?.username) {
-          setIsFriend(true);
-          setIsRequestReceived(false);
-          setIsRequestSent(false);
-          setRequestId(null);
-        }
-      } else if (action === "deny") {
-        if (extra.username === profile?.username) {
-          setIsRequestReceived(false);
-          setIsRequestSent(false);
-          setIsFriend(false);
-          setRequestId(null);
-        }
-      }
-    });
+    const isIncomingRequest = incomingRequests.find(
+      (request) => request.username === profile?.username
+    );
+    if (isIncomingRequest) {
+      setIsRequestReceived(true);
+      setRequestId(isIncomingRequest.requestId);
+    } else {
+      setIsRequestReceived(false);
+    }
 
-    socket.on("sendFriendRequest", (request) => {
-      if (request.username === profile?.username) {
-        setIsRequestReceived(true);
-        setRequestId(request.requestId);
-      }
-    });
+    const isSentRequest = sentRequests.find(
+      (request) => request.receiver === profile?.username
+    );
+    if (isSentRequest) {
+      setIsRequestSent(true);
+      setRequestId(isSentRequest.requestId);
+    } else {
+      setIsRequestSent(false);
+    }
 
-    socket.on("cancelFriendRequest", ({ senderUsername }) => {
-      if (senderUsername === profile?.username) {
-        setIsRequestReceived(false);
-        setIsRequestSent(false);
-        setRequestId(null);
-        isFriend(false);
-      }
-    });
+    const isFriend = activeFriends.find(
+      (f) => f.username === profile?.username
+    );
 
-    return () => {
-      socket.off("actionOnFRForProfileView");
-      socket.off("sendFriendRequest");
-      socket.off("cancelFriendRequest");
-    };
-  }, [profile, setProfile]);
+    if (isFriend) {
+      setIsFriend(true);
+    } else {
+      setIsFriend(false);
+    }
+  }, [incomingRequests, profile?.username, sentRequests, setIncomingRequests]);
 
   const addFriend = async () => {
     setIsAddingFriend(true);
@@ -138,6 +131,10 @@ const User = () => {
         const data = await response.json();
         setRequestId(data.data.requestId);
         setIsRequestSent(true);
+        setSentRequests((prev) => [
+          ...prev,
+          { requestId: data.data.requestId, receiver: profile.username },
+        ]);
 
         socket.emit("sendFriendRequest", {
           request: { requestId: data.data.requestId, ...user },
@@ -223,17 +220,19 @@ const User = () => {
       senderUsername,
     });
 
-    const sender = incomingRequests.find((request) => request.requestId === id);
-    setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
-    const { requestId, _id, ...rest } = sender;
-
     if (action === "accept") {
+      const sender = incomingRequests.find(
+        (request) => request.requestId === id
+      );
+      const { requestId, _id, ...rest } = sender;
       setIsFriend(true);
       setActiveFriends((prev) => [
         ...prev,
-        { totalAmount: 0, isActive: false, rest },
+        { totalAmount: 0, isActive: false, ...rest },
       ]);
+      console.log(activeFriends);
     }
+    setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
     setRequestId(null);
     setIsRequestReceived(false);
     setIsAccepting(false);

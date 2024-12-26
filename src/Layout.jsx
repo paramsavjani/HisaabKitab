@@ -12,8 +12,14 @@ import NotificationHandler from "./Components/NotificationHandler.jsx";
 import socket from "./socket.js";
 
 const Layout = () => {
-  const { setUser, setAccessToken, setRefreshToken, setIncomingRequests } =
-    useContext(UserContext);
+  const {
+    setUser,
+    setAccessToken,
+    setRefreshToken,
+    setIncomingRequests,
+    setSentRequests,
+    sentRequests,
+  } = useContext(UserContext);
   const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -183,8 +189,8 @@ const Layout = () => {
 
   useEffect(() => {
     socket.on("actionOnFriendRequest", ({ id, action, extra }) => {
-      setIncomingRequests((prev) => {
-        return prev.filter((request) => request.requestId !== id);
+      setSentRequests((prev) => {
+        return prev.filter((r) => r.requestId !== id);
       });
       if (action === "deny") {
       } else {
@@ -208,6 +214,7 @@ const Layout = () => {
     return () => {
       socket.off("actionOnFriendRequest");
       socket.off("sendFriendRequest");
+      socket.off("cancelFriendRequest");
     };
   }, []);
 
