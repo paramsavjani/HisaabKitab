@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import UserContext from "../context/UserContext.js";
 import UserNotFound from "./UserNotFound";
 import socket from "../socket.js";
+import { Preferences } from "@capacitor/preferences";
 
 const User = () => {
   const { user, accessToken, refreshToken } = useContext(UserContext);
@@ -85,6 +86,12 @@ const User = () => {
   const addFriend = async () => {
     setIsAddingFriend(true);
     try {
+      const { value: accessToken } = await Preferences.get({
+        key: "accessToken",
+      });
+      const { value: refreshToken } = await Preferences.get({
+        key: "refreshToken",
+      });
       const response = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${profile.username}/send`,
         {
