@@ -194,10 +194,9 @@ function Navbar() {
 
       <div
         className={`md:hidden fixed top-8 left-6 transform -translate-x-1/2 -translate-y-1/2 z-50 p-4 flex justify-center items-center cursor-pointer ${
-          menuOpen ? "hidden" : ""
+          menuOpen || incomingRequests < 1 ? "hidden" : ""
         }`}
         onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Toggle navigation menu"
       >
         <span className="flex items-center justify-center bg-green-600 text-white text-sm font-bold w-5 h-5 rounded-full shadow-lg">
           {incomingRequests}
