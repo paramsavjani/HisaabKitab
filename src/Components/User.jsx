@@ -151,7 +151,7 @@ const User = () => {
           socket.emit("cancelFriendRequest", {
             requestId,
             receiver: profile.username,
-            senderName: user.name
+            senderName: user.name,
           });
         } else {
           const data = await response.json();
