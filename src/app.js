@@ -35,7 +35,6 @@ import userRouter from "./routes/user.route.js";
 import friendRequestRouter from "./routes/request.route.js";
 import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
-import { fr } from "@faker-js/faker";
 
 // Routes
 app.get("/", (req, res) => {
@@ -47,10 +46,8 @@ app.use("/api/v1/friendRequests", friendRequestRouter);
 app.use("/api/v1/friends", friendRouter);
 app.use("/api/v1/transactions", transactionRouter);
 
-// Create HTTP Server
 const httpServer = createServer(app);
 
-// Initialize Socket.IO
 const io = new Server(httpServer, {
   cors: {
     origin: (origin, callback) => {
@@ -157,17 +154,20 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("actionOnFriendRequest", ({ id, action, senderUsername }) => {
-    const receiverSocketId = onlineUsers.get(senderUsername);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("friendRequest", {
-        id,
-        action,
-        extra,
-      });
-    } else {
+  socket.on(
+    "actionOnFriendRequest",
+    ({ id, action, senderUsername, extra }) => {
+      const receiverSocketId = onlineUsers.get(senderUsername);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("actionOnFriendRequest", {
+          id,
+          action,
+          extra,
+        });
+      } else {
+      }
     }
-  });
+  );
 
   socket.on("disconnect", () => {
     onlineUsers.delete(socket.user.username);
