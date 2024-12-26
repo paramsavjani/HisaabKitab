@@ -62,7 +62,6 @@ const onlineUsers = new Map();
 io.use((socket, next) => {
   try {
     const token = socket.handshake.auth?.accessToken;
-    console.log(token);
     if (!token) {
       throw new Error("Token not provided");
     }
@@ -158,6 +157,9 @@ io.on("connection", (socket) => {
   socket.on(
     "actionOnFriendRequest",
     ({ id, action, senderUsername, extra }) => {
+      console.log(
+        `request action ${action} on ${senderUsername} by ${extra.username}`
+      );
       const receiverSocketId = onlineUsers.get(senderUsername);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
