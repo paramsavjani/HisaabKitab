@@ -164,6 +164,11 @@ io.on("connection", (socket) => {
           action,
           extra,
         });
+        io.to(receiverSocketId).emit("actionOnFRForProfileView", {
+          id,
+          action,
+          extra,
+        });
       } else {
       }
     }
