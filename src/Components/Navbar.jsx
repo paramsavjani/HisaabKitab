@@ -2,8 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useContext } from "react";
 import UserContext from "../context/UserContext.js";
-
-// Import PNG images
 import HomeIcon from "../assets/icons/home.png";
 import FriendsIcon from "../assets/icons/friend1.png";
 import SearchIcon from "../assets/icons/search.png";
@@ -14,7 +12,6 @@ import { Preferences } from "@capacitor/preferences";
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [incomingRequests, setIncomingRequests] = useState(0);
   const {
     user,
     setUser,
@@ -22,6 +19,8 @@ function Navbar() {
     refreshToken,
     setAccessToken,
     setRefreshToken,
+    incomingRequests,
+    setIncomingRequests,
   } = useContext(UserContext);
 
   const navRef = useRef();
@@ -49,7 +48,7 @@ function Navbar() {
             }
           );
           const data = await res.json();
-          setIncomingRequests(data.data.senders.length);
+          setIncomingRequests(data.data.senders);
         } catch (e) {
           console.error("Error fetching requests:", e);
         }
@@ -194,19 +193,19 @@ function Navbar() {
 
       <div
         className={`md:hidden fixed top-8 left-6 transform -translate-x-1/2 -translate-y-1/2 z-50 p-4 flex justify-center items-center cursor-pointer ${
-          menuOpen || incomingRequests < 1 ? "hidden" : ""
+          menuOpen || incomingRequests.length < 1 ? "hidden" : ""
         }`}
         onClick={() => setMenuOpen(!menuOpen)}
       >
         <span className="flex items-center justify-center bg-green-600 text-white text-sm font-bold w-5 h-5 rounded-full shadow-lg">
-          {incomingRequests}
+          {incomingRequests.length}
         </span>
       </div>
 
       {/* Navbar */}
       <nav
         ref={navRef}
-        className={`bg-slate-900 p-4 shadow-xl fixed left-0 top-0 max-w-[80%] h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
+        className={`bg-slate-900 p-4 shadow-xl fixed left-0 top-0 max-w-[90%] h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
@@ -282,9 +281,9 @@ function Navbar() {
                   Incoming Requests
                 </span>
               </div>
-              {incomingRequests > 0 && (
+              {incomingRequests.length > 0 && (
                 <span className="flex items-center justify-center bg-green-500 text-white text-xs font-bold w-6 h-6 rounded-full shadow-lg animate-pulse">
-                  {incomingRequests}
+                  {incomingRequests.length}
                 </span>
               )}
             </NavLink>

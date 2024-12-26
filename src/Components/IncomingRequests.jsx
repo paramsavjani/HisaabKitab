@@ -4,11 +4,11 @@ import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 
 function IncomingRequests() {
-  const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false); // State for loading spinner
   const [errorMessage, setErrorMessage] = useState(""); // Error state
   const [buttonLoading, setButtonLoading] = useState({}); // Individual button loading state
-  const { accessToken, refreshToken } = React.useContext(UserContext);
+  const { accessToken, refreshToken, incomingRequests, setIncomingRequests } =
+    React.useContext(UserContext);
 
   // Fetch incoming requests from the backend
   useEffect(() => {
@@ -24,7 +24,7 @@ function IncomingRequests() {
     )
       .then((response) => response.json())
       .then((data) => {
-        setRequests(data.data.senders);
+        setIncomingRequests(data.data.senders);
         setLoading(false);
       })
       .catch((error) => {
@@ -55,7 +55,9 @@ function IncomingRequests() {
       return;
     }
 
-    setRequests(requests.filter((request) => request.requestId !== id));
+    setIncomingRequests(
+      incomingRequests.filter((request) => request.requestId !== id)
+    );
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
   };
 
@@ -76,10 +78,10 @@ function IncomingRequests() {
             <div className="flex justify-center items-center py-4">
               <FaSpinner className="animate-spin text-green-500 text-2xl" />
             </div>
-          ) : requests.length === 0 ? (
+          ) : incomingRequests.length === 0 ? (
             <p className="text-center text-gray-500">No incoming requests.</p>
           ) : (
-            requests.map((request) => (
+            incomingRequests.map((request) => (
               <div
                 key={request._id}
                 className="flex flex-col sm:flex-row justify-between items-center bg-gray-800 p-4 rounded-lg shadow-lg hover:bg-gray-600 transition-all duration-300"
