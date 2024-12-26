@@ -53,7 +53,9 @@ const httpServer = createServer(app);
 // Initialize Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: "*", // Allow all origins
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
     credentials: true,
   },
 });
@@ -155,20 +157,17 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on(
-    "actionOnFriendRequest",
-    ({ id, action, senderUsername }) => {
-      const receiverSocketId = onlineUsers.get(senderUsername);
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit("friendRequest", {
-          id,
-          action,
-          extra,
-        });
-      } else {
-      }
+  socket.on("actionOnFriendRequest", ({ id, action, senderUsername }) => {
+    const receiverSocketId = onlineUsers.get(senderUsername);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("friendRequest", {
+        id,
+        action,
+        extra,
+      });
+    } else {
     }
-  );
+  });
 
   socket.on("disconnect", () => {
     onlineUsers.delete(socket.user.username);
