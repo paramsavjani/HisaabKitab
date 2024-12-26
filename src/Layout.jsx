@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, act } from "react";
 import Navbar from "./Components/Navbar";
 import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -9,10 +9,12 @@ import "./loading.css";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
 import NotificationHandler from "./Components/NotificationHandler.jsx";
+import socket from "./socket.js";
 
 const Layout = () => {
-  const { setUser, setAccessToken, setRefreshToken } = useContext(UserContext);
-  const { setActiveFriends } = useDashboardContext();
+  const { setUser, setAccessToken, setRefreshToken, setIncomingRequests } =
+    useContext(UserContext);
+  const { activeFriends, setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -26,7 +28,6 @@ const Layout = () => {
     setLoading(true);
 
     try {
-      // Fetch User Details and Dashboard Data
       const { value: storedAccessToken } = await Preferences.get({
         key: "accessToken",
       });
@@ -110,6 +111,23 @@ const Layout = () => {
 
       const { friends } = await dashboardResponse.json();
       setActiveFriends(() => friends);
+
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            updatedAccessToken,
+            updatedRefreshToken,
+          }),
+        }
+      );
+      const data = await res.json();
+      setIncomingRequests(data.data.senders);
     } catch (error) {
       console.error("Initialization Error:", error);
     } finally {
@@ -162,6 +180,22 @@ const Layout = () => {
   useEffect(() => {
     initializeApp();
   }, [setAccessToken]);
+
+  useEffect(() => {
+    console.log(activeFriends);
+    socket.on("friendRequest", ({ id, action, extra }) => {
+      setIncomingRequests((prev) => {
+        return prev.filter((request) => request.requestId !== id);
+      });
+      if (action === "deny") {
+      } else {
+        setActiveFriends((prev) => [
+          ...prev,
+          { totalAmount: 0, isActive: false, ...extra },
+        ]);
+      }
+    });
+  });
 
   return (
     <>

@@ -2,39 +2,25 @@ import React, { useEffect, useState } from "react";
 import { FaExclamationTriangle, FaSpinner } from "react-icons/fa"; // Error and Spinner icons
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
+import socket from "../socket.js";
 
 function IncomingRequests() {
-  const [loading, setLoading] = useState(false); // State for loading spinner
   const [errorMessage, setErrorMessage] = useState(""); // Error state
   const [buttonLoading, setButtonLoading] = useState({}); // Individual button loading state
-  const { accessToken, refreshToken, incomingRequests, setIncomingRequests } =
-    React.useContext(UserContext);
+  const {
+    user,
+    accessToken,
+    refreshToken,
+    incomingRequests,
+    setIncomingRequests,
+  } = React.useContext(UserContext);
 
-  // Fetch incoming requests from the backend
   useEffect(() => {
-    setLoading(true);
-    fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
-      {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken, refreshToken }),
-      }
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        setIncomingRequests(data.data.senders);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        setErrorMessage("Failed to load incoming requests. Please try again.");
-        console.error("Error fetching requests:", error);
-      });
-  }, [accessToken, refreshToken]);
+    console.log(user);
+    console.log(incomingRequests);
+  });
 
-  const handleRequest = async (id, action) => {
+  const handleRequest = async (id, action, senderUsername) => {
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));
     const res = await fetch(
       `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/${id}/${action}`,
@@ -54,6 +40,8 @@ function IncomingRequests() {
       setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: false }));
       return;
     }
+    const { email, ...extra } = user;
+    socket.emit("friendRequest", { id, action, extra, senderUsername });
 
     setIncomingRequests(
       incomingRequests.filter((request) => request.requestId !== id)
@@ -74,11 +62,7 @@ function IncomingRequests() {
               <p className="text-sm">{errorMessage}</p>
             </div>
           )}
-          {loading ? (
-            <div className="flex justify-center items-center py-4">
-              <FaSpinner className="animate-spin text-green-500 text-2xl" />
-            </div>
-          ) : incomingRequests.length === 0 ? (
+          {incomingRequests.length === 0 ? (
             <p className="text-center text-gray-500">No incoming requests.</p>
           ) : (
             incomingRequests.map((request) => (
@@ -115,7 +99,9 @@ function IncomingRequests() {
                     )}
                   </button>
                   <button
-                    onClick={() => handleRequest(request.requestId, "deny")}
+                    onClick={() =>
+                      handleRequest(request.requestId, "deny", request.username)
+                    }
                     className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm flex items-center"
                     disabled={buttonLoading[`${request.requestId}-deny`]}
                   >
