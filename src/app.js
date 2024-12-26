@@ -157,7 +157,6 @@ io.on("connection", (socket) => {
   socket.on(
     "actionOnFriendRequest",
     ({ id, action, senderUsername, extra }) => {
-      console.log("action happened");
       const receiverSocketId = onlineUsers.get(senderUsername);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
@@ -183,13 +182,19 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("cancelFriendRequest", ({ requestId, receiver, senderName }) => {
-    const receiverSocketId = onlineUsers.get(receiver);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("cancelFriendRequest", requestId);
-    } else {
+  socket.on(
+    "cancelFriendRequest",
+    ({ requestId, receiver, senderName, senderUsername }) => {
+      const receiverSocketId = onlineUsers.get(receiver);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("cancelFriendRequest", {
+          requestId,
+          senderUsername,
+        });
+      } else {
+      }
     }
-  });
+  );
 
   socket.on("disconnect", () => {
     onlineUsers.delete(socket.user.username);
