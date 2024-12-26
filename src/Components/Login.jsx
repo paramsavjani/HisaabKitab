@@ -103,6 +103,7 @@ const Login = () => {
         // Fetch dashboard data after successful login
         await fetchDashboardData(data.data.accessToken, data.data.refreshToken);
 
+        window.location.reload();
         window.location.href = "/";
       }
     } catch (e) {

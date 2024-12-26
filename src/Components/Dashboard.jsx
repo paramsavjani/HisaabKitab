@@ -110,47 +110,52 @@ const Dashboard = () => {
       <div className="block md:hidden">
         <ul className="merienda-regular divide-y divide-gray-700">
           {activeFriends &&
-            activeFriends.map((friend, index) => (
-              <li
-                key={friend.username}
-                data-aos="fade-up"
-                data-aos-delay={index * 100} // Staggered animations
-              >
-                <Link
-                  to={`/transactions/${user?.username}--${friend.username}`}
-                  className="flex items-center space-x-4 p-3"
-                >
-                  {/* Profile Picture */}
-                  <div className="w-12 h-12">
-                    <img
-                      src={
-                        friend.profilePicture ||
-                        "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
-                      }
-                      alt={friend.username}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  </div>
-
-                  {/* User Info */}
-                  <div className="flex-1">
-                    <p className="text-base font-semibold">{friend.name}</p>
-                    <p className="text-sm text-gray-400">
-                      {"@" + friend.username}
-                    </p>
-                  </div>
-
-                  {/* Balance */}
-                  <div
-                    className={`kranky-regular text-lg font-extrabold ${
-                      friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
-                    }`}
+            activeFriends.map(
+              (friend, index) =>
+                friend.isActive && (
+                  <li
+                    key={friend.username}
+                    data-aos="fade-up"
+                    data-aos-delay={index * 100} // Staggered animations
                   >
-                    ₹{Math.abs(friend.totalAmount)}
-                  </div>
-                </Link>
-              </li>
-            ))}
+                    <Link
+                      to={`/transactions/${user?.username}--${friend.username}`}
+                      className="flex items-center space-x-4 p-3"
+                    >
+                      {/* Profile Picture */}
+                      <div className="w-12 h-12">
+                        <img
+                          src={
+                            friend.profilePicture ||
+                            "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                          }
+                          alt={friend.username}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      </div>
+
+                      {/* User Info */}
+                      <div className="flex-1">
+                        <p className="text-base font-semibold">{friend.name}</p>
+                        <p className="text-sm text-gray-400">
+                          {"@" + friend.username}
+                        </p>
+                      </div>
+
+                      {/* Balance */}
+                      <div
+                        className={`kranky-regular text-lg font-extrabold ${
+                          friend.totalAmount < 0
+                            ? "text-red-400"
+                            : "text-green-400"
+                        }`}
+                      >
+                        ₹{Math.abs(friend.totalAmount)}
+                      </div>
+                    </Link>
+                  </li>
+                )
+            )}
         </ul>
       </div>
 
@@ -210,46 +215,53 @@ const Dashboard = () => {
         {/* User List */}
         {/* Desktop User List */}
         <ul className="space-y-3">
-          {activeFriends.map((friend, index) => (
-            <li
-              key={friend.username}
-              className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
-            >
-              <Link
-                to={`/transactions/${user?.username}--${friend.username}`}
-                className="flex items-center space-x-4 p-4 pr-6"
-              >
-                {/* Profile Picture */}
-                <div className="w-16 h-16">
-                  <img
-                    src={
-                      friend.profilePicture ||
-                      "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
-                    }
-                    alt={friend.username}
-                    className="w-full h-full rounded-full object-cover border-2 border-blue-400"
-                  />
-                </div>
-
-                {/* User Info */}
-                <div className="merienda-regular flex-1">
-                  <p className="text-lg font-semibold">{friend.name}</p>
-                  <p className="text-sm text-gray-400">@{friend.username}</p>
-                </div>
-
-                {/* Balance */}
-                <div
-                  className={`text-xl kranky-regular font-bold ${
-                    friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
-                  }`}
+          {activeFriends.map(
+            (friend, index) =>
+              friend.isActive && (
+                <li
+                  key={friend.username}
+                  className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
                 >
-                  ₹{Math.abs(friend.totalAmount)}
-                </div>
-              </Link>
-            </li>
-          ))}
+                  <Link
+                    to={`/transactions/${user?.username}--${friend.username}`}
+                    className="flex items-center space-x-4 p-4 pr-6"
+                  >
+                    {/* Profile Picture */}
+                    <div className="w-16 h-16">
+                      <img
+                        src={
+                          friend.profilePicture ||
+                          "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        }
+                        alt={friend.username}
+                        className="w-full h-full rounded-full object-cover border-2 border-blue-400"
+                      />
+                    </div>
+
+                    {/* User Info */}
+                    <div className="merienda-regular flex-1">
+                      <p className="text-lg font-semibold">{friend.name}</p>
+                      <p className="text-sm text-gray-400">
+                        @{friend.username}
+                      </p>
+                    </div>
+
+                    {/* Balance */}
+                    <div
+                      className={`text-xl kranky-regular font-bold ${
+                        friend.totalAmount < 0
+                          ? "text-red-400"
+                          : "text-green-400"
+                      }`}
+                    >
+                      ₹{Math.abs(friend.totalAmount)}
+                    </div>
+                  </Link>
+                </li>
+              )
+          )}
         </ul>
       </div>
       <div className="md:hidden container-eg-btn-4 uf-border fixed bottom-0 right-0 z-10">

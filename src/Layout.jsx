@@ -68,6 +68,7 @@ const Layout = () => {
         return;
       }
 
+      setIsAuthenticated(() => true);
       setUser(() => verifiedUser);
 
       // Update tokens in storage
@@ -89,8 +90,6 @@ const Layout = () => {
         setRefreshToken(updatedRefreshToken);
       }
 
-      setIsAuthenticated(() => true);
-
       // Fetch Dashboard Data
       const dashboardResponse = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
@@ -111,7 +110,6 @@ const Layout = () => {
 
       const { friends } = await dashboardResponse.json();
       setActiveFriends(() => friends);
-
     } catch (error) {
       console.error("Initialization Error:", error);
     } finally {

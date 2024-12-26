@@ -153,6 +153,7 @@ const Signup = () => {
 
       setUser(data.data.user);
 
+      window.location.reload();
       window.location.href = "/friends";
     } catch (error) {
       setGeneralError("Failed to register. Please try again.");

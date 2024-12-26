@@ -120,6 +120,19 @@ const Transactions = () => {
 
     setFriend(activeFriends.find((friend) => friend.username === friendId));
 
+    setActiveFriends((prevActiveFriends) => {
+      const updatedActiveFriends = prevActiveFriends.map((friend) => {
+        if (friend.username === friendId) {
+          return {
+            ...friend,
+            isActive: true,
+          };
+        }
+        return friend;
+      });
+      return updatedActiveFriends;
+    });
+
     fetchTransactions();
   }, [accessToken, friendId, refreshToken]);
 

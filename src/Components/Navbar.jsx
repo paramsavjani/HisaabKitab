@@ -218,11 +218,11 @@ function Navbar() {
             { to: "/", label: "Home", icon: HomeIcon },
             { to: "/friends", label: "Friends", icon: FriendsIcon },
             { to: "/search", label: "Search", icon: SearchIcon },
-            {
-              to: "/add-one",
-              label: "Add Transaction",
-              icon: AddTransactionIcon,
-            },
+            // {
+            //   to: "/add-one",
+            //   label: "Add Transaction",
+            //   icon: AddTransactionIcon,
+            // },
             {
               to: "/split-expense",
               label: "Split Expense",

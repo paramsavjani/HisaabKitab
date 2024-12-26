@@ -1,17 +1,19 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, act } from "react";
 import UserContext from "../context/UserContext.js";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // AOS styles
+import useDashboardContext from "../context/DashboardContext.js";
 
 function Friends() {
   const { user, accessToken, refreshToken } = useContext(UserContext);
   const [friends, setFriends] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
+  const { setActiveFriends, activeFriends } = useDashboardContext();
 
   useEffect(() => {
-    AOS.init({ duration: 1000 }); // Initialize AOS with a default animation duration
+    AOS.init({ duration: 1000 });
   }, []);
 
   useEffect(() => {
