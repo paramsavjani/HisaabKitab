@@ -22,7 +22,7 @@ const Transactions = () => {
   const userUsername = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
   const lastTransactionRef = useRef(null);
-  const { accessToken, refreshToken } = React.useContext(UserContext);
+  const { user, accessToken, refreshToken } = React.useContext(UserContext);
   const { activeFriends, setActiveFriends } = useDashboardContext();
 
   useEffect(() => {
@@ -79,6 +79,13 @@ const Transactions = () => {
 
   useEffect(() => {
     document.title = "Transactions";
+    if (user.username !== userUsername) {
+      window.location.replace(
+        "/transactions/" + user.username + "--" + friendId
+      );
+      return;
+    }
+
     const fetchTransactions = async () => {
       try {
         const res = await fetch(
