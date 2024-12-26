@@ -254,17 +254,17 @@ const getActiveFriends = asyncHandler(async (req, res) => {
     const activeFriends = await Friend.find(
       {
         $or: [{ userId }, { friendId: userId }],
-        isActive: true,
       },
-      { userId: 1, friendId: 1, lastTransactionTime: 1, _id: 0 }
+      { userId: 1, friendId: 1, lastTransactionTime: 1, _id: 0, isActive: 1 }
     );
 
     if (!activeFriends.length) {
       return res.status(200).json({ friends: [] });
     }
 
-    // Map friend IDs and lastTransactionTime
+    // Map friend IDs, lastTransactionTime, and isActive status
     const friendMap = {};
+    const isActiveMap = {};
     activeFriends.forEach((connection) => {
       const friendId =
         connection.userId.toString() === userId.toString()
@@ -272,6 +272,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
           : connection.userId.toString();
 
       friendMap[friendId] = connection.lastTransactionTime;
+      isActiveMap[friendId] = connection.isActive; // Store isActive status
     });
 
     const friendIds = Object.keys(friendMap);
@@ -340,6 +341,7 @@ const getActiveFriends = asyncHandler(async (req, res) => {
         fcmToken: friend.fcmToken,
         lastTransactionTime: friendMap[friend._id.toString()],
         totalAmount: totalAmount, // Add total transaction amount
+        isActive: isActiveMap[friend._id.toString()], // Include isActive status
       };
     });
 
