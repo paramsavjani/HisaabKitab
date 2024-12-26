@@ -36,7 +36,7 @@ const User = () => {
         if (response.ok) {
           setProfile(data?.user);
           if (data?.requested) {
-            if (data?.request?.sender === user.username) {
+            if (data?.request?.sender === user._id) {
               setIsRequestSent(true);
               setRequestId(data?.request?._id);
             } else {
