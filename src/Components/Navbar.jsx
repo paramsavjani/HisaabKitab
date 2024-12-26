@@ -7,7 +7,6 @@ import UserContext from "../context/UserContext.js";
 import HomeIcon from "../assets/icons/home.png";
 import FriendsIcon from "../assets/icons/friend1.png";
 import SearchIcon from "../assets/icons/search.png";
-import AddTransactionIcon from "../assets/icons/transfer1.png";
 import SplitExpenseIcon from "../assets/icons/group.png";
 import SettingIcon from "../assets/icons/gear1.png";
 import { Preferences } from "@capacitor/preferences";
@@ -192,6 +191,18 @@ function Navbar() {
       >
         <span>☰</span> {/* Replace with your desired hamburger menu icon */}
       </button>
+
+      <div
+        className={`md:hidden fixed top-8 left-6 transform -translate-x-1/2 -translate-y-1/2 z-50 p-4 flex justify-center items-center cursor-pointer ${
+          menuOpen ? "hidden" : ""
+        }`}
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle navigation menu"
+      >
+        <span className="flex items-center justify-center bg-green-600 text-white text-sm font-bold w-5 h-5 rounded-full shadow-lg">
+          {incomingRequests}
+        </span>
+      </div>
 
       {/* Navbar */}
       <nav
