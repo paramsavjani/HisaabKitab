@@ -15,11 +15,6 @@ function IncomingRequests() {
     setIncomingRequests,
   } = React.useContext(UserContext);
 
-  useEffect(() => {
-    console.log(user);
-    console.log(incomingRequests);
-  });
-
   const handleRequest = async (id, action, senderUsername) => {
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));
     const res = await fetch(
@@ -41,7 +36,8 @@ function IncomingRequests() {
       return;
     }
     const { email, ...extra } = user;
-    socket.emit("friendRequest", { id, action, extra, senderUsername });
+    socket.emit("actionOnFriendRequest", { id, action, extra, senderUsername });
+
 
     setIncomingRequests(
       incomingRequests.filter((request) => request.requestId !== id)
@@ -88,7 +84,13 @@ function IncomingRequests() {
                 </Link>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleRequest(request.requestId, "accept")}
+                    onClick={() =>
+                      handleRequest(
+                        request.requestId,
+                        "accept",
+                        request.username
+                      )
+                    }
                     className="px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition text-sm flex items-center"
                     disabled={buttonLoading[`${request.requestId}-accept`]}
                   >

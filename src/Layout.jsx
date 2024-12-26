@@ -182,8 +182,7 @@ const Layout = () => {
   }, [setAccessToken]);
 
   useEffect(() => {
-    console.log(activeFriends);
-    socket.on("friendRequest", ({ id, action, extra }) => {
+    socket.on("actionOnFriendRequest", ({ id, action, extra }) => {
       setIncomingRequests((prev) => {
         return prev.filter((request) => request.requestId !== id);
       });
@@ -193,9 +192,15 @@ const Layout = () => {
           ...prev,
           { totalAmount: 0, isActive: false, ...extra },
         ]);
+        console.log("Active Friends:", activeFriends);
+        console.log("extra:", extra);
       }
     });
-  });
+
+    return () => {
+      socket.off("friendRequest");
+    };
+  }, []);
 
   return (
     <>

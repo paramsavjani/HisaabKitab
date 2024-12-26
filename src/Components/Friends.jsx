@@ -6,51 +6,13 @@ import "aos/dist/aos.css"; // AOS styles
 import useDashboardContext from "../context/DashboardContext.js";
 
 function Friends() {
-  const { user, accessToken, refreshToken } = useContext(UserContext);
-  const [friends, setFriends] = useState([]);
+  const { user } = useContext(UserContext);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
-  const { setActiveFriends, activeFriends } = useDashboardContext();
+  const { activeFriends } = useDashboardContext();
 
   useEffect(() => {
     AOS.init({ duration: 1000 });
   }, []);
-
-  useEffect(() => {
-    if (user) {
-      // Fetch friends list
-      setLoading(true); // Set loading to true when the request starts
-      fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/friends`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Failed to fetch friends");
-          }
-          return response.json(); // Parse response body as JSON
-        })
-        .then((data) => {
-          if (data.data && data.data.length > 0) {
-            setFriends(data.data);
-          }
-        })
-        .catch((e) => {
-          console.error("Failed to fetch friends", e);
-          setError(e.message); // Handle error
-        })
-        .finally(() => {
-          setLoading(false); // Set loading to false once the fetch is complete
-        });
-    } else {
-      setLoading(false);
-    }
-  }, [user, accessToken, refreshToken]);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black py-10 px-4">
@@ -68,39 +30,15 @@ function Friends() {
         </div>
       )}
 
-      {/* Skeleton Loader */}
-      {loading ? (
-        <div
-          className="w-full max-w-xl bg-gray-900 p-6 rounded-lg shadow-lg"
-          data-aos="fade-up"
-        >
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <div
-                key={index}
-                className="flex items-center space-x-4 animate-pulse"
-                data-aos="fade-right"
-                data-aos-delay={index * 100} // Staggered animations
-              >
-                <div className="w-12 h-12 bg-gray-700 rounded-full"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-700 rounded w-1/2"></div>
-                  <div className="h-4 bg-gray-700 rounded w-2/3 mt-2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
+      {
         // Friend List
         <div
           className="w-full max-w-xl bg-gray-900 md:p-6 p-3 rounded-lg shadow-lg"
           data-aos="fade-up"
         >
-          {friends.length > 0 ? (
+          {activeFriends.length > 0 ? (
             <ul className="space-y-4">
-              {friends.map((friend, index) => (
+              {activeFriends.map((friend, index) => (
                 <Link
                   to={`/transactions/${user.username}--${friend.username}`}
                   className=""
@@ -144,7 +82,7 @@ function Friends() {
             </p>
           )}
         </div>
-      )}
+      }
     </div>
   );
 }
