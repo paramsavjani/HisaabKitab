@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UserContext from "../context/UserContext.js";
 import UserNotFound from "./UserNotFound";
+import socket from "../socket.js";
 
 const User = () => {
   const { user, accessToken, refreshToken } = useContext(UserContext);
@@ -58,6 +59,28 @@ const User = () => {
 
     fetchUser();
   }, [id]);
+
+  useEffect(() => {
+    socket.on("actionOnFRForProfileView", ({ action, extra }) => {
+      if (action === "accept") {
+        if (extra.username === profile?.username) {
+          setIsFriend(true);
+          setIsRequestReceived(false);
+          setIsRequestSent(false);
+        }
+      } else if (action === "deny") {
+        if (extra.username === profile?.username) {
+          setIsRequestReceived(false);
+          setIsRequestSent(false);
+          setIsFriend(false);
+        }
+      }
+    });
+
+    return () => {
+      socket.off("actionOnFRForProfileView");
+    };
+  }, [profile, setProfile]);
 
   const addFriend = async () => {
     setIsAddingFriend(true);

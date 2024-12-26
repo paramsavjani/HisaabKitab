@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaExclamationTriangle, FaSpinner } from "react-icons/fa"; // Error and Spinner icons
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
@@ -37,7 +37,6 @@ function IncomingRequests() {
     }
     const { email, ...extra } = user;
     socket.emit("actionOnFriendRequest", { id, action, extra, senderUsername });
-
 
     setIncomingRequests(
       incomingRequests.filter((request) => request.requestId !== id)

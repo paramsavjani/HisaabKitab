@@ -198,7 +198,7 @@ const Layout = () => {
     });
 
     return () => {
-      socket.off("friendRequest");
+      socket.off("actionOnFriendRequest");
     };
   }, []);
 
