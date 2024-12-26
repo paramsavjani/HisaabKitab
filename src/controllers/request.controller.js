@@ -59,7 +59,7 @@ const sendRequest = asyncHandler(async (req, res) => {
     sender: receiver._id,
     receiver: user._id,
     status: "pending",
-  }); 
+  });
 
   if (otherUserAlreadySentRequest) {
     res.status(403).json({
@@ -99,7 +99,7 @@ const receivedAll = asyncHandler(async (req, res) => {
   const senders = await Promise.all(
     requests.map(async (request) => {
       const sender = await User.findById(request.sender).select(
-        "username name profilePicture"
+        "username name profilePicture fcmToken"
       );
 
       return {
