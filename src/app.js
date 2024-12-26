@@ -160,6 +160,7 @@ io.on("connection", (socket) => {
       console.log(
         `request action ${action} on ${senderUsername} by ${extra.username}`
       );
+      console.log(extra);
       const receiverSocketId = onlineUsers.get(senderUsername);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
