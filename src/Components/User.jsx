@@ -170,6 +170,9 @@ const User = () => {
         if (response.ok) {
           setIsRequestSent(false);
           setIsFriend(false);
+          setSentRequests((prev) =>
+            prev.filter((request) => request.receiver !== profile.username)
+          );
 
           socket.emit("cancelFriendRequest", {
             requestId,
