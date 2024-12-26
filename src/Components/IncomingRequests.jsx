@@ -3,6 +3,7 @@ import { FaExclamationTriangle, FaSpinner } from "react-icons/fa"; // Error and 
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 import socket from "../socket.js";
+import { useEffect } from "react";
 
 function IncomingRequests() {
   const [errorMessage, setErrorMessage] = useState(""); // Error state
@@ -14,6 +15,7 @@ function IncomingRequests() {
     incomingRequests,
     setIncomingRequests,
   } = React.useContext(UserContext);
+
 
   const handleRequest = async (id, action, senderUsername) => {
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));

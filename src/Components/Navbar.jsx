@@ -205,7 +205,7 @@ function Navbar() {
       {/* Navbar */}
       <nav
         ref={navRef}
-        className={`bg-slate-900 p-4 shadow-xl fixed left-0 top-0 max-w-[90%] h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
+        className={`bg-slate-900 p-4 shadow-xl fixed left-0 top-0 max-w-[90%] w-80 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >

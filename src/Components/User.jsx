@@ -111,6 +111,12 @@ const User = () => {
         const data = await response.json();
         setRequestId(data.data.requestId);
         setIsRequestSent(true);
+
+        socket.emit("sendFriendRequest", {
+          request: { requestId: data.data.requestId, ...user },
+          receiver: profile.username,
+        });
+        console.log(user);
       } else {
         const data = await response.json();
         toast.error(data.message || "Error adding friend!");

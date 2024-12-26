@@ -14,7 +14,7 @@ import socket from "./socket.js";
 const Layout = () => {
   const { setUser, setAccessToken, setRefreshToken, setIncomingRequests } =
     useContext(UserContext);
-  const { activeFriends, setActiveFriends } = useDashboardContext();
+  const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -195,8 +195,13 @@ const Layout = () => {
       }
     });
 
+    socket.on("sendFriendRequest", (request) => {
+      setIncomingRequests((prev) => [...prev, request]);
+    });
+
     return () => {
       socket.off("actionOnFriendRequest");
+      socket.off("sendFriendRequest");
     };
   }, []);
 
