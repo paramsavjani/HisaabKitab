@@ -9,8 +9,14 @@ import socket from "../socket.js";
 import { Preferences } from "@capacitor/preferences";
 
 const User = () => {
-  const { user, accessToken, refreshToken, setIncomingRequests } =
-    useContext(UserContext);
+  const {
+    user,
+    accessToken,
+    refreshToken,
+    setActiveFriends,
+    incomingRequests,
+    setIncomingRequests,
+  } = useContext(UserContext);
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -217,10 +223,16 @@ const User = () => {
       senderUsername,
     });
 
+    const sender = incomingRequests.find((request) => request.requestId === id);
     setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
+    const { requestId, _id, ...rest } = sender;
 
     if (action === "accept") {
       setIsFriend(true);
+      setActiveFriends((prev) => [
+        ...prev,
+        { totalAmount: 0, isActive: false, rest },
+      ]);
     }
     setRequestId(null);
     setIsRequestReceived(false);
