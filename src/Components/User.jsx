@@ -72,18 +72,38 @@ const User = () => {
           setIsFriend(true);
           setIsRequestReceived(false);
           setIsRequestSent(false);
+          setRequestId(null);
         }
       } else if (action === "deny") {
         if (extra.username === profile?.username) {
           setIsRequestReceived(false);
           setIsRequestSent(false);
           setIsFriend(false);
+          setRequestId(null);
         }
+      }
+    });
+
+    socket.on("sendFriendRequest", (request) => {
+      if (request.username === profile?.username) {
+        setIsRequestReceived(true);
+        setRequestId(request.requestId);
+      }
+    });
+
+    socket.on("cancelFriendRequest", ({ senderUsername }) => {
+      if (senderUsername === profile?.username) {
+        setIsRequestReceived(false);
+        setIsRequestSent(false);
+        setRequestId(null);
+        isFriend(false);
       }
     });
 
     return () => {
       socket.off("actionOnFRForProfileView");
+      socket.off("sendFriendRequest");
+      socket.off("cancelFriendRequest");
     };
   }, [profile, setProfile]);
 
@@ -152,6 +172,7 @@ const User = () => {
             requestId,
             receiver: profile.username,
             senderName: user.name,
+            senderUsername: user.username,
           });
         } else {
           const data = await response.json();
@@ -422,14 +443,14 @@ const User = () => {
                 <div className="flex space-x-4">
                   {renderButton(
                     "Accept",
-                    () => handleRequest(requestId, "accept"),
+                    () => handleRequest(requestId, "accept", profile.username),
                     isAccepting,
                     "bg-green-500 text-white",
                     "Accepting..."
                   )}
                   {renderButton(
                     "Reject",
-                    () => handleRequest(requestId, "deny"),
+                    () => handleRequest(requestId, "deny", profile.username),
                     isRejecting,
                     "bg-red-500 text-white",
                     "Rejecting..."

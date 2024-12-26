@@ -195,9 +195,9 @@ const Layout = () => {
       }
     });
 
-    socket.on("cancelFriendRequest", (id) => {
+    socket.on("cancelFriendRequest", ({ requestId }) => {
       setIncomingRequests((prev) => {
-        return prev.filter((request) => request.requestId !== id);
+        return prev.filter((request) => request.requestId !== requestId);
       });
     });
 
