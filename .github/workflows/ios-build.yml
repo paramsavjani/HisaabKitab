@@ -1,4 +1,4 @@
-name: iOS Build
+name: Android Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-latest # You can change this to ubuntu-latest for Android builds to save resources
 
     steps:
       # Checkout the code
@@ -18,7 +18,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       # Disable CI to ignore warnings as errors
       - name: Set CI to false
@@ -32,22 +32,23 @@ jobs:
       - name: Build Capacitor App
         run: |
           npm run build
-          npx cap add ios
+          npx cap add android
 
-      # Install CocoaPods dependencies
-      - name: Install CocoaPods
+      # Install Android dependencies (Android SDK & Gradle)
+      - name: Install Android SDK and dependencies
         run: |
-          cd ios/App
-          pod install
+          echo "y" | sdkmanager --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64"
+          echo "y" | sdkmanager --licenses
 
-      - name: Build iOS App
+      # Build the Android app using Gradle
+      - name: Build Android App
         run: |
-          cd ios/App
-          xcodebuild -scheme App -sdk iphoneos -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY="" PROVISIONING_PROFILE_SPECIFIER="" DEVELOPMENT_TEAM="0000000000" -allowProvisioningUpdates=NO
+          cd android
+          ./gradlew assembleRelease
 
-      # Upload the build artifact (IPA)
+      # Upload the build artifact (APK or AAB)
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ios-build
-          path: ios/App/build/Release-iphoneos/*.ipa
+          name: android-build
+          path: android/app/build/outputs/bundle/release/*.apk # Or *.apk for APK
