@@ -213,6 +213,8 @@ io.on("connection", (socket) => {
     "actionOnFriendRequest",
     ({ id, action, senderUsername, extra }) => {
       const receiverSocketId = onlineUsers.get(senderUsername);
+      console.log("receiverSocketId", senderUsername);
+      console.log(extra.fcmToken);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
           id,
