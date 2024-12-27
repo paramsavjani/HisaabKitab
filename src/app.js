@@ -130,21 +130,73 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("acceptTransaction", ({ friendUsername, transactionId }) => {
-    const receiverSocketId = onlineUsers.get(friendUsername);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("acceptTransaction", transactionId);
-    } else {
-    }
-  });
+  socket.on(
+    "acceptTransaction",
+    ({ friendUsername, transactionId, fcmToken, transactionAmount }) => {
+      const receiverSocketId = onlineUsers.get(friendUsername);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("acceptTransaction", transactionId);
+      } else {
+        if (fcmToken) {
+          let message = {
+            notification: {
+              title: "Transaction Accepted",
+              body: `Your transaction of ₹${Math.abs(
+                transactionAmount
+              )} with ${friendUsername} has been accepted.`,
+            },
+            data: {
+              transactionId: transactionId,
+              actionType: "transaction",
+              friendUsername: socket.user.username,
+            },
+            android: {
+              notification: {
+                clickAction: "OPEN_APP",
+              },
+            },
+            token: fcmToken,
+          };
 
-  socket.on("rejectTransaction", ({ friendUsername, transactionId }) => {
-    const receiverSocketId = onlineUsers.get(friendUsername);
-    if (receiverSocketId) {
-      io.to(receiverSocketId).emit("rejectTransaction", transactionId);
-    } else {
+          sendPushNotification(message);
+        }
+      }
     }
-  });
+  );
+
+  socket.on(
+    "rejectTransaction",
+    ({ friendUsername, transactionId, transactionAmount, fcmToken }) => {
+      const receiverSocketId = onlineUsers.get(friendUsername);
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("rejectTransaction", transactionId);
+      } else {
+        if (fcmToken) {
+          let message = {
+            notification: {
+              title: "Transaction Rejected",
+              body: `Your transaction of ₹${Math.abs(
+                transactionAmount
+              )} with ${friendUsername} has been rejected.`,
+            },
+            data: {
+              transactionId: transactionId,
+              actionType: "transaction",
+              friendUsername: socket.user.username,
+            },
+            android: {
+              notification: {
+                clickAction: "OPEN_APP",
+              },
+            },
+            token: fcmToken,
+          };
+
+          sendPushNotification(message);
+        }
+      }
+    }
+  );
 
   socket.on("cancelTransaction", ({ friendUsername, transactionId }) => {
     const receiverSocketId = onlineUsers.get(friendUsername);
@@ -159,12 +211,9 @@ io.on("connection", (socket) => {
     ({ id, action, senderUsername, extra }) => {
       const receiverSocketId = onlineUsers.get(senderUsername);
       if (receiverSocketId) {
+        console.log("ready");
+        console.log(id, action, senderUsername, extra);
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
-          id,
-          action,
-          extra,
-        });
-        io.to(receiverSocketId).emit("actionOnFRForProfileView", {
           id,
           action,
           extra,
