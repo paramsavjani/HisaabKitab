@@ -23,3 +23,5 @@ jobs:
           cd ios/App
           pod install
           xcodebuild -scheme App -sdk iphoneos -configuration Release
+
+          
