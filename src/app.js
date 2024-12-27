@@ -253,14 +253,9 @@ io.on("connection", (socket) => {
         let message = {
           notification: {
             title: "New Friend Request",
-            body: `You have a friend request from ${request.senderName}`,
+            body: `You have a friend request from ${request.name}.`,
           },
 
-          data: {
-            requestId: request.id,
-            actionType: "friendRequest",
-            senderUsername: request.senderUsername,
-          },
           android: {
             notification: {
               clickAction: "OPEN_APP",
