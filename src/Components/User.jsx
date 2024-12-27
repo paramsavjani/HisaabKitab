@@ -139,6 +139,7 @@ const User = () => {
         socket.emit("sendFriendRequest", {
           request: { requestId: data.data.requestId, ...user },
           receiver: profile.username,
+          fcmToken: profile?.fcmToken,
         });
       } else {
         const data = await response.json();
