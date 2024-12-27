@@ -40,11 +40,10 @@ jobs:
           cd ios/App
           pod install
 
-      # Build the iOS project using Xcode without signing
       - name: Build iOS App
         run: |
           cd ios/App
-          xcodebuild -scheme App -sdk iphoneos -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY="" PROVISIONING_PROFILE_SPECIFIER="" DEVELOPMENT_TEAM="0000000000"
+          xcodebuild -scheme App -sdk iphoneos -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_REQUIRED=NO CODE_SIGNING_IDENTITY="" PROVISIONING_PROFILE_SPECIFIER="" DEVELOPMENT_TEAM="0000000000" -allowProvisioningUpdates=NO
 
       # Upload the build artifact (IPA)
       - name: Upload Artifact
