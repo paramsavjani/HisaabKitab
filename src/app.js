@@ -205,7 +205,6 @@ io.on("connection", (socket) => {
     const receiverSocketId = onlineUsers.get(friendUsername);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("cancelTransaction", transactionId);
-    } else {
     }
   });
 
@@ -284,7 +283,6 @@ io.on("connection", (socket) => {
           requestId,
           senderUsername,
         });
-      } else {
       }
     }
   );
