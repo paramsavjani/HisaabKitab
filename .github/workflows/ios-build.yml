@@ -32,7 +32,7 @@ jobs:
       - name: Build Capacitor App
         run: |
           npm run build
-          npx cap add android
+          npx cap sync
 
       # Install Android dependencies (Android SDK & Gradle)
       - name: Install Android SDK and dependencies
