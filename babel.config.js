@@ -1,1 +1,3 @@
-export const plugins = ["@babel/plugin-proposal-private-property-in-object"];
+module.exports = {
+  plugins: ["@babel/plugin-proposal-private-property-in-object"],
+};
