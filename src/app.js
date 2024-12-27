@@ -35,6 +35,7 @@ import userRouter from "./routes/user.route.js";
 import friendRequestRouter from "./routes/request.route.js";
 import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
+import { fcmtoken } from "./controllers/user.controller.js";
 
 // Routes
 app.get("/", (req, res) => {
@@ -141,10 +142,11 @@ io.on("connection", (socket) => {
           let message = {
             notification: {
               title: "Transaction Accepted",
-              body: `Your transaction of ₹${Math.abs(
+              body: `Your request for ₹${Math.abs(
                 transactionAmount
-              )} with ${friendUsername} has been accepted.`,
+              )} from ${friendUsername} has been accepted.`,
             },
+
             data: {
               transactionId: transactionId,
               actionType: "transaction",
@@ -175,10 +177,11 @@ io.on("connection", (socket) => {
           let message = {
             notification: {
               title: "Transaction Rejected",
-              body: `Your transaction of ₹${Math.abs(
+              body: `Your transaction request of ₹${Math.abs(
                 transactionAmount
-              )} with ${friendUsername} has been rejected.`,
+              )} to ${friendUsername} has been denied.`,
             },
+
             data: {
               transactionId: transactionId,
               actionType: "transaction",
@@ -211,23 +214,62 @@ io.on("connection", (socket) => {
     ({ id, action, senderUsername, extra }) => {
       const receiverSocketId = onlineUsers.get(senderUsername);
       if (receiverSocketId) {
-        console.log("ready");
-        console.log(id, action, senderUsername, extra);
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
           id,
           action,
           extra,
         });
       } else {
+        if (extra?.fcmToken) {
+          let message = {
+            notification: {
+              title: `Friend Request ${
+                action === "accept" ? "Accepted" : "Declined"
+              }`,
+              body: `${extra.name} has ${action} your friend request.`,
+            },
+
+            android: {
+              notification: {
+                clickAction: "OPEN_APP",
+              },
+            },
+            token: extra.fcmToken,
+          };
+
+          sendPushNotification(message);
+        }
       }
     }
   );
 
-  socket.on("sendFriendRequest", ({ request, receiver }) => {
+  socket.on("sendFriendRequest", ({ request, receiver, fcmToken }) => {
     const receiverSocketId = onlineUsers.get(receiver);
     if (receiverSocketId) {
       io.to(receiverSocketId).emit("sendFriendRequest", request);
     } else {
+      if (fcmToken) {
+        let message = {
+          notification: {
+            title: "New Friend Request",
+            body: `You have a friend request from ${request.senderName}`,
+          },
+
+          data: {
+            requestId: request.id,
+            actionType: "friendRequest",
+            senderUsername: request.senderUsername,
+          },
+          android: {
+            notification: {
+              clickAction: "OPEN_APP",
+            },
+          },
+          token: fcmToken,
+        };
+
+        sendPushNotification(message);
+      }
     }
   });
 
