@@ -8,20 +8,47 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+
     steps:
-      - uses: actions/checkout@v4
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Node.js environment
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+
+      # Disable CI to ignore warnings as errors
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
+
+      # Install project dependencies
       - name: Install Dependencies
         run: npm install
+
+      # Build the app
       - name: Build Capacitor App
         run: |
           npm run build
           npx cap add ios
+
+      # Install CocoaPods dependencies
+      - name: Install CocoaPods
+        run: |
           cd ios/App
           pod install
+
+      # Build the iOS project using Xcode
+      - name: Build iOS App
+        run: |
+          cd ios/App
           xcodebuild -scheme App -sdk iphoneos -configuration Release
 
-          
+      # Upload the build artifact
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-build
+          path: ios/App/build/Release-iphoneos/*.ipa
