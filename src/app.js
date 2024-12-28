@@ -6,6 +6,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import { sendPushNotification } from "./notification.js";
+import { nanoid } from "nanoid";
 
 // Initialize Express app
 const app = express();
@@ -107,6 +108,8 @@ io.on("connection", (socket) => {
         const notificationColor =
           transaction.amount < 0 ? "#4CAF50" : "#FF5722";
 
+        const uniqueId = nanoid(); // Generate a unique ID
+
         const message = {
           notification: {
             title: messageTitle,
@@ -118,6 +121,7 @@ io.on("connection", (socket) => {
               color: notificationColor,
             },
             priority: "high",
+            collapseKey: uniqueId,
           },
           apns: {
             payload: {
@@ -126,7 +130,7 @@ io.on("connection", (socket) => {
               },
             },
           },
-          collapseKey: null,
+
           token: fcmToken,
         };
 
