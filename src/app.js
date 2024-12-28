@@ -107,6 +107,9 @@ io.on("connection", (socket) => {
             title: messageTitle,
             body: messageBody,
           },
+          data: {
+            path: `/transactions/${socket.user.username}--${transaction.friendUsername}`,
+          },
           android: {
             notification: {
               clickAction: "OPEN_APP",
@@ -135,6 +138,9 @@ io.on("connection", (socket) => {
               body: `Your request for ₹${Math.abs(
                 transactionAmount
               )} from ${friendUsername} has been accepted.`,
+            },
+            data: {
+              path: `/transactions/${socket.user.username}--${friendUsername}`,
             },
 
             android: {
@@ -165,6 +171,9 @@ io.on("connection", (socket) => {
               body: `Your transaction request of ₹${Math.abs(
                 transactionAmount
               )} to ${friendUsername} has been denied.`,
+            },
+            data: {
+              path: `/transactions/${socket.user.username}--${friendUsername}`,
             },
 
             android: {
@@ -209,6 +218,10 @@ io.on("connection", (socket) => {
               body: `${extra.name} has ${action} your friend request.`,
             },
 
+            data: {
+              path: `/users/${extra.username}`,
+            },
+
             android: {
               notification: {
                 clickAction: "OPEN_APP",
@@ -233,6 +246,10 @@ io.on("connection", (socket) => {
           notification: {
             title: "New Friend Request",
             body: `You have a friend request from ${request.name}.`,
+          },
+
+          data: {
+            path: `/users/${request.username}`,
           },
 
           android: {
