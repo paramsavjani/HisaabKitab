@@ -32,29 +32,29 @@ const Transactions = () => {
       ]);
     });
 
-    socket.on("acceptTransaction", (id) => {
+    socket.on("acceptTransaction", (_id) => {
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
-          transaction._id === id
+          transaction._id === _id
             ? { ...transaction, status: "accepted" }
             : transaction
         )
       );
     });
 
-    socket.on("rejectTransaction", (id) => {
+    socket.on("rejectTransaction", (_id) => {
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
-          transaction._id === id
+          transaction._id === _id
             ? { ...transaction, status: "rejected" }
             : transaction
         )
       );
     });
 
-    socket.on("cancelTransaction", (id) => {
+    socket.on("cancelTransaction", (_id) => {
       setTransactions((prevTransactions) =>
-        prevTransactions.filter((transaction) => transaction._id !== id)
+        prevTransactions.filter((transaction) => transaction._id !== _id)
       );
     });
 

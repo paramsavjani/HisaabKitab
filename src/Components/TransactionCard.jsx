@@ -11,10 +11,9 @@ const TransactionCard = ({
   setFriendTransactions,
   friendUsername,
   fcmToken,
-  friendId,
 }) => {
   const { createdAt, amount, description, status, _id, sender } = transaction;
-  const { transactions, setTransactions, accessToken, refreshToken } =
+  const { setTransactions, accessToken, refreshToken } =
     useContext(UserContext);
   const isSender = sender === userId;
 
