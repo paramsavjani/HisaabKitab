@@ -316,15 +316,9 @@ const getUser = asyncHandler(async (req, res) => {
     };
   });
 
-  const transactionsArray = {};
   const transactionMap = {};
 
   transactions.forEach((transaction) => {
-    const key =
-      transaction.sender.toString() === user._id.toString()
-        ? transaction.receiver.toString()
-        : transaction.sender.toString();
-
     if (transaction.status === "completed") {
       if (transaction.sender.toString() === user._id.toString()) {
         transactionMap[transaction.receiver.toString()] =
@@ -336,12 +330,6 @@ const getUser = asyncHandler(async (req, res) => {
           transaction.amount;
       }
     }
-
-    if (!transactionsArray[key]) {
-      transactionsArray[key] = [];
-    }
-
-    transactionsArray[key].push(transaction);
   });
 
   const result = finalFriends.map((friend) => {
@@ -349,7 +337,6 @@ const getUser = asyncHandler(async (req, res) => {
     return {
       ...friend,
       totalAmount,
-      transactions: transactionsArray[friend._id] || [],
     };
   });
 
@@ -357,6 +344,7 @@ const getUser = asyncHandler(async (req, res) => {
     status: "success",
     user,
     friends: result,
+    transactions,
   });
 });
 
