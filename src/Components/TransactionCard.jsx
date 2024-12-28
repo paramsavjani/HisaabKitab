@@ -13,6 +13,7 @@ const TransactionCard = ({
   fcmToken,
 }) => {
   const { createdAt, amount, description, status, _id, sender } = transaction;
+  console.log(transaction._id);
   const { setTransactions, accessToken, refreshToken } =
     useContext(UserContext);
   const isSender = sender === userId;

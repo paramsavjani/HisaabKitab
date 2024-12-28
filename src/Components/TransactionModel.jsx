@@ -76,7 +76,7 @@ const TransactionModal = ({
       socket.emit("newTransaction", {
         amount: data.transaction._doc.amount,
         description: data.transaction._doc.description,
-        transactionId: data.transaction._doc._id,
+        _id: data.transaction._doc._id,
         createdAt: data.transaction._doc.createdAt,
         status: data.transaction._doc.status,
         sender: data.transaction.sender,
