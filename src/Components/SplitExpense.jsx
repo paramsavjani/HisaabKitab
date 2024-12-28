@@ -1,42 +1,28 @@
 import React, { useState } from "react";
-import { ArrowLeft, MoreVertical, Clock, Percent } from "lucide-react";
+import {
+  ArrowLeft,
+  MoreVertical,
+  Clock,
+  Percent,
+  CheckCircle,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const friends = [
-  {
-    id: 1,
-    name: "You",
-    avatar: "https://i.pravatar.cc/150?img=1",
-    initial: "Y",
-  },
-  {
-    id: 2,
-    name: "Meet Vaghela",
-    avatar: "https://i.pravatar.cc/150?img=2",
-    initial: "M",
-  },
-  {
-    id: 3,
-    name: "Vivek Parmar",
-    avatar: "https://i.pravatar.cc/150?img=3",
-    initial: "V",
-  },
-  {
-    id: 4,
-    name: "John Doe",
-    avatar: "https://i.pravatar.cc/150?img=4",
-    initial: "J",
-  },
+  { id: 1, name: "You", avatar: "https://i.pravatar.cc/150?img=1" },
+  { id: 2, name: "Meet Vaghela", avatar: "https://i.pravatar.cc/150?img=2" },
+  { id: 3, name: "Vivek Parmar", avatar: "https://i.pravatar.cc/150?img=3" },
+  { id: 4, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
 ];
 
 export default function SplitExpense() {
   const [step, setStep] = useState("selectFriends");
-
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [amount, setAmount] = useState("");
   const [splitType, setSplitType] = useState("even");
   const [description, setDescription] = useState("");
   const [splits, setSplits] = useState({});
+  const [error, setError] = useState("");
 
   const handleFriendSelection = (friend) => {
     setSelectedFriends((prev) =>
@@ -46,10 +32,23 @@ export default function SplitExpense() {
     );
   };
 
+  const handleContinue = () => {
+    if (!amount) {
+      setError("Please enter an amount.");
+      return;
+    }
+    if (selectedFriends.length < 2) {
+      setError("Please select at least two friends.");
+      return;
+    }
+    setError("");
+    setStep("splitOptions");
+  };
+
   const renderFriendSelection = () => (
-    <dv className="w-full h-full bg-black border-gray-800 shadow-lg lg:rounded-l-3xl lg:rounded-r-none">
-      <div className="p-6">
-        <div className="text-2xl md:text-3xl font-bold text-white">
+    <div className="w-full h-full bg-black border-gray-800 shadow-lg lg:rounded-l-3xl lg:rounded-r-none">
+      <div className="p-6 text-center">
+        <div className="text-2xl md:text-3xl font-bold text-blue-500">
           Select Friends
         </div>
       </div>
@@ -64,7 +63,11 @@ export default function SplitExpense() {
             style={{ appearance: "textfield" }}
           />
         </div>
-
+        {error && (
+          <div className="text-red-500 text-center text-sm md:text-base">
+            {error}
+          </div>
+        )}
         <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
           {friends.map((friend) => (
             <motion.div
@@ -78,35 +81,30 @@ export default function SplitExpense() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="h-12 w-12">
-                <img src={friend.avatar} alt="" />
+              <div className="relative h-12 w-12">
+                <img src={friend.avatar} alt="" className="rounded-full" />
+                {selectedFriends.some((f) => f.id === friend.id) && (
+                  <CheckCircle className="absolute -top-2 -right-2 h-5 w-5 text-blue-500" />
+                )}
               </div>
               <div className="flex-1">
                 <p className="text-white text-lg">{friend.name}</p>
               </div>
-              <input
-                type="checkbox"
-                checked={selectedFriends.some((f) => f.id === friend.id)}
-                className="border-gray-600 h-5 w-5"
-              />
             </motion.div>
           ))}
         </div>
-
         <button
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6 text-lg font-semibold transition-colors duration-200"
-          onClick={() => setStep("splitOptions")}
-          disabled={selectedFriends.length === 0 || !amount}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-4 text-lg font-semibold transition-colors duration-200"
+          onClick={handleContinue}
         >
           Continue
         </button>
       </div>
-    </dv>
+    </div>
   );
 
   const renderSplitOptions = () => (
     <div className="w-full h-full bg-black lg:rounded-r-3xl lg:rounded-l-none">
-      {/* Header */}
       <div className="flex items-center justify-between p-6">
         <ArrowLeft
           className="h-6 w-6 cursor-pointer text-gray-400 hover:text-white transition-colors duration-200"
@@ -114,16 +112,13 @@ export default function SplitExpense() {
         />
         <MoreVertical className="h-6 w-6 text-gray-400" />
       </div>
-
-      {/* Main Content */}
       <div className="px-6 space-y-8">
-        {/* Total Amount */}
         <div className="text-center space-y-2">
           <div className="text-gray-400 text-lg">Total</div>
-          <div className="text-5xl md:text-6xl font-light">₹{amount}</div>
+          <div className="text-5xl md:text-6xl font-light text-white">
+            ₹{amount}
+          </div>
         </div>
-
-        {/* Description Input */}
         <div className="flex justify-center">
           <input
             type="text"
@@ -133,8 +128,6 @@ export default function SplitExpense() {
             className="bg-gray-900 text-center rounded-full px-6 py-3 text-sm md:text-base w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
           />
         </div>
-
-        {/* Split Type Selection */}
         <div className="flex justify-around border-b border-gray-800 pb-2">
           <button
             onClick={() => setSplitType("even")}
@@ -142,7 +135,7 @@ export default function SplitExpense() {
               splitType === "even" ? "border-b-2 border-blue-500" : ""
             }`}
           >
-            <div className="text-2xl md:text-3xl">⚖️</div>
+            ⚖️
           </button>
           <button
             onClick={() => setSplitType("amount")}
@@ -150,7 +143,7 @@ export default function SplitExpense() {
               splitType === "amount" ? "border-b-2 border-blue-500" : ""
             }`}
           >
-            <div className="text-2xl md:text-3xl">123</div>
+            123
           </button>
           <button
             onClick={() => setSplitType("time")}
@@ -169,8 +162,6 @@ export default function SplitExpense() {
             <Percent className="h-6 w-6 md:h-8 md:w-8" />
           </button>
         </div>
-
-        {/* Split Content */}
         <div className="pb-24 max-h-[calc(100vh-400px)] overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
@@ -181,15 +172,6 @@ export default function SplitExpense() {
               transition={{ duration: 0.2 }}
             >
               <div className="space-y-6">
-                <div className="text-sm md:text-base text-gray-400 capitalize">
-                  {splitType === "even"
-                    ? "Split evenly"
-                    : splitType === "amount"
-                    ? "Split by amounts"
-                    : splitType === "percentage"
-                    ? "Split by percentages"
-                    : "Split by time"}
-                </div>
                 {selectedFriends.map((friend) => (
                   <div
                     key={friend.id}
@@ -200,49 +182,16 @@ export default function SplitExpense() {
                         <div className="h-12 w-12">
                           <img src={friend.avatar} alt="" />
                         </div>
-                        <div className="absolute -top-1 -left-1">
-                          <div className="h-4 w-4 rounded-full border-2 border-black bg-blue-500" />
-                        </div>
                       </div>
                       <span className="text-base md:text-lg">
                         {friend.name}
                       </span>
                     </div>
-                    {splitType === "even" ? (
-                      <div className="text-base md:text-lg font-medium">
-                        ₹
-                        {(parseFloat(amount) / selectedFriends.length).toFixed(
-                          2
-                        )}
-                      </div>
-                    ) : splitType === "percentage" ? (
-                      <div className="flex items-center">
-                        <input
-                          type="number"
-                          className="w-20 bg-transparent text-right text-base md:text-lg"
-                          value={splits[friend.id] || "0.00"}
-                          onChange={(e) =>
-                            setSplits({
-                              ...splits,
-                              [friend.id]: e.target.value,
-                            })
-                          }
-                          style={{ appearance: "textfield" }}
-                        />
-                        <span className="ml-1 text-base md:text-lg">%</span>
-                      </div>
-                    ) : (
-                      <input
-                        type="number"
-                        className="w-24 bg-transparent text-right text-base md:text-lg"
-                        value={splits[friend.id] || ""}
-                        onChange={(e) =>
-                          setSplits({ ...splits, [friend.id]: e.target.value })
-                        }
-                        placeholder="0"
-                        style={{ appearance: "textfield" }}
-                      />
-                    )}
+                    <div>
+                      {splitType === "even"
+                        ? `₹${(amount / selectedFriends.length).toFixed(2)}`
+                        : splitType}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -250,11 +199,9 @@ export default function SplitExpense() {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* Bottom button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 max-w-md mx-auto lg:relative lg:p-0 lg:mt-8">
-        <button className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6 text-lg font-semibold transition-colors duration-200">
-          Send request
+      <div className="p-6">
+        <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 text-lg">
+          Make Request
         </button>
       </div>
     </div>
