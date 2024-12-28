@@ -6,7 +6,6 @@ import {
   acceptTransaction,
   denyTransaction,
   cancelTransaction,
-  getActiveFriends,
 } from "../controllers/transaction.controller.js";
 
 const router = Router();
