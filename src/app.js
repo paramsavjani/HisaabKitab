@@ -6,14 +6,11 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import { sendPushNotification } from "./notification.js";
-import { nanoid } from "nanoid";
 
-// Initialize Express app
 const app = express();
 
 app.use(express.json());
 
-// Enable CORS
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -31,14 +28,11 @@ app.use(cookieParser());
 
 app.use(bodyParser.json());
 
-// Import routes
 import userRouter from "./routes/user.route.js";
 import friendRequestRouter from "./routes/request.route.js";
 import friendRouter from "./routes/friend.route.js";
 import transactionRouter from "./routes/transaction.route.js";
-import { fcmtoken } from "./controllers/user.controller.js";
 
-// Routes
 app.get("/", (req, res) => {
   res.send("hello world");
 });
@@ -108,27 +102,15 @@ io.on("connection", (socket) => {
         const notificationColor =
           transaction.amount < 0 ? "#4CAF50" : "#FF5722";
 
-        const uniqueId = nanoid(); // Generate a unique ID
-
         const message = {
-          data: {
+          notification: {
             title: messageTitle,
             body: messageBody,
-            id: uniqueId, // Custom ID to ensure uniqueness
           },
           android: {
-            priority: "high",
-            ttl: 3600 * 1000, // 1 hour in milliseconds
-            collapseKey: uniqueId, // Unique collapse key
-          },
-          apns: {
-            payload: {
-              aps: {
-                contentAvailable: true,
-              },
-            },
-            headers: {
-              "apns-expiration": Math.floor(Date.now() / 1000) + 3600, // 1 hour expiration
+            notification: {
+              clickAction: "OPEN_APP",
+              color: notificationColor,
             },
           },
           token: fcmToken,
@@ -159,17 +141,8 @@ io.on("connection", (socket) => {
               notification: {
                 clickAction: "OPEN_APP",
               },
-              priority: "high",
             },
             token: fcmToken,
-            apns: {
-              payload: {
-                aps: {
-                  contentAvailable: true,
-                },
-              },
-            },
-            collapseKey: null,
           };
 
           sendPushNotification(message);
@@ -197,18 +170,10 @@ io.on("connection", (socket) => {
             android: {
               notification: {
                 clickAction: "OPEN_APP",
-                priority: "high",
               },
             },
+
             token: fcmToken,
-            apns: {
-              payload: {
-                aps: {
-                  contentAvailable: true,
-                },
-              },
-            },
-            collapseKey: null,
           };
 
           sendPushNotification(message);
@@ -248,17 +213,8 @@ io.on("connection", (socket) => {
               notification: {
                 clickAction: "OPEN_APP",
               },
-              priority: "high",
             },
             token: fcmToken,
-            apns: {
-              payload: {
-                aps: {
-                  contentAvailable: true,
-                },
-              },
-            },
-            collapseKey: null,
           };
 
           sendPushNotification(message);
@@ -283,16 +239,8 @@ io.on("connection", (socket) => {
             notification: {
               clickAction: "OPEN_APP",
             },
-            priority: "high",
           },
           token: fcmToken,
-          apns: {
-            payload: {
-              aps: {
-                contentAvailable: true,
-              },
-            },
-          },
         };
 
         sendPushNotification(message);
@@ -302,7 +250,7 @@ io.on("connection", (socket) => {
 
   socket.on(
     "cancelFriendRequest",
-    ({ requestId, receiver, senderName, senderUsername }) => {
+    ({ requestId, receiver, senderUsername }) => {
       const receiverSocketId = onlineUsers.get(receiver);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("cancelFriendRequest", {
