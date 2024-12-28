@@ -11,8 +11,6 @@ import {
 
 const router = Router();
 
-router.route("/").post(verifyJWT, getActiveFriends);
-
 router.route("/:username/add").post(verifyJWT, addTransaction);
 
 router.route("/:username").post(verifyJWT, showTransactions);

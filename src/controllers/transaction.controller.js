@@ -241,71 +241,6 @@ const cancelTransaction = asyncHandler(async (req, res) => {
     .json({ message: "Transaction cancelled successfully" });
 });
 
-const getActiveFriends = asyncHandler(async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    const userExists = await User.exists({ _id: userId });
-    if (!userExists) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Fetch active friend relationships
-    const activeFriends = await Friend.find(
-      {
-        $or: [{ userId }, { friendId: userId }],
-      },
-      { userId: 1, friendId: 1, lastTransactionTime: 1, _id: 0, isActive: 1 }
-    );
-
-    if (!activeFriends.length) {
-      return res.status(200).json({ friends: [] });
-    }
-
-    // Map friend IDs, lastTransactionTime, and isActive status
-    const friendMap = {};
-    const isActiveMap = {};
-    activeFriends.forEach((connection) => {
-      const friendId =
-        connection.userId.toString() === userId.toString()
-          ? connection.friendId.toString()
-          : connection.userId.toString();
-
-      friendMap[friendId] = connection.lastTransactionTime;
-      isActiveMap[friendId] = connection.isActive; // Store isActive status
-    });
-
-    const friendIds = Object.keys(friendMap);
-
-    // Fetch user details
-    const friends = await User.find(
-      { _id: { $in: friendIds } },
-      {
-        username: 1,
-        name: 1,
-        profilePicture: 1,
-        fcmToken: 1,
-      }
-    ).lean();
-
-    const result = friends.map((friend) => {
-      return {
-        _id: friend._id,
-        username: friend.username,
-        name: friend.name,
-        profilePicture: friend.profilePicture,
-        fcmToken: friend.fcmToken,
-        lastTransactionTime: friendMap[friend._id.toString()],
-        isActive: isActiveMap[friend._id.toString()],
-      };
-    });
-
-    return res.status(200).json({ friends: result });
-  } catch (error) {
-    console.error("Error fetching active friends:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-});
 
 export {
   addTransaction,
@@ -313,5 +248,4 @@ export {
   acceptTransaction,
   denyTransaction,
   cancelTransaction,
-  getActiveFriends,
 };
