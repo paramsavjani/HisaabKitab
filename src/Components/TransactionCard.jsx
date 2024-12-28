@@ -242,17 +242,13 @@ const TransactionCard = ({
           </div>
         )}
         {status === "rejected" && (
-          <div
-            className={`relative w-20 h-20`} // Using relative for the parent div to position child absolutely
-          >
-            <img
-              src={rejectedIcon}
-              alt=""
-              className={`absolute top-0 ${
-                isSender ? "right-0" : "md:left-32 left-14"
-              } w-20 h-20`} // Position based on isSender
-            />
-          </div>
+          <img
+            src={rejectedIcon}
+            alt=""
+            className={`absolute top-4 ${
+              isSender ? "right-0" : "md:left-32 left-28"
+            } w-14 h-14`} // Position based on isSender
+          />
         )}
 
         {/* Action Buttons */}

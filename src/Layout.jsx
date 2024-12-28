@@ -7,7 +7,6 @@ import UserContext from "./context/UserContext.js";
 import "./loading.css";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
-import NotificationHandler from "./Components/NotificationHandler.jsx";
 import socket from "./socket.js";
 
 const Layout = () => {
@@ -155,23 +154,23 @@ const Layout = () => {
           }
         );
       });
-    }
-    PushNotifications.addListener(
-      "pushNotificationActionPerformed",
-      async (action) => {
-        const path = action.notification.data.path;
+      PushNotifications.addListener(
+        "pushNotificationActionPerformed",
+        async (action) => {
+          const path = action.notification.data.path;
 
-        if (path) {
-          await initializeApp();
-          window.location.href = path;
+          if (path) {
+            // await initializeApp();
+            window.location.href = path;
+          }
         }
-      }
-    );
+      );
+    }
   }, [isAuthenticated]);
 
   useEffect(() => {
     initializeApp();
-  }, [setAccessToken]);
+  }, []);
 
   useEffect(() => {
     socket.on("actionOnFriendRequest", ({ id, action, extra }) => {
@@ -216,7 +215,6 @@ const Layout = () => {
         <div className="flex">
           {/* Navbar */}
           <Navbar />
-          <NotificationHandler />
 
           {/* Notifications */}
           <ToastContainer
