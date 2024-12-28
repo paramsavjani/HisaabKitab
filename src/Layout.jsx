@@ -158,11 +158,11 @@ const Layout = () => {
     }
     PushNotifications.addListener(
       "pushNotificationActionPerformed",
-      (action) => {
-
+      async (action) => {
         const path = action.notification.data.path;
 
         if (path) {
+          initializeApp();
           window.location.href = path;
         }
       }
