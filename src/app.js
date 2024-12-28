@@ -112,11 +112,6 @@ io.on("connection", (socket) => {
             title: messageTitle,
             body: messageBody,
           },
-          data: {
-            transactionId: transaction.transactionId,
-            actionType: "transaction",
-            friendUsername: transaction.friendUsername,
-          },
           android: {
             notification: {
               clickAction: "OPEN_APP",
@@ -133,10 +128,10 @@ io.on("connection", (socket) => {
 
   socket.on(
     "acceptTransaction",
-    ({ friendUsername, transactionId, fcmToken, transactionAmount }) => {
+    ({ friendUsername, _id, fcmToken, transactionAmount }) => {
       const receiverSocketId = onlineUsers.get(friendUsername);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("acceptTransaction", transactionId);
+        io.to(receiverSocketId).emit("acceptTransaction", _id);
       } else {
         if (fcmToken) {
           let message = {
@@ -147,11 +142,6 @@ io.on("connection", (socket) => {
               )} from ${friendUsername} has been accepted.`,
             },
 
-            data: {
-              transactionId: transactionId,
-              actionType: "transaction",
-              friendUsername: socket.user.username,
-            },
             android: {
               notification: {
                 clickAction: "OPEN_APP",
@@ -168,10 +158,10 @@ io.on("connection", (socket) => {
 
   socket.on(
     "rejectTransaction",
-    ({ friendUsername, transactionId, transactionAmount, fcmToken }) => {
+    ({ friendUsername, _id, transactionAmount, fcmToken }) => {
       const receiverSocketId = onlineUsers.get(friendUsername);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("rejectTransaction", transactionId);
+        io.to(receiverSocketId).emit("rejectTransaction", _id);
       } else {
         if (fcmToken) {
           let message = {
@@ -182,11 +172,6 @@ io.on("connection", (socket) => {
               )} to ${friendUsername} has been denied.`,
             },
 
-            data: {
-              transactionId: transactionId,
-              actionType: "transaction",
-              friendUsername: socket.user.username,
-            },
             android: {
               notification: {
                 clickAction: "OPEN_APP",
@@ -201,10 +186,10 @@ io.on("connection", (socket) => {
     }
   );
 
-  socket.on("cancelTransaction", ({ friendUsername, transactionId }) => {
+  socket.on("cancelTransaction", ({ friendUsername, _id }) => {
     const receiverSocketId = onlineUsers.get(friendUsername);
     if (receiverSocketId) {
-      io.to(receiverSocketId).emit("cancelTransaction", transactionId);
+      io.to(receiverSocketId).emit("cancelTransaction", _id);
     }
   });
 
