@@ -1,4 +1,3 @@
-import { de } from "@faker-js/faker";
 import mongoose, { Schema } from "mongoose";
 
 const friendSchema = new Schema(

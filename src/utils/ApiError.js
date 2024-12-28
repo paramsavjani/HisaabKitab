@@ -1,4 +1,3 @@
-import { de } from "@faker-js/faker";
 
 class ApiError extends Error {
   constructor(
