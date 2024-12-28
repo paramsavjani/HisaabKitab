@@ -49,7 +49,6 @@ const User = () => {
         );
         const data = await response.json();
         if (response.ok) {
-          console.log(data);
           setProfile(data?.user);
           if (data?.requested) {
             if (data?.request?.sender === user._id) {
@@ -240,7 +239,6 @@ const User = () => {
         ...prev,
         { totalAmount: 0, isActive: false, ...rest },
       ]);
-      console.log(activeFriends);
     }
     setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
     setRequestId(null);
