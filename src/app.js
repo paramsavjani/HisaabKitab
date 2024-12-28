@@ -117,7 +117,16 @@ io.on("connection", (socket) => {
               clickAction: "OPEN_APP",
               color: notificationColor,
             },
+            priority: "high",
           },
+          apns: {
+            payload: {
+              aps: {
+                contentAvailable: true,
+              },
+            },
+          },
+          collapseKey: null,
           token: fcmToken,
         };
 
@@ -146,8 +155,17 @@ io.on("connection", (socket) => {
               notification: {
                 clickAction: "OPEN_APP",
               },
+              priority: "high",
             },
             token: fcmToken,
+            apns: {
+              payload: {
+                aps: {
+                  contentAvailable: true,
+                },
+              },
+            },
+            collapseKey: null,
           };
 
           sendPushNotification(message);
@@ -175,9 +193,18 @@ io.on("connection", (socket) => {
             android: {
               notification: {
                 clickAction: "OPEN_APP",
+                priority: "high",
               },
             },
             token: fcmToken,
+            apns: {
+              payload: {
+                aps: {
+                  contentAvailable: true,
+                },
+              },
+            },
+            collapseKey: null,
           };
 
           sendPushNotification(message);
@@ -217,8 +244,17 @@ io.on("connection", (socket) => {
               notification: {
                 clickAction: "OPEN_APP",
               },
+              priority: "high",
             },
             token: fcmToken,
+            apns: {
+              payload: {
+                aps: {
+                  contentAvailable: true,
+                },
+              },
+            },
+            collapseKey: null,
           };
 
           sendPushNotification(message);
@@ -243,8 +279,16 @@ io.on("connection", (socket) => {
             notification: {
               clickAction: "OPEN_APP",
             },
+            priority: "high",
           },
           token: fcmToken,
+          apns: {
+            payload: {
+              aps: {
+                contentAvailable: true,
+              },
+            },
+          },
         };
 
         sendPushNotification(message);
