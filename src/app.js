@@ -108,7 +108,7 @@ io.on("connection", (socket) => {
             body: messageBody,
           },
           data: {
-            path: `/transactions/${socket.user.username}--${transaction.friendUsername}`,
+            path: `/transactions/${transaction.friendUsername}--${socket.user.username}`,
           },
           android: {
             notification: {
@@ -140,7 +140,7 @@ io.on("connection", (socket) => {
               )} from ${friendUsername} has been accepted.`,
             },
             data: {
-              path: `/transactions/${socket.user.username}--${friendUsername}`,
+              path: `/transactions/${friendUsername}--${socket.user.username}`,
             },
 
             android: {
@@ -173,7 +173,7 @@ io.on("connection", (socket) => {
               )} to ${friendUsername} has been denied.`,
             },
             data: {
-              path: `/transactions/${socket.user.username}--${friendUsername}`,
+              path: `/transactions/${friendUsername}--${socket.user.username}`,
             },
 
             android: {
