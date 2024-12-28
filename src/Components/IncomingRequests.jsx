@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaExclamationTriangle, FaSpinner } from "react-icons/fa"; // Error and Spinner icons
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
@@ -16,6 +16,10 @@ function IncomingRequests() {
     setIncomingRequests,
   } = React.useContext(UserContext);
   const { setActiveFriends } = useDashboardContext();
+
+  useEffect(() => {
+    console.log(incomingRequests);
+  }, [incomingRequests]);
 
   const handleRequest = async (id, action, senderUsername) => {
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));
@@ -42,17 +46,18 @@ function IncomingRequests() {
       }
 
       const { _id: userId, email, ...extra } = user;
-      socket.emit("actionOnFriendRequest", {
-        id,
-        action,
-        extra,
-        senderUsername,
-      });
 
       const sender = incomingRequests.find(
         (request) => request.requestId === id
       );
       const { requestId, _id, ...rest } = sender;
+      socket.emit("actionOnFriendRequest", {
+        id,
+        action,
+        extra,
+        senderUsername,
+        fcmToken: sender.fcmToken,
+      });
 
       if (action === "accept") {
         setActiveFriends((prev) => [
