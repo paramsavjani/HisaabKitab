@@ -91,8 +91,6 @@ const User = () => {
     if (isSentRequest) {
       setIsRequestSent(true);
       setRequestId(isSentRequest.requestId);
-    } else {
-      setIsRequestSent(false);
     }
 
     const isFriend = activeFriends.find(
@@ -104,7 +102,13 @@ const User = () => {
     } else {
       setIsFriend(false);
     }
-  }, [incomingRequests, profile?.username, sentRequests, setIncomingRequests]);
+  }, [
+    activeFriends,
+    incomingRequests,
+    profile?.username,
+    sentRequests,
+    setIncomingRequests,
+  ]);
 
   const addFriend = async () => {
     setIsAddingFriend(true);
@@ -139,6 +143,7 @@ const User = () => {
         socket.emit("sendFriendRequest", {
           request: { requestId: data.data.requestId, ...user },
           receiver: profile.username,
+          fcmToken: profile?.fcmToken,
         });
       } else {
         const data = await response.json();
@@ -216,24 +221,24 @@ const User = () => {
       return;
     }
     const { email, ...extra } = user;
+
+    const sender = incomingRequests.find((request) => request.requestId === id);
+
     socket.emit("actionOnFriendRequest", {
       id,
       action,
       extra,
       senderUsername,
+      fcmToken: sender.fcmToken,
     });
 
     if (action === "accept") {
-      const sender = incomingRequests.find(
-        (request) => request.requestId === id
-      );
       const { requestId, _id, ...rest } = sender;
       setIsFriend(true);
       setActiveFriends((prev) => [
         ...prev,
         { totalAmount: 0, isActive: false, ...rest },
       ]);
-      console.log(activeFriends);
     }
     setIncomingRequests((p) => p.filter((request) => request.requestId !== id));
     setRequestId(null);

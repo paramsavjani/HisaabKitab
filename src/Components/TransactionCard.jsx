@@ -10,6 +10,7 @@ const TransactionCard = ({
   userUsername,
   setTransactions,
   friendUsername,
+  fcmToken,
 }) => {
   const { createdAt, amount, description, status, transactionId, sender } =
     transaction;
@@ -51,7 +52,14 @@ const TransactionCard = ({
         });
         return;
       }
-      socket.emit("acceptTransaction", { transactionId, friendUsername });
+      const transactionAmount = transaction.amount;
+
+      socket.emit("acceptTransaction", {
+        transactionId,
+        friendUsername,
+        fcmToken,
+        transactionAmount,
+      });
       setTransactions((prevTransactions) =>
         prevTransactions.map((prevTransaction) => {
           if (prevTransaction.transactionId === transactionId) {
@@ -85,8 +93,6 @@ const TransactionCard = ({
         }
       );
 
-
-
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.message, {
@@ -100,7 +106,16 @@ const TransactionCard = ({
         });
         return;
       }
-      socket.emit("rejectTransaction", { transactionId, friendUsername });
+
+
+      const transactionAmount = transaction.amount;
+
+      socket.emit("rejectTransaction", {
+        transactionId,
+        friendUsername,
+        fcmToken,
+        transactionAmount,
+      });
 
       setTransactions((prevTransactions) =>
         prevTransactions.map((prevTransaction) => {

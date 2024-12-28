@@ -1,4 +1,4 @@
-name: iOS Build
+name: Android Build
 
 on:
   push:
@@ -7,21 +7,48 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-latest # You can change this to ubuntu-latest for Android builds to save resources
+
     steps:
-      - uses: actions/checkout@v4
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Node.js environment
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
+
+      # Disable CI to ignore warnings as errors
+      - name: Set CI to false
+        run: echo "CI=false" >> $GITHUB_ENV
+
+      # Install project dependencies
       - name: Install Dependencies
         run: npm install
+
+      # Build the app
       - name: Build Capacitor App
         run: |
           npm run build
-          npx cap add ios
-          cd ios/App
-          pod install
-          xcodebuild -scheme App -sdk iphoneos -configuration Release
+          npx cap sync
 
-          
+      # Install Android dependencies (Android SDK & Gradle)
+      - name: Install Android SDK and dependencies
+        run: |
+          echo "y" | sdkmanager --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;google_apis;x86_64"
+          echo "y" | sdkmanager --licenses
+
+      # Build the Android app using Gradle
+      - name: Build Android App
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      # Upload the build artifact (APK or AAB)
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-build
+          path: android/app/build/outputs/bundle/release/*.apk # Or *.apk for APK

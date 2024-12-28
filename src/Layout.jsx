@@ -173,13 +173,6 @@ const Layout = () => {
           }
         );
       });
-
-      PushNotifications.addListener(
-        "pushNotificationReceived",
-        (notification) => {
-          console.log("Notification received:", notification);
-        }
-      );
     }
   }, [isAuthenticated]);
 

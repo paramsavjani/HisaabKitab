@@ -295,6 +295,7 @@ const Transactions = () => {
                             userUsername={userUsername}
                             setTransactions={setTransactions}
                             friendUsername={friendId}
+                            fcmToken={friend?.fcmToken}
                           />
                         </div>
                       ))}
