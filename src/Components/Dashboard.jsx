@@ -27,9 +27,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.title = "Dashboard";
-    if (!user) {
-      window.location.href = "/login";
-    }
+    // if (!user) {
+    //   window.location.href = "/login";
+    // }
   }, [user]);
 
   return (
@@ -211,7 +211,7 @@ const Dashboard = () => {
               friend.isActive && (
                 <li
                   key={friend.username}
-                  className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
+                  className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform transition-all duration-300"
                 >
                   <Link
                     to={`/transactions/${user?.username}--${friend.username}`}
