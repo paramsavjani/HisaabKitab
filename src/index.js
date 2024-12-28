@@ -15,6 +15,7 @@ import User from "./Components/User";
 import IncomingRequests from "./Components/IncomingRequests";
 import Transactions from "./Components/Transactions";
 import DashboardContextProvider from "./context/DashboardContextProvider";
+import SplitExpense from "./Components/SplitExpense";
 
 import {
   createBrowserRouter,
@@ -51,6 +52,7 @@ const router = createBrowserRouter(
       <Route path="users/:id" element={<User />} />
       <Route path="transactions/:chatId" element={<Transactions />} />
       <Route path="dashboard" element={<Dashboard />} />
+      <Route path="split-expense" element={<SplitExpense />} />
     </Route>
   )
 );
