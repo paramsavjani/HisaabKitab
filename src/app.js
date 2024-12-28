@@ -91,10 +91,10 @@ io.on("connection", (socket) => {
           messageTitle = "You Will Receive Money!";
           messageBody = `You will receive ₹${Math.abs(
             transaction.amount
-          )} from ${transaction.friendName}.`;
+          )} from ${socket.user.name}.`;
         } else if (transaction.amount > 0) {
           messageTitle = "Money Requested!";
-          messageBody = `${transaction.friendName} has requested ₹${Math.abs(
+          messageBody = `${socket.user.name} has requested ₹${Math.abs(
             transaction.amount
           )} from you.`;
         }
@@ -137,7 +137,7 @@ io.on("connection", (socket) => {
               title: "Transaction Accepted",
               body: `Your request for ₹${Math.abs(
                 transactionAmount
-              )} from ${friendUsername} has been accepted.`,
+              )} from ${socket.user.name} has been accepted.`,
             },
             data: {
               path: `/transactions/${friendUsername}--${socket.user.username}`,
@@ -170,7 +170,7 @@ io.on("connection", (socket) => {
               title: "Transaction Rejected",
               body: `Your transaction request of ₹${Math.abs(
                 transactionAmount
-              )} to ${friendUsername} has been denied.`,
+              )} to ${socket.user.name} has been denied.`,
             },
             data: {
               path: `/transactions/${friendUsername}--${socket.user.username}`,
