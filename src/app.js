@@ -210,10 +210,8 @@ io.on("connection", (socket) => {
 
   socket.on(
     "actionOnFriendRequest",
-    ({ id, action, senderUsername, extra }) => {
+    ({ id, action, senderUsername, extra, fcmToken }) => {
       const receiverSocketId = onlineUsers.get(senderUsername);
-      console.log("receiverSocketId", senderUsername);
-      console.log(extra.fcmToken);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit("actionOnFriendRequest", {
           id,
@@ -221,7 +219,7 @@ io.on("connection", (socket) => {
           extra,
         });
       } else {
-        if (extra?.fcmToken) {
+        if (fcmToken) {
           let message = {
             notification: {
               title: `Friend Request ${
@@ -235,7 +233,7 @@ io.on("connection", (socket) => {
                 clickAction: "OPEN_APP",
               },
             },
-            token: extra.fcmToken,
+            token: fcmToken,
           };
 
           sendPushNotification(message);
