@@ -40,14 +40,14 @@ const Transactions = () => {
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
           transaction._id === _id
-            ? { ...transaction, status: "accepted" }
+            ? { ...transaction, status: "completed" }
             : transaction
         )
       );
       setFriendTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
           transaction._id === _id
-            ? { ...transaction, status: "accepted" }
+            ? { ...transaction, status: "completed" }
             : transaction
         )
       );
@@ -163,6 +163,9 @@ const Transactions = () => {
       });
       return updatedActiveFriends;
     });
+
+    console.log(accumulatedTotal);
+    console.log("hii");
 
     setTotal(() => accumulatedTotal);
   }, [userUsername, friendTransactions, setFriendTransactions]);
