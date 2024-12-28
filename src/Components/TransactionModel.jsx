@@ -14,7 +14,6 @@ const TransactionModal = ({
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false); // Loading state for the submit button
   const { accessToken, refreshToken } = React.useContext(UserContext);
-
   const amountInputRef = useRef(null);
 
   useEffect(() => {
@@ -79,7 +78,7 @@ const TransactionModal = ({
         _id: data.transaction._doc._id,
         createdAt: data.transaction._doc.createdAt,
         status: data.transaction._doc.status,
-        sender: data.transaction.sender,
+        sender: data.transaction._doc.sender,
         friendUsername: friend.username,
         fcmToken: friend.fcmToken,
         friendName: friend.name,

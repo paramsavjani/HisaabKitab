@@ -156,6 +156,17 @@ const Layout = () => {
         );
       });
     }
+    PushNotifications.addListener(
+      "pushNotificationActionPerformed",
+      (action) => {
+
+        const path = action.notification.data.path;
+
+        if (path) {
+          window.location.href = path;
+        }
+      }
+    );
   }, [isAuthenticated]);
 
   useEffect(() => {
