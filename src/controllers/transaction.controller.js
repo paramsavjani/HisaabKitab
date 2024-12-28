@@ -288,64 +288,19 @@ const getActiveFriends = asyncHandler(async (req, res) => {
       }
     ).lean();
 
-    // Aggregate transaction amounts for each friend
-    const transactionCounts = await Transaction.find(
-      {
-        $or: [
-          { sender: userId, receiver: { $in: friendIds } },
-          { receiver: userId, sender: { $in: friendIds } },
-        ],
-        status: "completed", // Only completed transactions
-      },
-      {
-        sender: 1,
-        amount: 1,
-        receiver: 1,
-        status: 1,
-      }
-    ).lean();
-
-    let totalTake = 0;
-    let totalGive = 0;
-
-    const transactionMap = {};
-    transactionCounts.forEach((transaction) => {
-      if (transaction.sender.toString() === userId.toString()) {
-        transactionMap[transaction.receiver.toString()] =
-          (transactionMap[transaction.receiver.toString()] || 0) +
-          transaction.amount;
-      } else {
-        transactionMap[transaction.sender.toString()] =
-          (transactionMap[transaction.sender.toString()] || 0) -
-          transaction.amount;
-      }
-    });
-
-    // Calculate totalTake and totalGive
-    friendIds.forEach((friendId) => {
-      const amount = transactionMap[friendId] || 0;
-      if (amount > 0) {
-        totalTake += amount;
-      } else {
-        totalGive -= amount;
-      }
-    });
-
-    // Construct the final result
     const result = friends.map((friend) => {
-      const totalAmount = transactionMap[friend._id.toString()] || 0; // Default to 0 if no transactions
       return {
+        _id: friend._id,
         username: friend.username,
         name: friend.name,
         profilePicture: friend.profilePicture,
         fcmToken: friend.fcmToken,
         lastTransactionTime: friendMap[friend._id.toString()],
-        totalAmount: totalAmount, // Add total transaction amount
-        isActive: isActiveMap[friend._id.toString()], // Include isActive status
+        isActive: isActiveMap[friend._id.toString()],
       };
     });
 
-    return res.status(200).json({ friends: result, totalTake, totalGive });
+    return res.status(200).json({ friends: result });
   } catch (error) {
     console.error("Error fetching active friends:", error);
     return res.status(500).json({ message: "Internal server error" });

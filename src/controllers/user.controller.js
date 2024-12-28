@@ -4,6 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import { Friend } from "../models/Friend.model.js";
 import { Request } from "../models/Request.model.js";
+import { Transaction } from "../models/Transaction.model.js";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -256,7 +257,7 @@ const getUser = asyncHandler(async (req, res) => {
   const username = req.user?.username;
 
   const user = await User.findOne({ username }).select(
-    "username email name profilePicture fcmToken"
+    "username email name profilePicture fcmToken _id"
   );
 
   if (!user) {
@@ -267,9 +268,80 @@ const getUser = asyncHandler(async (req, res) => {
     return;
   }
 
+  const friends = await Friend.find({
+    $or: [{ userId: user._id }, { friendId: user._id }],
+  }).select("userId friendId lastTransactionTime isActive _id");
+
+  const transactions = await Transaction.find({
+    $or: [{ sender: user._id }, { receiver: user._id }],
+  })
+    .sort({ createdAt: -1 })
+    .select("sender receiver amount createdAt _id status description");
+
+  const friendMap = {};
+  const isActiveMap = {};
+
+  friends.forEach((connection) => {
+    const friendId =
+      connection.userId.toString() === userId.toString()
+        ? connection.friendId.toString()
+        : connection.userId.toString();
+
+    friendMap[friendId] = connection.lastTransactionTime;
+    isActiveMap[friendId] = connection.isActive; // Store isActive status
+  });
+
+  const friendIds = Object.keys(friendMap);
+
+  // Fetch user details
+  const friendsDetail = await User.find(
+    { _id: { $in: friendIds } },
+    {
+      username: 1,
+      name: 1,
+      profilePicture: 1,
+      fcmToken: 1,
+    }
+  ).lean();
+
+  const finalFriends = friendsDetail.map((friend) => {
+    return {
+      _id: friend._id,
+      username: friend.username,
+      name: friend.name,
+      profilePicture: friend.profilePicture,
+      fcmToken: friend.fcmToken,
+      lastTransactionTime: friendMap[friend._id.toString()],
+      isActive: isActiveMap[friend._id.toString()],
+    };
+  });
+
+  const transactionsArray = {};
+
+  transactions.forEach((transaction) => {
+    const key =
+      transaction.sender.toString() === user._id.toString()
+        ? transaction.receiver.toString()
+        : transaction.sender.toString();
+
+    if (!transactionsArray[key]) {
+      transactionsArray[key] = [];
+    }
+
+    transactionsArray[key].push(transaction);
+  });
+
+  const result = finalFriends.map((friend) => {
+    return {
+      ...friend,
+      transactions: transactionsArray[friend._id] || [],
+    };
+  });
+
   return res.status(200).json({
     status: "success",
     user,
+    friends: result,
   });
 });
 
