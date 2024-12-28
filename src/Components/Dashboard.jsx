@@ -1,6 +1,4 @@
 import React, { useEffect, useContext } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 // import DashboardSkeleton from "./DashboardSkeleton";
@@ -9,7 +7,7 @@ import "../loading.css";
 import addFriend from "../assets/icons/user.png";
 
 const Dashboard = () => {
-  const { user,activeFriends } = useContext(UserContext);
+  const { user, activeFriends } = useContext(UserContext);
   // friend:{username,name,lastTransactionTime,profilePicture}
 
   const [totalTake, setTotalTake] = React.useState(0);
@@ -28,7 +26,6 @@ const Dashboard = () => {
   }, [activeFriends]);
 
   useEffect(() => {
-    AOS.init({ duration: 800, once: true });
     document.title = "Dashboard";
     if (!user) {
       window.location.href = "/login";
@@ -111,11 +108,7 @@ const Dashboard = () => {
             activeFriends.map(
               (friend, index) =>
                 friend.isActive && (
-                  <li
-                    key={friend.username}
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100} // Staggered animations
-                  >
+                  <li key={friend.username}>
                     <Link
                       to={`/transactions/${user?.username}--${friend.username}`}
                       className="flex items-center space-x-4 p-3"
@@ -219,8 +212,6 @@ const Dashboard = () => {
                 <li
                   key={friend.username}
                   className="bg-gray-900 rounded-lg shadow-md hover:bg-gray-800 transform hover:scale-105 transition-all duration-300"
-                  data-aos="fade-up"
-                  data-aos-delay={index * 100}
                 >
                   <Link
                     to={`/transactions/${user?.username}--${friend.username}`}
