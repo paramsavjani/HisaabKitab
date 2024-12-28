@@ -112,17 +112,14 @@ io.on("connection", (socket) => {
 
         const message = {
           data: {
-            title: messageTitle, // Custom title
-            body: messageBody, // Custom body
-            uniqueId: nanoid(), // Add a unique ID
+            title: messageTitle,
+            body: messageBody,
+            id: uniqueId, // Custom ID to ensure uniqueness
           },
           android: {
-            notification: {
-              clickAction: "OPEN_APP",
-              color: notificationColor,
-            },
             priority: "high",
-            collapseKey: uniqueId,
+            ttl: 3600 * 1000, // 1 hour in milliseconds
+            collapseKey: uniqueId, // Unique collapse key
           },
           apns: {
             payload: {
@@ -130,8 +127,10 @@ io.on("connection", (socket) => {
                 contentAvailable: true,
               },
             },
+            headers: {
+              "apns-expiration": Math.floor(Date.now() / 1000) + 3600, // 1 hour expiration
+            },
           },
-
           token: fcmToken,
         };
 
