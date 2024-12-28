@@ -131,7 +131,7 @@ const showTransactions = asyncHandler(async (req, res) => {
 
   const allTransaction = transactions.map((transaction) => {
     return {
-      transactionId: transaction._id,
+      _id: transaction._id,
       amount: transaction.amount,
       description: transaction.description,
       status: transaction.status,
@@ -240,7 +240,6 @@ const cancelTransaction = asyncHandler(async (req, res) => {
     .status(200)
     .json({ message: "Transaction cancelled successfully" });
 });
-
 
 export {
   addTransaction,
