@@ -5,10 +5,10 @@ import socket from "../socket.js";
 
 const TransactionModal = ({
   transactionType,
-  friendId,
   setIsModalOpen,
-  setTransactions,
+  setFriendTransactions,
   friend,
+  setTransactions,
 }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -41,7 +41,7 @@ const TransactionModal = ({
     setIsLoading(true); // Set loading state to true when submitting
 
     try {
-      const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}/add`;
+      const endpoint = `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friend.username}/add`;
 
       const res = await fetch(endpoint, {
         method: "POST",
@@ -80,17 +80,28 @@ const TransactionModal = ({
         createdAt: data.transaction._doc.createdAt,
         status: data.transaction._doc.status,
         sender: data.transaction.sender,
-        friendUsername: friendId,
+        friendUsername: friend.username,
         fcmToken: friend.fcmToken,
         friendName: friend.name,
       });
 
+      setFriendTransactions((prev) => [
+        ...prev,
+        {
+          amount: data.transaction._doc.amount,
+          description: data.transaction._doc.description,
+          _id: data.transaction._doc._id,
+          createdAt: data.transaction._doc.createdAt,
+          status: data.transaction._doc.status,
+          sender: data.transaction._doc.sender,
+        },
+      ]);
       setTransactions((prev) => [
         ...prev,
         {
           amount: data.transaction._doc.amount,
           description: data.transaction._doc.description,
-          transactionId: data.transaction._doc._id,
+          _id: data.transaction._doc._id,
           createdAt: data.transaction._doc.createdAt,
           status: data.transaction._doc.status,
           sender: data.transaction.sender,

@@ -3,11 +3,9 @@ import UserContext from "../context/UserContext.js";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css"; // AOS styles
-import useDashboardContext from "../context/DashboardContext.js";
 
 function Friends() {
-  const { user } = useContext(UserContext);
-  const { activeFriends } = useDashboardContext();
+  const { user, activeFriends } = useContext(UserContext);
 
   useEffect(() => {
     AOS.init({ duration: 1000 });

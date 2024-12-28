@@ -7,15 +7,16 @@ import rejectedIcon from "../assets/icons/rejected.png";
 
 const TransactionCard = ({
   transaction,
-  userUsername,
-  setTransactions,
+  userId,
+  setFriendTransactions,
   friendUsername,
   fcmToken,
+  friendId,
 }) => {
-  const { createdAt, amount, description, status, transactionId, sender } =
-    transaction;
-  const { accessToken, refreshToken } = useContext(UserContext);
-  const isSender = sender.username === userUsername;
+  const { createdAt, amount, description, status, _id, sender } = transaction;
+  const { transactions, setTransactions, accessToken, refreshToken } =
+    useContext(UserContext);
+  const isSender = sender === userId;
 
   // Loading states for buttons
   const [loading, setLoading] = useState({
@@ -29,7 +30,7 @@ const TransactionCard = ({
     setLoading((prev) => ({ ...prev, accept: true }));
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/accept`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/accept`,
         {
           method: "POST",
           headers: {
@@ -55,14 +56,25 @@ const TransactionCard = ({
       const transactionAmount = transaction.amount;
 
       socket.emit("acceptTransaction", {
-        transactionId,
+        _id,
         friendUsername,
         fcmToken,
         transactionAmount,
       });
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction._id === _id) {
+            return {
+              ...prevTransaction,
+              status: "completed",
+            };
+          }
+          return prevTransaction;
+        })
+      );
       setTransactions((prevTransactions) =>
         prevTransactions.map((prevTransaction) => {
-          if (prevTransaction.transactionId === transactionId) {
+          if (prevTransaction._id === _id) {
             return {
               ...prevTransaction,
               status: "completed",
@@ -82,7 +94,7 @@ const TransactionCard = ({
     setLoading((prev) => ({ ...prev, reject: true }));
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/deny`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/deny`,
         {
           method: "POST",
           headers: {
@@ -107,11 +119,10 @@ const TransactionCard = ({
         return;
       }
 
-
       const transactionAmount = transaction.amount;
 
       socket.emit("rejectTransaction", {
-        transactionId,
+        _id,
         friendUsername,
         fcmToken,
         transactionAmount,
@@ -119,7 +130,18 @@ const TransactionCard = ({
 
       setTransactions((prevTransactions) =>
         prevTransactions.map((prevTransaction) => {
-          if (prevTransaction.transactionId === transactionId) {
+          if (prevTransaction._id === _id) {
+            return {
+              ...prevTransaction,
+              status: "rejected",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction._id === _id) {
             return {
               ...prevTransaction,
               status: "rejected",
@@ -139,7 +161,7 @@ const TransactionCard = ({
     setLoading((prev) => ({ ...prev, cancel: true }));
     try {
       const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${transactionId}/cancel`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/cancel`,
         {
           method: "POST",
           headers: {
@@ -162,9 +184,12 @@ const TransactionCard = ({
         });
         return;
       }
-      socket.emit("cancelTransaction", { transactionId, friendUsername });
+      socket.emit("cancelTransaction", { _id, friendUsername });
       setTransactions((prevTransactions) =>
-        prevTransactions.filter((t) => t.transactionId !== transactionId)
+        prevTransactions.filter((t) => t._id !== _id)
+      );
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.filter((t) => t._id !== _id)
       );
     } catch (err) {
       console.log(err);

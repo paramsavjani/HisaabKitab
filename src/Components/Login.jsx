@@ -2,17 +2,15 @@ import React, { useState, useContext, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 import UserContext from "../context/UserContext.js";
 import { Preferences } from "@capacitor/preferences";
-import useDashboardContext from "../context/DashboardContext.js";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const { user, setUser, setRefreshToken, setAccessToken } =
+  const { user, setUser, setRefreshToken, setAccessToken, setActiveFriends } =
     useContext(UserContext);
   const [isMobile, setIsMobile] = useState(false);
-  const { setActiveFriends } = useDashboardContext();
 
   useEffect(() => {
     if (user) {

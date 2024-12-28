@@ -6,13 +6,11 @@ import UserContext from "../context/UserContext.js";
 // import DashboardSkeleton from "./DashboardSkeleton";
 import "./styles.css";
 import "../loading.css";
-import useDashboardContext from "../context/DashboardContext.js";
 import addFriend from "../assets/icons/user.png";
 
 const Dashboard = () => {
-  const { user } = useContext(UserContext);
+  const { user,activeFriends } = useContext(UserContext);
   // friend:{username,name,lastTransactionTime,profilePicture}
-  const { activeFriends } = useDashboardContext();
 
   const [totalTake, setTotalTake] = React.useState(0);
   const [totalGive, setTotalGive] = React.useState(0);

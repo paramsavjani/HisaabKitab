@@ -4,7 +4,6 @@ import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
 import UserContext from "./context/UserContext.js";
-import useDashboardContext from "./context/DashboardContext.js";
 import "./loading.css";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
@@ -18,9 +17,9 @@ const Layout = () => {
     setRefreshToken,
     setIncomingRequests,
     setSentRequests,
-    sentRequests,
+    setActiveFriends,
+    setTransactions,
   } = useContext(UserContext);
-  const { setActiveFriends } = useDashboardContext();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -67,7 +66,9 @@ const Layout = () => {
         );
       }
 
-      const { user: verifiedUser } = await verifyResponse.json();
+      const mahiti = await verifyResponse.json();
+
+      const { user: verifiedUser } = mahiti;
 
       // If user is not found, exit early
       if (!verifiedUser) {
@@ -77,6 +78,8 @@ const Layout = () => {
 
       setIsAuthenticated(() => true);
       setUser(() => verifiedUser);
+      setActiveFriends(() => mahiti.friends);
+      setTransactions(() => mahiti.transactions);
 
       // Update tokens in storage
       const updatedAccessToken = getTokenFromCookies("accessToken");
@@ -96,27 +99,6 @@ const Layout = () => {
         });
         setRefreshToken(updatedRefreshToken);
       }
-
-      // Fetch Dashboard Data
-      const dashboardResponse = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            accessToken: updatedAccessToken,
-            refreshToken: updatedRefreshToken,
-          }),
-        }
-      );
-
-      if (!dashboardResponse.ok) {
-        throw new Error("Failed to fetch dashboard data");
-      }
-
-      const { friends } = await dashboardResponse.json();
-      setActiveFriends(() => friends);
 
       const res = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,

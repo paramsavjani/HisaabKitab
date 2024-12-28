@@ -14,7 +14,6 @@ import Search from "./Components/Search";
 import User from "./Components/User";
 import IncomingRequests from "./Components/IncomingRequests";
 import Transactions from "./Components/Transactions";
-import DashboardContextProvider from "./context/DashboardContextProvider";
 import SplitExpense from "./Components/SplitExpense";
 
 import {
@@ -61,9 +60,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
     <UserContextProvider>
-      <DashboardContextProvider>
-        <RouterProvider router={router} />
-      </DashboardContextProvider>
+      <RouterProvider router={router} />
     </UserContextProvider>
   </>
 );

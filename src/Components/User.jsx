@@ -7,7 +7,6 @@ import UserContext from "../context/UserContext.js";
 import UserNotFound from "./UserNotFound";
 import socket from "../socket.js";
 import { Preferences } from "@capacitor/preferences";
-import useDashboardContext from "../context/DashboardContext.js";
 
 const User = () => {
   const {
@@ -18,8 +17,9 @@ const User = () => {
     setIncomingRequests,
     setSentRequests,
     sentRequests,
+    setActiveFriends,
+    activeFriends,
   } = useContext(UserContext);
-  const { setActiveFriends, activeFriends } = useDashboardContext();
   const { id } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);

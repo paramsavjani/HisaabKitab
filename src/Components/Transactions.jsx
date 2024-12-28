@@ -2,28 +2,27 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
-import TransactionSkeleton from "./TransactionSkeleton";
-import { toast } from "react-toastify";
 import UserContext from "../context/UserContext.js";
-import useDashboardContext from "../context/DashboardContext.js";
 import "./styles.css";
 import socket from "../socket.js";
 
 const Transactions = () => {
   const { chatId } = useParams();
   const [total, setTotal] = useState(null);
-  const [transactions, setTransactions] = useState([]);
-  const [prevTransactionCount, setPrevTransactionCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [friend, setFriend] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [transactionType, setTransactionType] = useState(null); // 'give' or 'get'
   const userUsername = chatId.split("--")[0];
   const friendId = chatId.split("--")[1];
   const lastTransactionRef = useRef(null);
-  const { user, accessToken, refreshToken } = React.useContext(UserContext);
-  const { activeFriends, setActiveFriends } = useDashboardContext();
+  const [friendTransactions, setFriendTransactions] = useState([]);
+  const {
+    user,
+    activeFriends,
+    setActiveFriends,
+    transactions,
+    setTransactions,
+  } = React.useContext(UserContext);
 
   useEffect(() => {
     socket.on("newTransaction", (newTransaction) => {
@@ -36,32 +35,27 @@ const Transactions = () => {
     socket.on("acceptTransaction", (id) => {
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
-          transaction.transactionId === id
+          transaction._id === id
             ? { ...transaction, status: "accepted" }
             : transaction
         )
       );
-      setPrevTransactionCount(() => transactions.length);
     });
 
     socket.on("rejectTransaction", (id) => {
       setTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
-          transaction.transactionId === id
+          transaction._id === id
             ? { ...transaction, status: "rejected" }
             : transaction
         )
       );
-      setPrevTransactionCount(() => transactions.length);
     });
 
     socket.on("cancelTransaction", (id) => {
       setTransactions((prevTransactions) =>
-        prevTransactions.filter(
-          (transaction) => transaction.transactionId !== id
-        )
+        prevTransactions.filter((transaction) => transaction._id !== id)
       );
-      setPrevTransactionCount(() => transactions.length);
     });
 
     return () => {
@@ -90,46 +84,24 @@ const Transactions = () => {
       return;
     }
 
-    const fetchTransactions = async () => {
-      try {
-        const res = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${friendId}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              accessToken,
-              refreshToken,
-            }),
-          }
-        );
+    const friendMain = activeFriends.find(
+      (friend) => friend.username === friendId
+    );
+    setFriend(() => friendMain);
 
-        if (!res.ok) {
-          const data = await res.json();
-          toast.error(data.message, {
-            position: "top-right",
-            autoClose: 7000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        }
+    setFriendTransactions(() => {
+      const friendTransactions = transactions.filter(
+        (transaction) =>
+          (transaction.sender === user._id &&
+            transaction.receiver === friendMain._id) ||
+          (transaction.receiver === user._id &&
+            transaction.sender === friendMain._id)
+      );
 
-        const data = await res.json();
-        setTransactions(data.transactions.reverse());
-        setPrevTransactionCount(data.transactions.length - 1);
-      } catch (err) {
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    setFriend(activeFriends.find((friend) => friend.username === friendId));
+      return friendTransactions.sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      );
+    });
 
     setActiveFriends((prevActiveFriends) => {
       const updatedActiveFriends = prevActiveFriends.map((friend) => {
@@ -143,19 +115,14 @@ const Transactions = () => {
       });
       return updatedActiveFriends;
     });
-
-    fetchTransactions();
-  }, [accessToken, friendId, refreshToken]);
+  }, [friendId, userUsername]);
 
   useEffect(() => {
-    if (error || loading) {
-      return;
-    }
     let accumulatedTotal = 0;
 
-    for (let transaction of transactions) {
+    for (let transaction of friendTransactions) {
       if (transaction.status === "completed") {
-        if (transaction.sender.username === userUsername) {
+        if (transaction.sender === user._id) {
           accumulatedTotal += transaction.amount; // Amount to totalGive
         } else {
           accumulatedTotal -= transaction.amount; // Amount to totalTake
@@ -177,7 +144,7 @@ const Transactions = () => {
     });
 
     setTotal(() => accumulatedTotal);
-  }, [transactions, userUsername, setTransactions]);
+  }, [userUsername, friendTransactions, setFriendTransactions]);
 
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
@@ -187,41 +154,21 @@ const Transactions = () => {
       return groups;
     }, {});
   };
-  const groupedTransactions = groupTransactionsByDate(transactions);
+  const groupedTransactions = groupTransactionsByDate(friendTransactions);
 
   useEffect(() => {
-    if (
-      lastTransactionRef.current &&
-      transactions.length !== prevTransactionCount
-    ) {
+    if (lastTransactionRef.current) {
       lastTransactionRef.current.scrollIntoView({
         block: "end",
       });
     }
-  }, [transactions]);
-
-  const ErrorState = () => (
-    <div className="text-red-500 text-center text-lg">{error}</div>
-  );
+  }, [friendTransactions]);
 
   const EmptyState = () => (
     <div className="text-center text-lg text-gray-400">
       No transactions found with this user.
     </div>
   );
-
-  if (error) {
-    toast.error(error, {
-      position: "top-right",
-      autoClose: 7000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-    return <TransactionSkeleton />;
-  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
@@ -252,15 +199,12 @@ const Transactions = () => {
       </div>
 
       {/* Transactions Section */}
-      {loading ? (
-        <TransactionSkeleton />
-      ) : (
+      {
         <div className="flex-1 pt-24 md:pt-28 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
-          {error && <ErrorState />}
-          {!loading && !error && transactions.length > 0 && (
+          {transactions.length > 0 && (
             <div className="space-y-6">
               {Object.keys(groupedTransactions)
-                .sort((a, b) => new Date(b) - new Date(a)) // Sort dates in descending order
+                .sort((a, b) => new Date(a) - new Date(b)) // Sort dates in descending order
                 .map((date) => (
                   <div key={date}>
                     <div className="flex justify-center items-center">
@@ -288,14 +232,15 @@ const Transactions = () => {
                               ? "md:pb-20 pb-20"
                               : ""
                           }`}
-                          key={transaction.transactionId}
+                          key={transaction._id}
                         >
                           <TransactionCard
                             transaction={transaction}
-                            userUsername={userUsername}
-                            setTransactions={setTransactions}
+                            userId={user._id}
+                            setFriendTransactions={setFriendTransactions}
                             friendUsername={friendId}
                             fcmToken={friend?.fcmToken}
+                            friendId={friend?._id}
                           />
                         </div>
                       ))}
@@ -304,9 +249,9 @@ const Transactions = () => {
                 ))}
             </div>
           )}
-          {!loading && !error && transactions.length === 0 && <EmptyState />}
+          {transactions.length === 0 && <EmptyState />}
         </div>
-      )}
+      }
 
       {/* Bottom Button Bar */}
       <div className="merienda-regular fixed bottom-0 w-full md:left-320 bg-gray-900 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
@@ -327,11 +272,10 @@ const Transactions = () => {
       {isModalOpen && (
         <TransactionModal
           transactionType={transactionType}
-          friendId={friendId}
           setIsModalOpen={setIsModalOpen}
-          transactions={transactions}
-          setTransactions={setTransactions}
+          setFriendTransactions={setFriendTransactions}
           friend={friend}
+          setTransactions={setTransactions}
         />
       )}
     </div>

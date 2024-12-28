@@ -3,7 +3,6 @@ import { FaExclamationTriangle, FaSpinner } from "react-icons/fa"; // Error and 
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 import socket from "../socket.js";
-import useDashboardContext from "../context/DashboardContext.js";
 
 function IncomingRequests() {
   const [errorMessage, setErrorMessage] = useState(""); // Error state
@@ -14,12 +13,8 @@ function IncomingRequests() {
     refreshToken,
     incomingRequests,
     setIncomingRequests,
+    setActiveFriends,
   } = React.useContext(UserContext);
-  const { setActiveFriends } = useDashboardContext();
-
-  useEffect(() => {
-    console.log(incomingRequests);
-  }, [incomingRequests]);
 
   const handleRequest = async (id, action, senderUsername) => {
     setButtonLoading((prev) => ({ ...prev, [`${id}-${action}`]: true }));
