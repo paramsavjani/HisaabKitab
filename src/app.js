@@ -111,9 +111,10 @@ io.on("connection", (socket) => {
         const uniqueId = nanoid(); // Generate a unique ID
 
         const message = {
-          notification: {
-            title: messageTitle,
-            body: messageBody,
+          data: {
+            title: messageTitle, // Custom title
+            body: messageBody, // Custom body
+            uniqueId: nanoid(), // Add a unique ID
           },
           android: {
             notification: {
