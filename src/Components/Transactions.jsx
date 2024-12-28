@@ -30,10 +30,21 @@ const Transactions = () => {
         ...prevTransactions,
         newTransaction,
       ]);
+      setFriendTransactions((prevTransactions) => [
+        ...prevTransactions,
+        newTransaction,
+      ]);
     });
 
     socket.on("acceptTransaction", (_id) => {
       setTransactions((prevTransactions) =>
+        prevTransactions.map((transaction) =>
+          transaction._id === _id
+            ? { ...transaction, status: "accepted" }
+            : transaction
+        )
+      );
+      setFriendTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
           transaction._id === _id
             ? { ...transaction, status: "accepted" }
@@ -50,10 +61,20 @@ const Transactions = () => {
             : transaction
         )
       );
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.map((transaction) =>
+          transaction._id === _id
+            ? { ...transaction, status: "rejected" }
+            : transaction
+        )
+      );
     });
 
     socket.on("cancelTransaction", (_id) => {
       setTransactions((prevTransactions) =>
+        prevTransactions.filter((transaction) => transaction._id !== _id)
+      );
+      setFriendTransactions((prevTransactions) =>
         prevTransactions.filter((transaction) => transaction._id !== _id)
       );
     });
