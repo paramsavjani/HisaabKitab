@@ -87,6 +87,26 @@ const Transactions = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      const friendMain = activeFriends.find(
+        (friend) => friend.username === friendId
+      );
+      if (!friendMain) {
+        window.history.pushState({}, "", "/dashboard");
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }
+      if (userUsername !== user.username) {
+        window.history.pushState(
+          {},
+          "",
+          "/transactions/" + user.username + "--" + friendId
+        );
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }
+    }
+  });
+
   const handleButtonClick = (type) => {
     setTransactionType(type);
     setIsModalOpen(true);
@@ -111,21 +131,21 @@ const Transactions = () => {
     setFriend(() => friendMain);
 
     setFriendTransactions(() => {
-      const friendTransactions = transactions.filter(
+      const friendTransactions = transactions?.filter(
         (transaction) =>
-          (transaction.sender === user._id &&
-            transaction.receiver === friendMain._id) ||
-          (transaction.receiver === user._id &&
-            transaction.sender === friendMain._id)
+          (transaction.sender === user?._id &&
+            transaction.receiver === friendMain?._id) ||
+          (transaction.receiver === user?._id &&
+            transaction.sender === friendMain?._id)
       );
 
-      return friendTransactions.sort(
+      return friendTransactions?.sort(
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
       );
     });
 
     setActiveFriends((prevActiveFriends) => {
-      const updatedActiveFriends = prevActiveFriends.map((friend) => {
+      const updatedActiveFriends = prevActiveFriends?.map((friend) => {
         if (friend.username === friendId) {
           return {
             ...friend,
@@ -152,7 +172,7 @@ const Transactions = () => {
     }
 
     setActiveFriends((prevActiveFriends) => {
-      const updatedActiveFriends = prevActiveFriends.map((friend) => {
+      const updatedActiveFriends = prevActiveFriends?.map((friend) => {
         if (friend.username === friendId) {
           return {
             ...friend,
@@ -163,9 +183,6 @@ const Transactions = () => {
       });
       return updatedActiveFriends;
     });
-
-    console.log(accumulatedTotal);
-    console.log("hii");
 
     setTotal(() => accumulatedTotal);
   }, [userUsername, friendTransactions, setFriendTransactions]);
@@ -225,7 +242,7 @@ const Transactions = () => {
       {/* Transactions Section */}
       {
         <div className="flex-1 pt-24 md:pt-28 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
-          {transactions.length > 0 && (
+          {transactions?.length > 0 && (
             <div className="space-y-6">
               {Object.keys(groupedTransactions)
                 .sort((a, b) => new Date(a) - new Date(b)) // Sort dates in descending order
@@ -244,7 +261,7 @@ const Transactions = () => {
                     </div>
 
                     <div className="space-y-0">
-                      {groupedTransactions[date].map((transaction, index) => (
+                      {groupedTransactions[date]?.map((transaction, index) => (
                         <div
                           ref={
                             index === groupedTransactions[date].length - 1

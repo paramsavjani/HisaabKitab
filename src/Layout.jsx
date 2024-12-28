@@ -162,7 +162,7 @@ const Layout = () => {
         const path = action.notification.data.path;
 
         if (path) {
-          initializeApp();
+          await initializeApp();
           window.location.href = path;
         }
       }
