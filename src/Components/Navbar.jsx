@@ -183,7 +183,9 @@ function Navbar() {
       {/* Hamburger Menu Button */}
       <button
         className={`md:hidden text-white text-2xl p-4 fixed top-2 left-2 z-50 ${
-          menuOpen ? "hidden" : ""
+          menuOpen || window.location.pathname === "/split-expense"
+            ? "hidden"
+            : ""
         }`}
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label="Toggle navigation menu"

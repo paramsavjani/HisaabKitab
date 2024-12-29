@@ -31,7 +31,7 @@ const friends = [
 export default function ImprovedSplitExpense() {
   const [step, setStep] = useState("enterAmount");
   const [selectedFriends, setSelectedFriends] = useState([]);
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState("0");
   const [splitType, setSplitType] = useState("even");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
@@ -144,37 +144,55 @@ export default function ImprovedSplitExpense() {
     setSplitValues({});
   };
 
+  // Handle keyboard 'Enter' or 'Next' key press
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleContinue();
+    }
+  };
+
   const renderAmountInput = () => (
-    <div className="w-full h-full bg-black text-white flex flex-col justify-center items-center">
-      <div className="w-full max-w-md p-4">
-        <div className="rounded-lg p-6 mb-6">
+    <div className="w-full h-screen bg-black text-white flex flex-col justify-center items-center relative">
+      {/* Input Field */}
+      <div className="flex-grow flex items-center justify-center w-full p-4">
+        <div className="w-full max-w-md">
           <input
             ref={amountInputRef}
             type="number"
             inputMode="numeric"
             value={amount}
-            onChange={(e) =>
+            onChange={(e) => {
               setAmount((a) => {
-                if (e.target.value.length === 1 && e.target.value[0] === "0") {
-                  return "";
-                }
-                if (/[^0-9]/.test(e.target.value)) {
-                  return a;
-                }
-                if (e.target.value.length <= 10) {
-                  return e.target.value;
-                }
-                return a;
-              })
-            }
-            className="bg-transparent kranky-regular border-none text-white text-center text-4xl w-full font-bold focus:outline-none"
+                const input = e.target.value;
+
+                // Allow empty input or a single zero "0"
+                if (input === "0" || input === "") return "";
+
+                // Prevent multiple dots or any non-numeric characters (except for the dot)
+                if (/[^0-9.]/.test(input)) return a;
+
+                // Ensure there's only one dot in the input
+                if ((input.match(/\./g) || []).length > 1) return a;
+
+                // Limit input to 10 digits in total (before and after the dot)
+                if (input.replace(".", "").length > 6) return a;
+
+                return input;
+              });
+            }}
+            onKeyDown={handleKeyPress} // Keyboard event listener
+            className="bg-transparent kranky-regular border-none text-white text-center text-6xl w-full font-bold focus:outline-none"
           />
+          {error && (
+            <div className="text-red-500 text-center text-sm font-sans mt-2">
+              {error}
+            </div>
+          )}
         </div>
-        {error && (
-          <div className="text-red-500 text-center text-sm font-sans mb-4">
-            {error}
-          </div>
-        )}
+      </div>
+
+      {/* Continue Button (Sticky above keyboard) */}
+      <div className="w-full max-w-md p-4 fixed bottom-4">
         <button
           className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 text-base font-medium font-sans transition duration-300 ease-in-out"
           onClick={handleContinue}
@@ -204,6 +222,7 @@ export default function ImprovedSplitExpense() {
           <div className="text-2xl font-bold text-white font-sans text-center">
             ₹{amount}
           </div>
+          0{" "}
         </div>
         {error && (
           <div className="text-red-500 text-center text-sm font-sans mb-4">
@@ -266,6 +285,7 @@ export default function ImprovedSplitExpense() {
             >
               ₹{amount}
             </div>
+            0{" "}
           </div>
           <div className="flex justify-center mt-4">
             <input
@@ -297,8 +317,8 @@ export default function ImprovedSplitExpense() {
           </button>
           <button
             onClick={() => setSplitType("amount")}
-            className={`text-sm flex flex-col items-center ${
-              splitType === "amount" ? "text-blue-500" : "text-gray-400"
+            className0={`text-sm flex flex-col items-center ${
+              splitType === "amount" ? "text-blue-500" : "te0xt-gray-400"
             }`}
           >
             <DollarSign className="h-6 w-6 mb-1" />
@@ -349,7 +369,7 @@ export default function ImprovedSplitExpense() {
                 </div>
                 {splitType === "even" ? (
                   <span className="text-base text-white font-sans">
-                    ₹{(amount / selectedFriends.length).toFixed(2)}
+                    ₹{(amount / selectedFriends.length0).toFixed(2)}
                   </span>
                 ) : splitType === "shares" ? (
                   <div className="flex items-center">
