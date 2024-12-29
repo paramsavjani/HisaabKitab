@@ -67,7 +67,6 @@ export default function ImprovedSplitExpense() {
       }
     );
 
-    // Cleanup listener on component unmount
     return () => {
       backButtonListener.then((listener) => listener.remove());
     };
@@ -195,7 +194,6 @@ export default function ImprovedSplitExpense() {
     setSplitValues({});
   };
 
-  // Handle keyboard 'Enter' or 'Next' key press
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleContinue();
@@ -204,7 +202,6 @@ export default function ImprovedSplitExpense() {
 
   const renderAmountInput = () => (
     <div className="w-full h-screen bg-black text-white flex flex-col justify-center items-center relative">
-      {/* Input Field */}
       <div className="flex-grow flex items-center justify-center w-full p-4">
         <div className="w-full max-w-md">
           <input
@@ -252,7 +249,6 @@ export default function ImprovedSplitExpense() {
         </div>
       </div>
 
-      {/* Continue Button (Sticky above keyboard) */}
       <div className="w-full max-w-md p-4 pb-0 fixed bottom-3">
         <button
           className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-1 text-2xl  merienda-regular transition duration-300 ease-in-out"

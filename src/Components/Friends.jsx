@@ -8,7 +8,7 @@ function Friends() {
   const { user, activeFriends } = useContext(UserContext);
 
   useEffect(() => {
-    AOS.init({ duration: 1000 });
+    AOS.init({ duration: 700 });
   }, []);
 
   return (
@@ -17,15 +17,6 @@ function Friends() {
         Your Friends
       </h2>
 
-      {/* Error Handling
-      {error && (
-        <div
-          className="bg-red-500 text-white p-4 rounded-md mb-6 max-w-xl w-full"
-          data-aos="fade-up"
-        >
-          <strong>Error:</strong> {error}
-        </div>
-      )} */}
 
       {
         // Friend List
