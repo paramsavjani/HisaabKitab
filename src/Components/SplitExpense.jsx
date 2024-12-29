@@ -3,7 +3,12 @@ import { Menu, DollarSign, Percent, CheckCircle, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const friends = [
-  { id: 1, name: "You", avatar: "https://i.pravatar.cc/150?img=1" },
+  {
+    id: 1,
+    name: "You",
+    avatar:
+      "https://res.cloudinary.com/dso4amwem/image/upload/v1734950091/yhahgl9ogwk1i3iljimw.jpg",
+  },
   { id: 2, name: "Meet Vaghela", avatar: "https://i.pravatar.cc/150?img=2" },
   { id: 3, name: "Vivek Parmar", avatar: "https://i.pravatar.cc/150?img=3" },
   { id: 4, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },

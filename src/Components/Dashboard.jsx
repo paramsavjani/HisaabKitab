@@ -117,8 +117,9 @@ const Dashboard = () => {
                       <div className="w-12 h-12">
                         <img
                           src={
-                            friend.profilePicture ||
-                            "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                            friend.profilePicture
+                              ? `${friend.profilePicture}`
+                              : "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
                           }
                           alt={friend.username}
                           className="w-full h-full rounded-full object-cover"

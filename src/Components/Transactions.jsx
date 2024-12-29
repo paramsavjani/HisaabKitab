@@ -217,7 +217,7 @@ const Transactions = () => {
       <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
         <img
           src={
-            friend?.profilePicture ||
+            friend?.profilePicture ? `${friend?.profilePicture}` :
             "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
           }
           alt="Profile"
