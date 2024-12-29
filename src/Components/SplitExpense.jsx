@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
-import {
-  DollarSign,
-  Percent,
-  CheckCircle,
-  Users,
-  Plus,
-  Minus,
-} from "lucide-react";
+import { CheckCircle, Plus, Minus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./styles.css";
 import UserContext from "../context/UserContext";
@@ -24,6 +17,7 @@ export default function ImprovedSplitExpense() {
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [splitValues, setSplitValues] = useState({});
+  const [isSetValue, setIsSetValue] = useState({});
   const amountInputRef = useRef(null);
   const { activeFriends, user } = useContext(UserContext);
 
@@ -108,7 +102,7 @@ export default function ImprovedSplitExpense() {
     setSelectedFriends((prev) =>
       prev.some((f) => f._id === friend._id)
         ? prev.filter((f) => f._id !== friend._id)
-        : [...prev, friend, friend, friend, friend]
+        : [...prev, friend]
     );
   };
 
@@ -180,15 +174,9 @@ export default function ImprovedSplitExpense() {
         return;
       }
     }
-    console.log({
-      description,
-      amount,
-      splitType,
-      selectedFriends,
-      splitValues,
-    });
     alert("Split request submitted successfully!");
-    // Reset the form
+    window.history.pushState({}, "", "/dashboard");
+    window.dispatchEvent(new PopStateEvent("popstate"));
     setStep("enterAmount");
     setSelectedFriends([]);
     setAmount("");
@@ -215,33 +203,24 @@ export default function ImprovedSplitExpense() {
             onChange={(e) => {
               setAmount((a) => {
                 let input = e.target.value;
-
-                console.log(e.target.value);
-
-                // Allow empty input or a single zero "0"
                 if (input === "0" || input === "") return "";
-
                 if (input[0] === "0") {
                   input = input.slice(1);
                 }
-
                 if (input[0] === ".") {
                   input = "0" + input;
                 }
-
-                // Prevent multiple dots or any non-numeric characters (except for the dot)
+                if (input.includes(".")) {
+                  const [whole, decimal] = input.split(".");
+                  input = `${whole}.${decimal.slice(0, 2)}`;
+                }
                 if (/[^0-9.]/.test(input)) return a;
-
-                // Ensure there's only one dot in the input
                 if ((input.match(/\./g) || []).length > 1) return a;
-
-                // Limit input to 10 digits in total (before and after the dot)
-                if (input.replace(".", "").length > 6) return a;
-
+                if (input.split(".")[0].length > 6) return a;
                 return input;
               });
             }}
-            onKeyDown={handleKeyPress} // Keyboard event listener
+            onKeyDown={handleKeyPress}
             className="bg-transparent kranky-regular border-none text-white text-center text-6xl w-full font-bold focus:outline-none"
           />
           {error && (
@@ -373,21 +352,38 @@ export default function ImprovedSplitExpense() {
             <button
               key={type}
               onClick={() => setSplitType(type)}
-              className={`text-sm flex flex-col items-center space-y-1 ${
+              className={`relative text-sm flex flex-col items-center space-y-1 ${
                 splitType === type ? "text-blue-500" : "text-gray-400"
-              } transition-all duration-300`}
+              } group transition-all duration-300`}
             >
               {isTextIcon ? (
                 <span className="text-2xl">{icon}</span>
               ) : (
-                <img src={icon} className="w-7 h-7" alt={label} />
+                <img src={icon} className="w-7 h-7" alt={type} />
               )}
-              <span className="font-sans">{label}</span>
+              <span className="text-xs font-sans">{label}</span>
+              {/* Animated Underline */}
+              <span
+                className={`absolute bottom-0 left-0 w-full h-0.5 transform transition-transform duration-300 ${
+                  splitType === type
+                    ? "scale-x-100 bg-blue-500"
+                    : "scale-x-0 bg-transparent"
+                }`}
+              />
             </button>
           ))}
         </div>
+        <div className="text-lg text-center pt-2 pb-0 border-separate border-t border-gray-700 font-semibold text-white mb-2">
+          {splitType === "even"
+            ? "Split Evenly"
+            : splitType === "amount"
+            ? "Split by Amount"
+            : splitType === "shares"
+            ? "Split by Shares"
+            : "Split by Percentage"}
+        </div>
       </div>
-      <div className="flex-grow overflow-y-auto  border-separate border-t border-gray-700 px-4 pt-4">
+      <div className="flex-grow overflow-y-auto  px-4 pt-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={splitType}
@@ -395,7 +391,7 @@ export default function ImprovedSplitExpense() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="space-y-1"
+            className="space-y-2"
           >
             {selectedFriends.map((friend) => (
               <div
@@ -413,12 +409,33 @@ export default function ImprovedSplitExpense() {
                       className="rounded-full object-cover"
                     />
                   </div>
-                  <span className="text-sm text-white font-sans">
-                    {friend.name}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-md merienda-regular text-white font-sans">
+                      {friend.name}
+                    </span>
+                    <span
+                      className={`text-sm ${
+                        splitType === "shares"
+                          ? "merienda-regular text-green-500"
+                          : ""
+                      } font-sans`}
+                    >
+                      {splitType === "shares"
+                        ? `₹${(
+                            ((splitValues[friend._id] || "1") /
+                              selectedFriends.reduce(
+                                (acc, f) =>
+                                  acc + parseInt(splitValues[f._id] || "1"),
+                                0
+                              )) *
+                            amount
+                          ).toFixed(2)}`
+                        : ""}
+                    </span>
+                  </div>
                 </div>
                 {splitType === "even" ? (
-                  <span className="text-sm text-white font-sans">
+                  <span className="text-md kranky-regular font-semibold text-green-500">
                     ₹{(amount / selectedFriends.length).toFixed(2)}
                   </span>
                 ) : splitType === "shares" ? (
@@ -433,17 +450,14 @@ export default function ImprovedSplitExpense() {
                           ).toString()
                         )
                       }
-                      className="bg-gray-700 text-white px-2 py-1 rounded-l focus:outline-none hover:bg-gray-600"
+                      className="bg-gray-700 text-white rounded-full mr-1 px-1 py-1 focus:outline-none hover:bg-gray-600"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
                     <input
                       type="number"
                       value={splitValues[friend._id] || "1"}
-                      onChange={(e) =>
-                        handleSplitInput(friend._id, e.target.value)
-                      }
-                      className="bg-gray-700 text-white text-center w-10 py-1 focus:outline-none rounded-md"
+                      className="bg-gray-800 text-white text-center w-8 py-1 focus:outline-none rounded-md"
                     />
                     <button
                       onClick={() =>
@@ -454,15 +468,82 @@ export default function ImprovedSplitExpense() {
                           ).toString()
                         )
                       }
-                      className="bg-gray-700 text-white px-2 py-1 rounded-r focus:outline-none hover:bg-gray-600"
+                      className="bg-gray-700 text-white px-1 py-1 ml-1 rounded-full focus:outline-none hover:bg-gray-600"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
                   </div>
+                ) : splitType === "amount" ? (
+                  <div className="flex items-center text-green-500">
+                    <span className="mr-0 text-lg">₹</span>
+                    <input
+                      type="number"
+                      value={splitValues[friend._id] || ""}
+                      onChange={(e) => {
+                        let input = e.target.value;
+                        if (input === "0" || input === "");
+                        if (input[0] === "0") {
+                          input = input.slice(1);
+                        }
+                        if (input.includes(".")) {
+                          const [whole, decimal] = input.split(".");
+                          input = `${whole}.${decimal.slice(0, 2)}`;
+                        }
+                        if (/[^0-9.]/.test(input)) return;
+                        if ((input.match(/\./g) || []).length > 1) return;
+                        if (parseFloat(input) > parseFloat(amount)) return;
+
+                        let totalSplit = Object.values(splitValues).reduce(
+                          (sum, val) => sum + parseFloat(val || 0),
+                          0
+                        );
+
+                        console.log("totalSplit", totalSplit);
+
+                        totalSplit -= parseFloat(splitValues[friend._id] || 0);
+
+                        console.log("final total split", totalSplit);
+
+                        if (totalSplit + parseFloat(input) > parseFloat(amount))
+                          return;
+
+                        if (input.split(".")[0].length > 6) return;
+
+                        setIsSetValue[friend._id] = true;
+
+                        const totalUnChanged =
+                          selectedFriends.length -
+                          Object.keys(isSetValue).length;
+
+                        const remainingAmount = parseFloat(amount) - input;
+
+                        const newValue =
+                          parseFloat(remainingAmount) / totalUnChanged;
+
+                        console.log(newValue);
+
+                        selectedFriends.forEach((f) => {
+                          if (!isSetValue[f._id]) {
+                            setSplitValues((prev) => ({
+                              ...prev,
+                              [f._id]: newValue.toFixed(2),
+                            }));
+                          }
+                        });
+
+                        handleSplitInput(friend._id, input);
+                      }}
+                      className="bg-gray-800 text-green-500 kranky-regular text-lg font-semibold w-16 px-1 py-1 focus:outline-none"
+                      placeholder="0.00"
+                    />
+                    {splitType === "percentage" && (
+                      <span className="ml-1">%</span>
+                    )}
+                  </div>
                 ) : (
                   <div className="flex items-center">
                     {splitType !== "percentage" && (
-                      <span className="mr-2">₹</span>
+                      <span className="mr-0">₹</span>
                     )}
                     <input
                       type="number"
@@ -470,8 +551,8 @@ export default function ImprovedSplitExpense() {
                       onChange={(e) =>
                         handleSplitInput(friend._id, e.target.value)
                       }
-                      className="bg-gray-700 text-white text-sm w-16 px-2 py-1 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder={splitType === "percentage" ? "%" : "Amount"}
+                      className="bg-gray-800 text-white kranky-regular font-semibold w-16 px-2 py-1 focus:outline-none"
+                      placeholder={splitType === "percentage" ? "%" : ""}
                     />
                     {splitType === "percentage" && (
                       <span className="ml-1">%</span>
