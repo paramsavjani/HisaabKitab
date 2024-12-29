@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import {
   ArrowLeft,
   DollarSign,
@@ -10,23 +10,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import "./styles.css";
-
-const friends = [
-  {
-    id: 1,
-    name: "You",
-    avatar:
-      "https://res.cloudinary.com/dso4amwem/image/upload/v1734950091/yhahgl9ogwk1i3iljimw.jpg",
-  },
-  { id: 2, name: "Meet Vaghela", avatar: "https://i.pravatar.cc/150?img=2" },
-  { id: 3, name: "Vivek Parmar", avatar: "https://i.pravatar.cc/150?img=3" },
-  { id: 4, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 5, name: "Jane Smith", avatar: "https://i.pravatar.cc/150?img=5" },
-  { id: 6, name: "Alice Johnson", avatar: "https://i.pravatar.cc/150?img=6" },
-  { id: 7, name: "Bob Williams", avatar: "https://i.pravatar.cc/150?img=7" },
-  { id: 8, name: "Emma Brown", avatar: "https://i.pravatar.cc/150?img=8" },
-  { id: 9, name: "Charlie Davis", avatar: "https://i.pravatar.cc/150?img=9" },
-];
+import UserContext from "../context/UserContext";
 
 export default function ImprovedSplitExpense() {
   const [step, setStep] = useState("enterAmount");
@@ -37,6 +21,7 @@ export default function ImprovedSplitExpense() {
   const [error, setError] = useState("");
   const [splitValues, setSplitValues] = useState({});
   const amountInputRef = useRef(null);
+  const { activeFriends } = useContext(UserContext);
 
   useEffect(() => {
     if (step === "enterAmount" && amountInputRef.current) {
@@ -51,14 +36,14 @@ export default function ImprovedSplitExpense() {
       );
       const newSplitValues = {};
       selectedFriends.forEach((friend) => {
-        newSplitValues[friend.id] = evenSplit;
+        newSplitValues[friend._id] = evenSplit;
       });
       setSplitValues(newSplitValues);
     } else if (splitType === "percentage") {
       const newSplitValues = {};
       const evenPercentage = (100 / selectedFriends.length).toFixed(2);
       selectedFriends.forEach((friend) => {
-        newSplitValues[friend.id] = evenPercentage;
+        newSplitValues[friend._id] = evenPercentage;
       });
       setSplitValues(newSplitValues);
     } else {
@@ -68,23 +53,23 @@ export default function ImprovedSplitExpense() {
 
   const handleFriendSelection = (friend) => {
     setSelectedFriends((prev) =>
-      prev.some((f) => f.id === friend.id)
-        ? prev.filter((f) => f.id !== friend.id)
+      prev.some((f) => f._id === friend._id)
+        ? prev.filter((f) => f._id !== friend._id)
         : [...prev, friend]
     );
   };
 
-  const handleSplitInput = (id, value) => {
+  const handleSplitInput = (_id, value) => {
     if (splitType === "percentage") {
       const numValue = parseFloat(value);
       if (isNaN(numValue) || numValue < 0 || numValue > 100) return;
-      setSplitValues({ ...splitValues, [id]: value });
+      setSplitValues({ ...splitValues, [_id]: value });
     } else if (splitType === "shares") {
       const numValue = parseInt(value);
       if (isNaN(numValue) || numValue < 1) return;
-      setSplitValues({ ...splitValues, [id]: numValue.toString() });
+      setSplitValues({ ...splitValues, [_id]: numValue.toString() });
     } else {
-      setSplitValues({ ...splitValues, [id]: value });
+      setSplitValues({ ...splitValues, [_id]: value });
     }
   };
 
@@ -163,10 +148,16 @@ export default function ImprovedSplitExpense() {
             value={amount}
             onChange={(e) => {
               setAmount((a) => {
-                const input = e.target.value;
+                let input = e.target.value;
+
+                console.log(e.target.value);
 
                 // Allow empty input or a single zero "0"
                 if (input === "0" || input === "") return "";
+
+                if (input[0] === "0") {
+                  input = input.slice(1);
+                }
 
                 // Prevent multiple dots or any non-numeric characters (except for the dot)
                 if (/[^0-9.]/.test(input)) return a;
@@ -211,41 +202,45 @@ export default function ImprovedSplitExpense() {
           className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
         >
           <ArrowLeft className="mr-2" />
-          Back
         </button>
         <div className="text-xl font-semibold text-blue-500 font-sans flex-grow text-center">
           Select Friends
         </div>
       </div>
       <div className="p-4">
-        <div className="bg-gray-900 rounded-lg p-4 mb-4">
-          <div className="text-2xl font-bold text-white font-sans text-center">
+        <div className=" p- mb-4">
+          <div className="kranky-regular text-5xl text-white font-sans text-center">
             ₹{amount}
           </div>
-          0{" "}
         </div>
         {error && (
           <div className="text-red-500 text-center text-sm font-sans mb-4">
             {error}
           </div>
         )}
-        <div className="space-y-4 max-h-[calc(100vh-250px)] overflow-y-auto mb-4">
-          {friends.map((friend) => (
+        <div className="space-y-2 max-h-[calc(100vh-215px)] overflow-y-auto mb-4">
+          {activeFriends.map((friend) => (
             <motion.div
-              key={friend.id}
+              key={friend._id}
               className={`flex items-center space-x-4 p-4 rounded-lg cursor-pointer ${
-                selectedFriends.some((f) => f.id === friend.id)
+                selectedFriends.some((f) => f._id === friend._id)
                   ? "bg-gray-800"
-                  : "bg-gray-900 hover:bg-gray-800"
+                  : "bg-gray-900"
               }`}
               onClick={() => handleFriendSelection(friend)}
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
               <div className="relative h-12 w-12">
-                <img src={friend.avatar} alt="" className="rounded-full" />
-                {selectedFriends.some((f) => f.id === friend.id) && (
-                  <CheckCircle className="absolute -top-1 -right-1 h-5 w-5 text-blue-500 bg-white rounded-full" />
+                <img
+                  src={
+                    friend.profilePicture ||
+                    "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                  }
+                  alt=""
+                  className="rounded-full"
+                />
+                {selectedFriends.some((f) => f._id === friend._id) && (
+                  <CheckCircle className="absolute -top-1 -right-1 h-5 w-5 text-white-600 bg-blue-500 rounded-full" />
                 )}
               </div>
               <div className="flex-1">
@@ -255,7 +250,7 @@ export default function ImprovedSplitExpense() {
           ))}
         </div>
         <button
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 text-base font-medium font-sans transition duration-300 ease-in-out"
+          className="w-full md:max-w-[calc(100%-350px)] max-w-[calc(100%-30px)] fixed bottom-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 text-base font-medium font-sans transition duration-300 ease-in-out"
           onClick={handleContinue}
         >
           Continue
@@ -285,7 +280,6 @@ export default function ImprovedSplitExpense() {
             >
               ₹{amount}
             </div>
-            0{" "}
           </div>
           <div className="flex justify-center mt-4">
             <input
@@ -317,7 +311,7 @@ export default function ImprovedSplitExpense() {
           </button>
           <button
             onClick={() => setSplitType("amount")}
-            className0={`text-sm flex flex-col items-center ${
+            className={`text-sm flex flex-col items-center ${
               splitType === "amount" ? "text-blue-500" : "te0xt-gray-400"
             }`}
           >
@@ -356,7 +350,7 @@ export default function ImprovedSplitExpense() {
           >
             {selectedFriends.map((friend) => (
               <div
-                key={friend.id}
+                key={friend._id}
                 className="flex items-center justify-between gap-4 bg-gray-900 p-4 rounded-lg"
               >
                 <div className="flex items-center gap-4">
@@ -376,10 +370,10 @@ export default function ImprovedSplitExpense() {
                     <button
                       onClick={() =>
                         handleSplitInput(
-                          friend.id,
+                          friend._id,
                           Math.max(
                             1,
-                            parseInt(splitValues[friend.id] || "1") - 1
+                            parseInt(splitValues[friend._id] || "1") - 1
                           ).toString()
                         )
                       }
@@ -389,18 +383,18 @@ export default function ImprovedSplitExpense() {
                     </button>
                     <input
                       type="number"
-                      value={splitValues[friend.id] || "1"}
+                      value={splitValues[friend._id] || "1"}
                       onChange={(e) =>
-                        handleSplitInput(friend.id, e.target.value)
+                        handleSplitInput(friend._id, e.target.value)
                       }
                       className="bg-gray-800 text-white text-center w-12 py-1 focus:outline-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                     <button
                       onClick={() =>
                         handleSplitInput(
-                          friend.id,
+                          friend._id,
                           (
-                            parseInt(splitValues[friend.id] || "1") + 1
+                            parseInt(splitValues[friend._id] || "1") + 1
                           ).toString()
                         )
                       }
@@ -416,9 +410,9 @@ export default function ImprovedSplitExpense() {
                     )}
                     <input
                       type="number"
-                      value={splitValues[friend.id] || ""}
+                      value={splitValues[friend._id] || ""}
                       onChange={(e) =>
-                        handleSplitInput(friend.id, e.target.value)
+                        handleSplitInput(friend._id, e.target.value)
                       }
                       className="bg-gray-800 text-white text-base w-24 rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
                       placeholder={splitType === "percentage" ? "%" : "Amount"}
