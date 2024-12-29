@@ -13,6 +13,10 @@ const friends = [
   { id: 2, name: "Meet Vaghela", avatar: "https://i.pravatar.cc/150?img=2" },
   { id: 3, name: "Vivek Parmar", avatar: "https://i.pravatar.cc/150?img=3" },
   { id: 4, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 5, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 6, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 7, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 8, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
 ];
 
 export default function SplitExpense() {
@@ -45,6 +49,50 @@ export default function SplitExpense() {
     setStep("splitOptions");
   };
 
+  const handleInputChange = (friendId, value) => {
+    const parsedValue = parseFloat(value);
+
+    if (splitType === "percentage") {
+      if (parsedValue > 100 || isNaN(parsedValue)) {
+        setError(
+          "Percentage for each friend must be less than or equal to 100."
+        );
+        return;
+      }
+      const updatedSplits = { ...splits, [friendId]: parsedValue };
+      const totalPercentage = Object.values(updatedSplits).reduce(
+        (acc, val) => acc + (isNaN(val) ? 0 : val),
+        0
+      );
+      if (totalPercentage > 100) {
+        setError("Total percentage cannot exceed 100.");
+        return;
+      }
+      setSplits(updatedSplits);
+      setError("");
+    } else {
+      setSplits({
+        ...splits,
+        [friendId]: isNaN(parsedValue) ? 0 : parsedValue,
+      });
+    }
+  };
+
+  const handleSubmit = () => {
+    if (splitType === "percentage") {
+      const totalPercentage = Object.values(splits).reduce(
+        (acc, val) => acc + (isNaN(val) ? 0 : val),
+        0
+      );
+      if (totalPercentage !== 100) {
+        setError("Total percentage must equal 100.");
+        return;
+      }
+    }
+    setError("");
+    alert("Split request submitted successfully!");
+  };
+
   const renderFriendSelection = () => (
     <div className="w-full h-full bg-black border-gray-800 shadow-lg lg:rounded-l-3xl lg:rounded-r-none">
       <div className="p-6 text-center">
@@ -72,9 +120,9 @@ export default function SplitExpense() {
           {friends.map((friend) => (
             <motion.div
               key={friend.id}
-              className={`flex items-center space-x-4 p-4 rounded-lg cursor-pointer transition-colors duration-200 ${
+              className={`flex items-center space-x-4 p-4 rounded-lg cursor-pointer transition-all duration-200 shadow-md ${
                 selectedFriends.some((f) => f.id === friend.id)
-                  ? "bg-gray-800"
+                  ? "bg-blue-600 border border-blue-400"
                   : "bg-gray-900 hover:bg-gray-800"
               }`}
               onClick={() => handleFriendSelection(friend)}
@@ -84,17 +132,17 @@ export default function SplitExpense() {
               <div className="relative h-12 w-12">
                 <img src={friend.avatar} alt="" className="rounded-full" />
                 {selectedFriends.some((f) => f.id === friend.id) && (
-                  <CheckCircle className="absolute -top-2 -right-2 h-5 w-5 text-blue-500" />
+                  <CheckCircle className="absolute -top-2 -right-2 h-5 w-5 text-white" />
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-white text-lg">{friend.name}</p>
+                <p className="text-white text-lg font-medium">{friend.name}</p>
               </div>
             </motion.div>
           ))}
         </div>
         <button
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-4 text-lg font-semibold transition-colors duration-200"
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-full py-4 text-lg font-semibold shadow-lg transition-transform duration-200 hover:scale-105"
           onClick={handleContinue}
         >
           Continue
@@ -110,9 +158,8 @@ export default function SplitExpense() {
           className="h-6 w-6 cursor-pointer text-gray-400 hover:text-white transition-colors duration-200"
           onClick={() => setStep("selectFriends")}
         />
-        <MoreVertical className="h-6 w-6 text-gray-400" />
       </div>
-      <div className="px-6 space-y-8">
+      <div className="px-4 space-y-6">
         <div className="text-center space-y-2">
           <div className="text-gray-400 text-lg">Total</div>
           <div className="text-5xl md:text-6xl font-light text-white">
@@ -125,7 +172,7 @@ export default function SplitExpense() {
             placeholder="What's this for?"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="bg-gray-900 text-center rounded-full px-6 py-3 text-sm md:text-base w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+            className="bg-gray-800 text-center rounded-full px- py-1 text-sm md:text-base w-36 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
           />
         </div>
         <div className="flex justify-around border-b border-gray-800 pb-2">
@@ -162,7 +209,17 @@ export default function SplitExpense() {
             <Percent className="h-6 w-6 md:h-8 md:w-8" />
           </button>
         </div>
-        <div className="pb-24 max-h-[calc(100vh-400px)] overflow-y-auto">
+        <div className="space-y-0 ">
+          {splitType === "even"
+            ? "Split evenly"
+            : splitType === "time"
+            ? "split by shares"
+            : splitType === "percentage"
+            ? "split by percentage"
+            : "split by amount"}
+        </div>
+
+        <div className="b-24 max-h-[calc(100vh-370px)] overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={splitType}
@@ -180,17 +237,30 @@ export default function SplitExpense() {
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <div className="h-12 w-12">
-                          <img src={friend.avatar} alt="" />
+                          <img
+                            src={friend.avatar}
+                            alt=""
+                            className="rounded-full"
+                          />
                         </div>
                       </div>
-                      <span className="text-base md:text-lg">
+                      <span className="text-base md:text-lg text-white">
                         {friend.name}
                       </span>
                     </div>
                     <div>
-                      {splitType === "even"
-                        ? `₹${(amount / selectedFriends.length).toFixed(2)}`
-                        : splitType}
+                      {splitType === "even" ? (
+                        `₹${(amount / selectedFriends.length).toFixed(2)}`
+                      ) : (
+                        <input
+                          type="number"
+                          className="bg-gray-900 text-center rounded-lg px-3 mr-2 py-1 text-sm w-24 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={splits[friend.id] || ""}
+                          onChange={(e) =>
+                            handleInputChange(friend.id, e.target.value)
+                          }
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -199,9 +269,13 @@ export default function SplitExpense() {
           </AnimatePresence>
         </div>
       </div>
-      <div className="p-6">
-        <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-4 text-lg">
-          Make Request
+      <div className="w-full fixed bottom-0 right-0 p-3 bg-black border-t border-gray-800">
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+        <button
+          className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white py-2 text-lg font-semibold rounded-full shadow-lg transition-transform duration-200 hover:scale-105"
+          onClick={handleSubmit}
+        >
+          Submit Request
         </button>
       </div>
     </div>

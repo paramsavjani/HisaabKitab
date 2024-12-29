@@ -160,7 +160,6 @@ const Layout = () => {
           const path = action.notification.data.path;
 
           if (path) {
-            // await initializeApp();
             window.location.href = path;
           }
         }
