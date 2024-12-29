@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Frijole&family=Kranky&family=Lobster&family=Merienda:wght@300..900&family=Mystery+Quest&family=Pacifico&family=Ponnala&family=Teko:wght@300..700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Agu+Display&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Agu+Display&family=Fredericka+the+Great&family=Griffy&family=Henny+Penny&family=Princess+Sofia&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Agu+Display&family=Fredericka+the+Great&family=Griffy&family=Henny+Penny&family=Kalam:wght@300;400;700&family=Princess+Sofia&display=swap');
 
 .agu-display-regular {
   font-family: "Agu Display", serif;
@@ -76,6 +76,21 @@
   font-weight: 400;
   font-style: normal;
 }
+
+
+.kalam-regular {
+  font-family: "Kalam", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.kalam-bold {
+  font-family: "Kalam", serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+
 
 .teko-regular {
   font-family: "Teko", serif;
@@ -422,3 +437,4 @@
   background-clip: unset;
   -webkit-text-fill-color: unset;
 }
+

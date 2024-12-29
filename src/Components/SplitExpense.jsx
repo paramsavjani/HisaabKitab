@@ -57,8 +57,9 @@ export default function ImprovedSplitExpense() {
             setStep("selectFriends");
           } else if (step === "selectFriends") {
             setStep("enterAmount");
-          } else {
-            window.history.back();
+          } else if (step === "enterAmount") {
+            window.history.pushState({}, "", "/dashboard");
+            window.dispatchEvent(new PopStateEvent("popstate"));
           }
         } else {
           App.exitApp();
@@ -270,8 +271,8 @@ export default function ImprovedSplitExpense() {
           onClick={() => setStep("enterAmount")}
           className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
         ></button>
-        <div className="merienda-regular text-transparent bg-gradient-to-r from-blue-400 bg-clip-text to-green-400 text-3xl pt-2 font-semibold font-sans flex-grow text-center">
-          Select Friends
+        <div className="kalam-bold text-transparent bg-gradient-to-r from-blue-400 bg-clip-text to-green-400 text-4xl pt-2 font-semibold font-sans flex-grow text-center">
+          हिस्सेदार Kaun?
         </div>
       </div>
       <div className="p-4">
