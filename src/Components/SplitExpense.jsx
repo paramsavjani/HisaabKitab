@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import {
-  ArrowLeft,
   DollarSign,
   Percent,
   CheckCircle,
@@ -12,6 +11,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./styles.css";
 import UserContext from "../context/UserContext";
 import { App } from "@capacitor/app";
+// import equal from "../assets/icons/balance (1).png";
+import percentage from "../assets/icons/money-bag.png";
+import sharing from "../assets/icons/sharing.png";
+import money from "../assets/icons/dollar.png";
 
 export default function ImprovedSplitExpense() {
   const [step, setStep] = useState("enterAmount");
@@ -105,7 +108,7 @@ export default function ImprovedSplitExpense() {
     setSelectedFriends((prev) =>
       prev.some((f) => f._id === friend._id)
         ? prev.filter((f) => f._id !== friend._id)
-        : [...prev, friend]
+        : [...prev, friend, friend, friend, friend]
     );
   };
 
@@ -330,26 +333,14 @@ export default function ImprovedSplitExpense() {
 
   const renderSplitOptions = () => (
     <div className="w-full h-full bg-black text-white flex flex-col">
-      <div className="flex-shrink-0">
-        <div className="flex justify-between items-center p-4">
-          <button
-            onClick={() => setStep("selectFriends")}
-            className="md:flex hidden text-blue-500 hover:text-blue-400 transition-colors duration-200 items-center"
-          >
-            <ArrowLeft className="mr-2" />
-            Back
-          </button>
-        </div>
-        <div className="px-4 space-y-4">
+      <div className="flex-shrink-0 pt-10">
+        <div className="px-4 space-y-3">
           <div className="text-center space-y-1">
-            <div
-              className="text-6xl font-bold text-white font-sans"
-              style={{ fontFamily: "Inter, sans-serif" }}
-            >
-              ₹{amount}
+            <div className="text-5xl kranky-regular font-bold text-white font-sans">
+              ₹{parseFloat(amount).toFixed(2)}
             </div>
           </div>
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center">
             <input
               type="text"
               placeholder="What's this for?"
@@ -359,54 +350,44 @@ export default function ImprovedSplitExpense() {
                   setDescription(e.target.value);
                 }
               }}
-              maxLength={30}
-              className="bg-gray-900 text-center rounded-full px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans placeholder-gray-500 transition-all duration-300"
+              // maxLength={30}
+              className="bg-gray-800 merienda-regular text-center rounded-2xl px-3 py-0 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition-all duration-300"
               style={{
-                width: `${Math.max(10, Math.min(30, description.length))}ch`,
+                width: `${Math.max(16, description.length)}ch`,
               }}
             />
           </div>
         </div>
-        <div className="flex justify-around pb-2 border-b border-gray-800 mt-4">
-          <button
-            onClick={() => setSplitType("even")}
-            className={`text-sm flex flex-col items-center ${
-              splitType === "even" ? "text-blue-500" : "text-gray-400"
-            }`}
-          >
-            <span className="text-2xl mb-1">⚖️</span>
-            <span className="font-sans">Even</span>
-          </button>
-          <button
-            onClick={() => setSplitType("amount")}
-            className={`text-sm flex flex-col items-center ${
-              splitType === "amount" ? "text-blue-500" : "te0xt-gray-400"
-            }`}
-          >
-            <DollarSign className="h-6 w-6 mb-1" />
-            <span className="font-sans">Amount</span>
-          </button>
-          <button
-            onClick={() => setSplitType("shares")}
-            className={`text-sm flex flex-col items-center ${
-              splitType === "shares" ? "text-blue-500" : "text-gray-400"
-            }`}
-          >
-            <Users className="h-6 w-6 mb-1" />
-            <span className="font-sans">Shares</span>
-          </button>
-          <button
-            onClick={() => setSplitType("percentage")}
-            className={`text-sm flex flex-col items-center ${
-              splitType === "percentage" ? "text-blue-500" : "text-gray-400"
-            }`}
-          >
-            <Percent className="h-6 w-6 mb-1" />
-            <span className="font-sans">Percent</span>
-          </button>
+        <div className="flex justify-around pb-4 mt-5">
+          {[
+            { type: "even", icon: "⚖️", label: "Even", isTextIcon: true },
+            { type: "amount", icon: money, label: "Amount", isImage: true },
+            { type: "shares", icon: sharing, label: "Shares", isImage: true },
+            {
+              type: "percentage",
+              icon: percentage,
+              label: "Percent",
+              isImage: true,
+            },
+          ].map(({ type, icon, label, isTextIcon }) => (
+            <button
+              key={type}
+              onClick={() => setSplitType(type)}
+              className={`text-sm flex flex-col items-center space-y-1 ${
+                splitType === type ? "text-blue-500" : "text-gray-400"
+              } transition-all duration-300`}
+            >
+              {isTextIcon ? (
+                <span className="text-2xl">{icon}</span>
+              ) : (
+                <img src={icon} className="w-7 h-7" alt={label} />
+              )}
+              <span className="font-sans">{label}</span>
+            </button>
+          ))}
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto px-4 py-2">
+      <div className="flex-grow overflow-y-auto px-4 py-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={splitType}
@@ -414,24 +395,31 @@ export default function ImprovedSplitExpense() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="space-y-4"
+            className="space-y-1"
           >
             {selectedFriends.map((friend) => (
               <div
                 key={friend._id}
-                className="flex items-center justify-between gap-4 bg-gray-900 p-4 rounded-lg"
+                className="flex items-center justify-between gap-4 bg-gray-800 p-3 rounded-lg shadow-md"
               >
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12">
-                    <img src={friend.avatar} alt="" className="rounded-full" />
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10">
+                    <img
+                      src={
+                        friend.profilePicture ||
+                        "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                      }
+                      alt=""
+                      className="rounded-full object-cover"
+                    />
                   </div>
-                  <span className="text-base text-white font-sans">
+                  <span className="text-sm text-white font-sans">
                     {friend.name}
                   </span>
                 </div>
                 {splitType === "even" ? (
-                  <span className="text-base text-white font-sans">
-                    ₹{(amount / selectedFriends.length0).toFixed(2)}
+                  <span className="text-sm text-white font-sans">
+                    ₹{(amount / selectedFriends.length).toFixed(2)}
                   </span>
                 ) : splitType === "shares" ? (
                   <div className="flex items-center">
@@ -445,7 +433,7 @@ export default function ImprovedSplitExpense() {
                           ).toString()
                         )
                       }
-                      className="bg-gray-800 text-white px-2 py-1 rounded-l focus:outline-none"
+                      className="bg-gray-700 text-white px-2 py-1 rounded-l focus:outline-none hover:bg-gray-600"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
@@ -455,7 +443,7 @@ export default function ImprovedSplitExpense() {
                       onChange={(e) =>
                         handleSplitInput(friend._id, e.target.value)
                       }
-                      className="bg-gray-800 text-white text-center w-12 py-1 focus:outline-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="bg-gray-700 text-white text-center w-10 py-1 focus:outline-none rounded-md"
                     />
                     <button
                       onClick={() =>
@@ -466,7 +454,7 @@ export default function ImprovedSplitExpense() {
                           ).toString()
                         )
                       }
-                      className="bg-gray-800 text-white px-2 py-1 rounded-r focus:outline-none"
+                      className="bg-gray-700 text-white px-2 py-1 rounded-r focus:outline-none hover:bg-gray-600"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
@@ -482,7 +470,7 @@ export default function ImprovedSplitExpense() {
                       onChange={(e) =>
                         handleSplitInput(friend._id, e.target.value)
                       }
-                      className="bg-gray-800 text-white text-base w-24 rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
+                      className="bg-gray-700 text-white text-sm w-16 px-2 py-1 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder={splitType === "percentage" ? "%" : "Amount"}
                     />
                     {splitType === "percentage" && (
@@ -497,7 +485,7 @@ export default function ImprovedSplitExpense() {
       </div>
       <div className="flex-shrink-0 p-4">
         <button
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 text-base font-medium font-sans rounded-lg transition duration-300 ease-in-out"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 text-sm font-medium font-sans rounded-lg transition duration-300 ease-in-out shadow-md"
           onClick={handleSubmit}
         >
           Submit Request
