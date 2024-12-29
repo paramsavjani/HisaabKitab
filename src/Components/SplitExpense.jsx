@@ -32,7 +32,7 @@ export default function ImprovedSplitExpense() {
   }, [activeFriends]);
 
   useEffect(() => {
-    if (step === "splitExpense") {
+    if (step === "splitExpense" || step === "selectFriends") {
       window.isOnSplitExpense = true;
     } else {
       window.isOnSplitExpense = false;
@@ -247,7 +247,7 @@ export default function ImprovedSplitExpense() {
       </div>
 
       {/* Continue Button (Sticky above keyboard) */}
-      <div className="w-full max-w-md p-4 fixed bottom-4">
+      <div className="w-full max-w-md p-4 pb-0 fixed bottom-2">
         <button
           className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-1 text-2xl  merienda-regular transition duration-300 ease-in-out"
           onClick={handleContinue}
