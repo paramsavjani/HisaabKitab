@@ -23,9 +23,8 @@ export default function ImprovedSplitExpense() {
   const amountInputRef = useRef(null);
   const { activeFriends } = useContext(UserContext);
 
-
   useEffect(() => {
-    if(activeFriends.length === 0) {
+    if (activeFriends.length === 0) {
       window.history.pushState({}, "", "/dashboard");
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
@@ -85,6 +84,21 @@ export default function ImprovedSplitExpense() {
     if (step === "enterAmount") {
       if (!amount) {
         setError("Please enter an amount.");
+        setTimeout(() => setError(""), 800);
+        return;
+      }
+      if (parseFloat(amount) <= 0) {
+        setError("Amount must be greater than zero.");
+        setTimeout(() => setError(""), 800);
+        return;
+      }
+      if (parseFloat(amount) > 1000000) {
+        setError("Amount must be less than 1,000,000.");
+        setTimeout(() => setError(""), 800);
+        return;
+      }
+      if (isNaN(amount)) {
+        setError("Amount must be a number.");
         setTimeout(() => setError(""), 800);
         return;
       }
@@ -165,6 +179,10 @@ export default function ImprovedSplitExpense() {
 
                 if (input[0] === "0") {
                   input = input.slice(1);
+                }
+
+                if (input[0] === ".") {
+                  input = "0" + input;
                 }
 
                 // Prevent multiple dots or any non-numeric characters (except for the dot)
