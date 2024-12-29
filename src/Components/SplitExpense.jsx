@@ -333,7 +333,7 @@ export default function ImprovedSplitExpense() {
 
   const renderSplitOptions = () => (
     <div className="w-full h-full bg-black text-white flex flex-col">
-      <div className="flex-shrink-0 pt-10">
+      <div className="flex-shrink-0 pt-14">
         <div className="px-4 space-y-3">
           <div className="text-center space-y-1">
             <div className="text-5xl kranky-regular font-bold text-white font-sans">
@@ -351,14 +351,14 @@ export default function ImprovedSplitExpense() {
                 }
               }}
               // maxLength={30}
-              className="bg-gray-800 merienda-regular text-center rounded-2xl px-3 py-0 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition-all duration-300"
+              className="bg-gray-800 merienda-regular text-center rounded-2xl px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition-all duration-300"
               style={{
                 width: `${Math.max(16, description.length)}ch`,
               }}
             />
           </div>
         </div>
-        <div className="flex justify-around pb-4 mt-5">
+        <div className="flex justify-around pb-1 mt-5">
           {[
             { type: "even", icon: "⚖️", label: "Even", isTextIcon: true },
             { type: "amount", icon: money, label: "Amount", isImage: true },
@@ -387,7 +387,7 @@ export default function ImprovedSplitExpense() {
           ))}
         </div>
       </div>
-      <div className="flex-grow overflow-y-auto px-4 py-0">
+      <div className="flex-grow overflow-y-auto  border-separate border-t border-gray-700 px-4 pt-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={splitType}
