@@ -25,15 +25,11 @@ import {
 import Dashboard from "./Components/Dashboard";
 
 import { App } from "@capacitor/app";
-// Main back button listener (index.js)
 App.addListener("backButton", ({ canGoBack }) => {
-  // Check if we're on the "splitExpense" step
   if (window.isOnSplitExpense) {
-    // If we're on the splitExpense page, do not trigger the default behavior
-    return; // Bypass the default back button action
+    return;
   }
 
-  // Default back button action
   if (canGoBack) {
     if (window.location.pathname === "/dashboard") {
       App.exitApp();
@@ -42,7 +38,6 @@ App.addListener("backButton", ({ canGoBack }) => {
       window.location.pathname === "/friends" ||
       window.location.pathname === "/incoming-requests" ||
       window.location.pathname === "/split-expense" ||
-      window.location.pathname === "/transactions" ||
       window.location.pathname === "/about-us" ||
       window.location.pathname === "/features"
     ) {

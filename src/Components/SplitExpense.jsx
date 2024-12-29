@@ -32,18 +32,16 @@ export default function ImprovedSplitExpense() {
   }, [activeFriends]);
 
   useEffect(() => {
-    // Set a flag when the user is on the "splitExpense" step
     if (step === "splitExpense") {
       window.isOnSplitExpense = true;
     } else {
       window.isOnSplitExpense = false;
     }
 
-    // Cleanup: revert the flag when the component is unmounted
     return () => {
-      window.isOnSplitExpense = false; // Ensure we revert the flag when the component is removed
+      window.isOnSplitExpense = false;
     };
-  }, [step]); // Ensure this runs every time the step changes
+  }, [step]);
 
   useEffect(() => {
     const backButtonListener = App.addListener(
@@ -65,7 +63,7 @@ export default function ImprovedSplitExpense() {
 
     // Cleanup listener on component unmount
     return () => {
-      backButtonListener.remove(); // Remove the back button listener
+      backButtonListener.then((listener) => listener.remove());
     };
   }, [step]);
 
@@ -73,6 +71,7 @@ export default function ImprovedSplitExpense() {
     if (step === "enterAmount" && amountInputRef.current) {
       amountInputRef.current.focus();
     }
+    setError("");
   }, [step]);
 
   useEffect(() => {
@@ -265,10 +264,8 @@ export default function ImprovedSplitExpense() {
         <button
           onClick={() => setStep("enterAmount")}
           className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
-        >
-          <ArrowLeft className="mr-2" />
-        </button>
-        <div className="text-xl font-semibold text-blue-500 font-sans flex-grow text-center">
+        ></button>
+        <div className="text-3xl pt-2 font-semibold text-blue-500 font-sans flex-grow text-center">
           Select Friends
         </div>
       </div>
@@ -330,7 +327,7 @@ export default function ImprovedSplitExpense() {
         <div className="flex justify-between items-center p-4">
           <button
             onClick={() => setStep("selectFriends")}
-            className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
+            className="md:flex hidden text-blue-500 hover:text-blue-400 transition-colors duration-200 items-center"
           >
             <ArrowLeft className="mr-2" />
             Back
@@ -338,7 +335,6 @@ export default function ImprovedSplitExpense() {
         </div>
         <div className="px-4 space-y-4">
           <div className="text-center space-y-1">
-            <div className="text-gray-400 text-sm font-sans">Total</div>
             <div
               className="text-6xl font-bold text-white font-sans"
               style={{ fontFamily: "Inter, sans-serif" }}
