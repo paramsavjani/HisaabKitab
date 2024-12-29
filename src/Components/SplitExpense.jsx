@@ -1,6 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Menu, DollarSign, Percent, CheckCircle, Users } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  ArrowLeft,
+  DollarSign,
+  Percent,
+  CheckCircle,
+  Users,
+  Plus,
+  Minus,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import "./styles.css";
 
 const friends = [
   {
@@ -12,21 +21,28 @@ const friends = [
   { id: 2, name: "Meet Vaghela", avatar: "https://i.pravatar.cc/150?img=2" },
   { id: 3, name: "Vivek Parmar", avatar: "https://i.pravatar.cc/150?img=3" },
   { id: 4, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 5, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 6, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 7, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 8, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
-  { id: 9, name: "John Doe", avatar: "https://i.pravatar.cc/150?img=4" },
+  { id: 5, name: "Jane Smith", avatar: "https://i.pravatar.cc/150?img=5" },
+  { id: 6, name: "Alice Johnson", avatar: "https://i.pravatar.cc/150?img=6" },
+  { id: 7, name: "Bob Williams", avatar: "https://i.pravatar.cc/150?img=7" },
+  { id: 8, name: "Emma Brown", avatar: "https://i.pravatar.cc/150?img=8" },
+  { id: 9, name: "Charlie Davis", avatar: "https://i.pravatar.cc/150?img=9" },
 ];
 
 export default function ImprovedSplitExpense() {
-  const [step, setStep] = useState("selectFriends");
+  const [step, setStep] = useState("enterAmount");
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [amount, setAmount] = useState("");
   const [splitType, setSplitType] = useState("even");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
   const [splitValues, setSplitValues] = useState({});
+  const amountInputRef = useRef(null);
+
+  useEffect(() => {
+    if (step === "enterAmount" && amountInputRef.current) {
+      amountInputRef.current.focus();
+    }
+  }, [step]);
 
   useEffect(() => {
     if (splitType === "even" && amount && selectedFriends.length > 0) {
@@ -38,6 +54,15 @@ export default function ImprovedSplitExpense() {
         newSplitValues[friend.id] = evenSplit;
       });
       setSplitValues(newSplitValues);
+    } else if (splitType === "percentage") {
+      const newSplitValues = {};
+      const evenPercentage = (100 / selectedFriends.length).toFixed(2);
+      selectedFriends.forEach((friend) => {
+        newSplitValues[friend.id] = evenPercentage;
+      });
+      setSplitValues(newSplitValues);
+    } else {
+      setSplitValues({});
     }
   }, [splitType, amount, selectedFriends]);
 
@@ -50,29 +75,53 @@ export default function ImprovedSplitExpense() {
   };
 
   const handleSplitInput = (id, value) => {
-    setSplitValues((prev) => ({ ...prev, [id]: value }));
+    if (splitType === "percentage") {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue < 0 || numValue > 100) return;
+      setSplitValues({ ...splitValues, [id]: value });
+    } else if (splitType === "shares") {
+      const numValue = parseInt(value);
+      if (isNaN(numValue) || numValue < 1) return;
+      setSplitValues({ ...splitValues, [id]: numValue.toString() });
+    } else {
+      setSplitValues({ ...splitValues, [id]: value });
+    }
   };
 
   const handleContinue = () => {
-    if (!amount) {
-      setError("Please enter an amount.");
-      return;
+    if (step === "enterAmount") {
+      if (!amount) {
+        setError("Please enter an amount.");
+        setTimeout(() => setError(""), 800);
+        return;
+      }
+      setError("");
+      setStep("selectFriends");
+    } else if (step === "selectFriends") {
+      if (selectedFriends.length < 1) {
+        setError("Please select at least one friend.");
+        return;
+      }
+      setError("");
+      setStep("splitExpense");
     }
-    if (selectedFriends.length < 2) {
-      setError("Please select at least two friends.");
-      return;
-    }
-    setError("");
-    setStep("splitOptions");
   };
 
   const handleSubmit = () => {
-    if (splitType !== "even") {
+    if (splitType === "percentage") {
+      const totalPercentage = Object.values(splitValues).reduce(
+        (sum, val) => sum + parseFloat(val || 0),
+        0
+      );
+      if (Math.abs(totalPercentage - 100) > 0.01) {
+        setError("Total percentage must equal 100%.");
+        return;
+      }
+    } else if (splitType !== "even") {
       const totalSplit = Object.values(splitValues).reduce(
         (sum, val) => sum + parseFloat(val || 0),
         0
       );
-
       if (Math.abs(totalSplit - parseFloat(amount)) > 0.01) {
         setError("Split values do not add up to the total amount.");
         return;
@@ -87,7 +136,7 @@ export default function ImprovedSplitExpense() {
     });
     alert("Split request submitted successfully!");
     // Reset the form
-    setStep("selectFriends");
+    setStep("enterAmount");
     setSelectedFriends([]);
     setAmount("");
     setSplitType("even");
@@ -95,29 +144,73 @@ export default function ImprovedSplitExpense() {
     setSplitValues({});
   };
 
-  const renderFriendSelection = () => (
-    <div className="w-full h-full bg-black text-white">
-      <div className="p-4 text-center">
-        <div className="text-xl font-semibold text-blue-500 font-sans">
-          Split Expense
-        </div>
-      </div>
-      <div className="space-y-6 p-4">
-        <div>
+  const renderAmountInput = () => (
+    <div className="w-full h-full bg-black text-white flex flex-col justify-center items-center">
+      <div className="w-full max-w-md p-4">
+        <div className="rounded-lg p-6 mb-6">
           <input
+            ref={amountInputRef}
             type="number"
+            inputMode="numeric"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="Enter total amount"
-            className="bg-gray-900 border border-gray-800 text-white text-center text-2xl rounded-lg p-4 w-full font-sans"
+            onChange={(e) =>
+              setAmount((a) => {
+                if (e.target.value.length === 1 && e.target.value[0] === "0") {
+                  return "";
+                }
+                if (/[^0-9]/.test(e.target.value)) {
+                  return a;
+                }
+                if (e.target.value.length <= 10) {
+                  return e.target.value;
+                }
+                return a;
+              })
+            }
+            className="bg-transparent kranky-regular border-none text-white text-center text-4xl w-full font-bold focus:outline-none"
           />
         </div>
         {error && (
-          <div className="text-red-500 text-center text-sm font-sans">
+          <div className="text-red-500 text-center text-sm font-sans mb-4">
             {error}
           </div>
         )}
-        <div className="space-y-4 max-h-[calc(100vh-300px)] overflow-y-auto">
+        <button
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 text-base font-medium font-sans transition duration-300 ease-in-out"
+          onClick={handleContinue}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderFriendSelection = () => (
+    <div className="w-full h-full bg-black text-white">
+      <div className="p-4 flex items-center">
+        <button
+          onClick={() => setStep("enterAmount")}
+          className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
+        >
+          <ArrowLeft className="mr-2" />
+          Back
+        </button>
+        <div className="text-xl font-semibold text-blue-500 font-sans flex-grow text-center">
+          Select Friends
+        </div>
+      </div>
+      <div className="p-4">
+        <div className="bg-gray-900 rounded-lg p-4 mb-4">
+          <div className="text-2xl font-bold text-white font-sans text-center">
+            ₹{amount}
+          </div>
+        </div>
+        {error && (
+          <div className="text-red-500 text-center text-sm font-sans mb-4">
+            {error}
+          </div>
+        )}
+        <div className="space-y-4 max-h-[calc(100vh-250px)] overflow-y-auto mb-4">
           {friends.map((friend) => (
             <motion.div
               key={friend.id}
@@ -153,24 +246,46 @@ export default function ImprovedSplitExpense() {
   );
 
   const renderSplitOptions = () => (
-    <div className="w-full h-full bg-black text-white">
-      <div className="pt-20 px-4 space-y-6 pb-24">
-        <div className="text-center space-y-1">
-          <div className="text-gray-400 text-sm font-sans">Total</div>
-          <div className="text-4xl font-light text-white font-sans">
-            ₹{amount}
+    <div className="w-full h-full bg-black text-white flex flex-col">
+      <div className="flex-shrink-0">
+        <div className="flex justify-between items-center p-4">
+          <button
+            onClick={() => setStep("selectFriends")}
+            className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
+          >
+            <ArrowLeft className="mr-2" />
+            Back
+          </button>
+        </div>
+        <div className="px-4 space-y-4">
+          <div className="text-center space-y-1">
+            <div className="text-gray-400 text-sm font-sans">Total</div>
+            <div
+              className="text-6xl font-bold text-white font-sans"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            >
+              ₹{amount}
+            </div>
+          </div>
+          <div className="flex justify-center mt-4">
+            <input
+              type="text"
+              placeholder="What's this for?"
+              value={description}
+              onChange={(e) => {
+                if (e.target.value.length <= 30) {
+                  setDescription(e.target.value);
+                }
+              }}
+              maxLength={30}
+              className="bg-gray-900 text-center rounded-full px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans placeholder-gray-500 transition-all duration-300"
+              style={{
+                width: `${Math.max(10, Math.min(30, description.length))}ch`,
+              }}
+            />
           </div>
         </div>
-        <div className="flex justify-center">
-          <input
-            type="text"
-            placeholder="What's this for?"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="bg-gray-900 text-center rounded-3xl px-2 py-1 text-base w-40 focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans placeholder-gray-500"
-          />
-        </div>
-        <div className="flex justify-around pb-2 border-b border-gray-800">
+        <div className="flex justify-around pb-2 border-b border-gray-800 mt-4">
           <button
             onClick={() => setSplitType("even")}
             className={`text-sm flex flex-col items-center ${
@@ -208,60 +323,97 @@ export default function ImprovedSplitExpense() {
             <span className="font-sans">Percent</span>
           </button>
         </div>
-        <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={splitType}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              {selectedFriends.map((friend) => (
-                <div
-                  key={friend.id}
-                  className="flex items-center justify-between gap-4 bg-gray-900 p-4 rounded-lg"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12">
-                      <img
-                        src={friend.avatar}
-                        alt=""
-                        className="rounded-full"
-                      />
-                    </div>
-                    <span className="text-base text-white font-sans">
-                      {friend.name}
-                    </span>
+      </div>
+      <div className="flex-grow overflow-y-auto px-4 py-2">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={splitType}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            {selectedFriends.map((friend) => (
+              <div
+                key={friend.id}
+                className="flex items-center justify-between gap-4 bg-gray-900 p-4 rounded-lg"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12">
+                    <img src={friend.avatar} alt="" className="rounded-full" />
                   </div>
-                  {splitType !== "even" ? (
+                  <span className="text-base text-white font-sans">
+                    {friend.name}
+                  </span>
+                </div>
+                {splitType === "even" ? (
+                  <span className="text-base text-white font-sans">
+                    ₹{(amount / selectedFriends.length).toFixed(2)}
+                  </span>
+                ) : splitType === "shares" ? (
+                  <div className="flex items-center">
+                    <button
+                      onClick={() =>
+                        handleSplitInput(
+                          friend.id,
+                          Math.max(
+                            1,
+                            parseInt(splitValues[friend.id] || "1") - 1
+                          ).toString()
+                        )
+                      }
+                      className="bg-gray-800 text-white px-2 py-1 rounded-l focus:outline-none"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
                     <input
-                      type={splitType === "percentage" ? "number" : "text"}
+                      type="number"
+                      value={splitValues[friend.id] || "1"}
+                      onChange={(e) =>
+                        handleSplitInput(friend.id, e.target.value)
+                      }
+                      className="bg-gray-800 text-white text-center w-12 py-1 focus:outline-none [-moz-appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <button
+                      onClick={() =>
+                        handleSplitInput(
+                          friend.id,
+                          (
+                            parseInt(splitValues[friend.id] || "1") + 1
+                          ).toString()
+                        )
+                      }
+                      className="bg-gray-800 text-white px-2 py-1 rounded-r focus:outline-none"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    {splitType !== "percentage" && (
+                      <span className="mr-2">₹</span>
+                    )}
+                    <input
+                      type="number"
                       value={splitValues[friend.id] || ""}
                       onChange={(e) =>
                         handleSplitInput(friend.id, e.target.value)
                       }
                       className="bg-gray-800 text-white text-base w-24 rounded-lg px-3 py-2 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-sans"
-                      placeholder={
-                        splitType === "percentage"
-                          ? "%"
-                          : splitType === "shares"
-                          ? "Shares"
-                          : "Amount"
-                      }
+                      placeholder={splitType === "percentage" ? "%" : "Amount"}
                     />
-                  ) : (
-                    <span className="text-base text-white font-sans">
-                      ₹{(amount / selectedFriends.length).toFixed(2)}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
-        </div>
+                    {splitType === "percentage" && (
+                      <span className="ml-1">%</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
-      <div className="fixed bottom-0 left-0 w-full bg-black p-4">
+      <div className="flex-shrink-0 p-4">
         <button
           className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 text-base font-medium font-sans rounded-lg transition duration-300 ease-in-out"
           onClick={handleSubmit}
@@ -275,12 +427,23 @@ export default function ImprovedSplitExpense() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col items-stretch justify-center">
       <AnimatePresence mode="wait">
-        {step === "selectFriends" ? (
+        {step === "enterAmount" ? (
           <motion.div
-            key="friendSelection"
+            key="amountInput"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+            className="w-full h-screen overflow-y-auto"
+          >
+            {renderAmountInput()}
+          </motion.div>
+        ) : step === "selectFriends" ? (
+          <motion.div
+            key="friendSelection"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
             className="w-full h-screen overflow-y-auto"
           >
