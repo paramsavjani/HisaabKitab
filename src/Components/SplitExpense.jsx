@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import {
   ArrowLeft,
   DollarSign,
@@ -22,14 +22,19 @@ export default function ImprovedSplitExpense() {
   const [error, setError] = useState("");
   const [splitValues, setSplitValues] = useState({});
   const amountInputRef = useRef(null);
-  const { activeFriends } = useContext(UserContext);
+  const { activeFriends, user } = useContext(UserContext);
+
+  const activeFriendsForSplit = useMemo(
+    () => [{ ...user, name: "You", username: undefined }, ...activeFriends],
+    [user, activeFriends]
+  );
 
   useEffect(() => {
-    if (activeFriends.length === 0) {
+    if (activeFriendsForSplit.length === 0) {
       window.history.pushState({}, "", "/dashboard");
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
-  }, [activeFriends]);
+  }, [activeFriendsForSplit]);
 
   useEffect(() => {
     if (step === "splitExpense" || step === "selectFriends") {
@@ -247,7 +252,7 @@ export default function ImprovedSplitExpense() {
       </div>
 
       {/* Continue Button (Sticky above keyboard) */}
-      <div className="w-full max-w-md p-4 pb-0 fixed bottom-2">
+      <div className="w-full max-w-md p-4 pb-0 fixed bottom-3">
         <button
           className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-1 text-2xl  merienda-regular transition duration-300 ease-in-out"
           onClick={handleContinue}
@@ -281,7 +286,7 @@ export default function ImprovedSplitExpense() {
           </div>
         )}
         <div className="space-y-1 max-h-[calc(100vh-215px)] overflow-y-auto mb-4">
-          {activeFriends.map((friend) => (
+          {activeFriendsForSplit.map((friend) => (
             <motion.div
               key={friend._id}
               className={`flex items-center space-x-4 p-4 py-3 rounded-lg cursor-pointer ${
@@ -306,11 +311,11 @@ export default function ImprovedSplitExpense() {
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-white text-lg lobster-regular">
+                <p className={`text-white text-xl lobster-regular`}>
                   {friend.name}
                 </p>
                 <p className="text-green-600 text-md teko-regular">
-                  @{friend.username}
+                  {friend.username ? `@${friend.username}` : ""}
                 </p>
               </div>
             </motion.div>
