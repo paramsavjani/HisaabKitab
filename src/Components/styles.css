@@ -12,7 +12,7 @@
 
 .fredericka-the-great-regular {
   font-family: "Fredericka the Great", serif;
-  font-weight: 400;
+  font-weight: 500;
   font-style: normal;
 }
 
@@ -91,291 +91,334 @@
   font-style: normal;
 }
 .container-eg-btn-4 {
-    font-family: sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    flex-wrap: wrap;
-    margin: 0 auto 10px;
-    padding: .5em;
-    line-height: normal;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  flex-wrap: wrap;
+  margin: 0 auto 10px;
+  padding: 0.5em;
+  line-height: normal;
 }
 .container-eg-btn-4 .button {
-    background: #af40ff;
-    margin: 15px;
-    padding: 18px 22px;
-    text-align: center;
-    text-transform: uppercase;
-    position: relative;
-    transition: .3s;
-    z-index: 1;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 18px;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    font-weight: 700;
+  background: #af40ff;
+  margin: 15px;
+  padding: 18px 22px;
+  text-align: center;
+  text-transform: uppercase;
+  position: relative;
+  transition: 0.3s;
+  z-index: 1;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 18px;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  font-weight: 700;
 }
 .container-eg-btn-4 .button-1 {
-    background-color: initial;
+  background-color: initial;
 }
 .container-eg-btn-4 .button-1:before {
-    border-radius: 18px;
+  border-radius: 18px;
 }
 .container-eg-btn-4 .button-1:after {
-    border-radius: 18px;
+  border-radius: 18px;
 }
 .container-eg-btn-4 .button-1:before {
-    background-color: #7a00ff33;
-    content: "";
-    display: block;
-    height: 100%;
-    left: 0;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: -2;
+  background-color: #7a00ff33;
+  content: "";
+  display: block;
+  height: 100%;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -2;
 }
 .container-eg-btn-4 .button-1:after {
-    background-color: initial;
-    background-image: linear-gradient(45deg, #ff6209 0, #6905d5 100%);
-    bottom: 4px;
-    content: "";
-    display: block;
-    left: 4px;
-    overflow: hidden;
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    transition: all 100ms ease-out;
-    z-index: -1;
+  background-color: initial;
+  background-image: linear-gradient(45deg, #ff6209 0, #6905d5 100%);
+  bottom: 4px;
+  content: "";
+  display: block;
+  left: 4px;
+  overflow: hidden;
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  transition: all 100ms ease-out;
+  z-index: -1;
 }
 .container-eg-btn-4 .button-1:hover:after {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    top: 0;
-    transition-timing-function: ease-in;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  transition-timing-function: ease-in;
 }
 .container-eg-btn-4 .button-1:active:after {
-    background-image: linear-gradient(0deg, rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)), linear-gradient(45deg, #ff7426 0, #f93a13 100%);
-    bottom: 4px;
-    left: 4px;
-    right: 4px;
-    top: 4px;
+  background-image: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2)
+    ),
+    linear-gradient(45deg, #ff7426 0, #f93a13 100%);
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  top: 4px;
 }
 .container-eg-btn-4 .button-2 {
-    background-size: 350% 100%;
-    background-image: linear-gradient(to right, #009245, #FCEE21, #00A8C5, #D9E021);
+  background-size: 350% 100%;
+  background-image: linear-gradient(
+    to right,
+    #009245,
+    #fcee21,
+    #00a8c5,
+    #d9e021
+  );
 }
 .container-eg-btn-4 .button-2:hover {
-    background-position: 100% 0;
+  background-position: 100% 0;
 }
 .container-eg-btn-4 .button-3 {
-    background-image: linear-gradient(to right, #1FA2FF 0%, #12D8FA 51%, #1FA2FF 100%);
-    background-size: 200% auto;
+  background-image: linear-gradient(
+    to right,
+    #1fa2ff 0%,
+    #12d8fa 51%,
+    #1fa2ff 100%
+  );
+  background-size: 200% auto;
 }
 .container-eg-btn-4 .button-3:hover {
-    background-position: right center;
-    box-shadow: 0 4px 15px 0 #12d8fa;
+  background-position: right center;
+  box-shadow: 0 4px 15px 0 #12d8fa;
 }
 .container-eg-btn-4 .button-4 {
-    background-image: linear-gradient(to right, #B24592 0%, #F15F79 51%, #B24592 100%);
-    background-size: 200% auto;
+  background-image: linear-gradient(
+    to right,
+    #b24592 0%,
+    #f15f79 51%,
+    #b24592 100%
+  );
+  background-size: 200% auto;
 }
 .container-eg-btn-4 .button-4:hover {
-    background-position: right center;
-    transform: translateY(-0.25em);
-    box-shadow: 0 10px 9px -3px #6f061961;
+  background-position: right center;
+  transform: translateY(-0.25em);
+  box-shadow: 0 10px 9px -3px #6f061961;
 }
 .container-eg-btn-4 .button-4:active {
-    transform: translateY(0);
-    box-shadow: unset;
+  transform: translateY(0);
+  box-shadow: unset;
 }
 .container-eg-btn-4 .button-5 {
-    background-image: linear-gradient(to right, #25aae1, #40e495);
-    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
-    overflow: hidden;
+  background-image: linear-gradient(to right, #25aae1, #40e495);
+  box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+  overflow: hidden;
 }
 .container-eg-btn-4 .button-5:hover:after {
-    top: auto;
-    bottom: 0;
-    height: 100%;
+  top: auto;
+  bottom: 0;
+  height: 100%;
 }
 .container-eg-btn-4 .button-5:after {
-    position: absolute;
-    content: "";
-    width: 100%;
-    height: 0;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    border-radius: 18px;
-    background-color: #8BC34A;
-    background-image: linear-gradient(to right, #CDDC39, #8BC34A);
-    transition: all 0.3s ease;
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 0;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: 18px;
+  background-color: #8bc34a;
+  background-image: linear-gradient(to right, #cddc39, #8bc34a);
+  transition: all 0.3s ease;
 }
-.container-eg-btn-4 .button-5:active{
-    box-shadow: unset;
+.container-eg-btn-4 .button-5:active {
+  box-shadow: unset;
 }
 .container-eg-btn-4 .button-6 {
-    background-image: linear-gradient(to right, #F7971E, #FFD200);
-    box-shadow: 0 4px 15px 0 #F7971E66;
-    overflow: hidden;
+  background-image: linear-gradient(to right, #f7971e, #ffd200);
+  box-shadow: 0 4px 15px 0 #f7971e66;
+  overflow: hidden;
 }
 .container-eg-btn-4 .button-6:hover:after {
-    left: 0;
-    right: auto;
-    width: 100%;
+  left: 0;
+  right: auto;
+  width: 100%;
 }
 .container-eg-btn-4 .button-6:after {
-    position: absolute;
-    content: "";
-    width: 0;
-    height: 100%;
-    top: 0;
-    right: 0;
-    z-index: -1;
-    border-radius: 18px;
-    background-color: #8BC34A;
-    background-image: linear-gradient(to right, #feb47b, #ff7e5f);
-    transition: all 0.3s ease;
+  position: absolute;
+  content: "";
+  width: 0;
+  height: 100%;
+  top: 0;
+  right: 0;
+  z-index: -1;
+  border-radius: 18px;
+  background-color: #8bc34a;
+  background-image: linear-gradient(to right, #feb47b, #ff7e5f);
+  transition: all 0.3s ease;
 }
-.container-eg-btn-4 .button-6:active{
-    box-shadow: unset;
+.container-eg-btn-4 .button-6:active {
+  box-shadow: unset;
 }
-.container-eg-btn-4 .button-7{
-    background: #fff;
-    box-shadow: 0px 6px 16px 0px #8d7bb187;
-    overflow: hidden;
+.container-eg-btn-4 .button-7 {
+  background: #fff;
+  box-shadow: 0px 6px 16px 0px #8d7bb187;
+  overflow: hidden;
 }
-.container-eg-btn-4 .button-7:after{
-    position: absolute;
-    content: "";
-    width: 100%;
-    height: 100%;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-    border-radius: 18px;
-    background-color: #8BC34A;
-    transition: all 0.3s ease;
-    background-image: linear-gradient(to right, #70e1f5, #ffd194);
+.container-eg-btn-4 .button-7:after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: 18px;
+  background-color: #8bc34a;
+  transition: all 0.3s ease;
+  background-image: linear-gradient(to right, #70e1f5, #ffd194);
 }
-.container-eg-btn-4 .button-7:hover{
-    color: #5f6095;
+.container-eg-btn-4 .button-7:hover {
+  color: #5f6095;
 }
-.container-eg-btn-4 .button-7:hover:after{
-    height: 5px;
+.container-eg-btn-4 .button-7:hover:after {
+  height: 5px;
 }
-.container-eg-btn-4 .button-7:active{
-    box-shadow: 0px 4px 8px 0px #8d7bb187;
+.container-eg-btn-4 .button-7:active {
+  box-shadow: 0px 4px 8px 0px #8d7bb187;
 }
 .container-eg-btn-4 .button-8:before {
-    content: '';
-    background: linear-gradient(225deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-size: 400%;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    transition: opacity .3s ease-in-out;
-    border-radius: 18px;
+  content: "";
+  background: linear-gradient(
+    225deg,
+    #ff0000,
+    #ff7300,
+    #fffb00,
+    #48ff00,
+    #00ffd5,
+    #002bff,
+    #7a00ff,
+    #ff00c8,
+    #ff0000
+  );
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-size: 400%;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  transition: opacity 0.3s ease-in-out;
+  border-radius: 18px;
 }
 .container-eg-btn-4 .button-8:hover:before {
-    animation: glowing 20s linear infinite;
+  animation: glowing 20s linear infinite;
 }
 .container-eg-btn-4 .button-8:active:before {
-    background: #000137;
+  background: #000137;
 }
 @keyframes glowing {
-    0% {
-        background-position: 0 0;
-    }
-    50% {
-        background-position: 400% 0;
-    }
-    100% {
-        background-position: 0 0;
-    }
+  0% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 400% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
 }
 .container-eg-btn-4 .button-9 {
-    background-image: linear-gradient(144deg, #44ba62, #5757e6);
-    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+  background-image: linear-gradient(144deg, #44ba62, #5757e6);
+  box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
 }
 .container-eg-btn-4 .button-9:after {
-    content: "";
-    position: absolute;
-    background-color: #000137;
-    border-radius: 18px;
-    width: calc(100% - 8px);
-    height: calc(100% - 8px);
-    top: 4px;
-    left: 4px;
-    z-index: -1;
-    transition: opacity .3s ease-in-out;
+  content: "";
+  position: absolute;
+  background-color: #000137;
+  border-radius: 18px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  top: 4px;
+  left: 4px;
+  z-index: -1;
+  transition: opacity 0.3s ease-in-out;
 }
 .container-eg-btn-4 .button-9:hover:after {
-    opacity: 0;
+  opacity: 0;
 }
 .container-eg-btn-4 .button-9:active:after {
-    opacity: 1;
+  opacity: 1;
 }
 .container-eg-btn-4 .button-10 {
-    background-image: linear-gradient(144deg, #AF40FF, #5B42F3 50%, #00DDEB);
-    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+  background-image: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb);
+  box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
 }
 .container-eg-btn-4 .button-10:after {
-    content: "";
-    position: absolute;
-    background-color: #000137;
-    border-radius: 18px;
-    width: calc(100% - 8px);
-    height: calc(100% - 8px);
-    top: 4px;
-    left: 4px;
-    z-index: -1;
-    transition: opacity .3s ease-in-out;
-    opacity: 0;
+  content: "";
+  position: absolute;
+  background-color: #000137;
+  border-radius: 18px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+  top: 4px;
+  left: 4px;
+  z-index: -1;
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0;
 }
 .container-eg-btn-4 .button-10:hover:after {
-    opacity: 1;
+  opacity: 1;
 }
 .container-eg-btn-4 .button-10:active:after {
-    opacity: 0;
+  opacity: 0;
 }
 .container-eg-btn-4 .button-11:hover {
-    background-position: right center;
-    -webkit-background-clip: unset;
-    background-clip: unset;
-    -webkit-text-fill-color: unset;
+  background-position: right center;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: unset;
 }
-.container-eg-btn-4 .button-11, .container-eg-btn-4 .button-11:active {
-    background-image: linear-gradient(to right, #16BFFD 0%, #CB3066 51%, #16BFFD 100%);
-    background-size: 200% auto;
-    box-shadow: 0px 6px 16px 0px #8d7bb187;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+.container-eg-btn-4 .button-11,
+.container-eg-btn-4 .button-11:active {
+  background-image: linear-gradient(
+    to right,
+    #16bffd 0%,
+    #cb3066 51%,
+    #16bffd 100%
+  );
+  background-size: 200% auto;
+  box-shadow: 0px 6px 16px 0px #8d7bb187;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .container-eg-btn-4 .button-12:hover {
-    background-position: right center;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+  background-position: right center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .container-eg-btn-4 .button-12 {
-    background-image: linear-gradient(to right, #16BFFD 0%, #CB3066 51%, #16BFFD 100%);
-    background-size: 200% auto;
-    box-shadow: 0px 6px 16px 0px #8d7bb187;
+  background-image: linear-gradient(
+    to right,
+    #16bffd 0%,
+    #cb3066 51%,
+    #16bffd 100%
+  );
+  background-size: 200% auto;
+  box-shadow: 0px 6px 16px 0px #8d7bb187;
 }
 .container-eg-btn-4 .button-12:active {
-    -webkit-background-clip: unset;
-    background-clip: unset;
-    -webkit-text-fill-color: unset;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: unset;
 }

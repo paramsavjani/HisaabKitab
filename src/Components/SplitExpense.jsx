@@ -265,13 +265,13 @@ export default function ImprovedSplitExpense() {
           onClick={() => setStep("enterAmount")}
           className="text-blue-500 hover:text-blue-400 transition-colors duration-200 flex items-center"
         ></button>
-        <div className="text-3xl pt-2 font-semibold text-blue-500 font-sans flex-grow text-center">
+        <div className="merienda-regular text-transparent bg-gradient-to-r from-blue-400 bg-clip-text to-green-400 text-3xl pt-2 font-semibold font-sans flex-grow text-center">
           Select Friends
         </div>
       </div>
       <div className="p-4">
         <div className=" p- mb-4">
-          <div className="kranky-regular text-5xl text-white font-sans text-center">
+          <div className="kranky-regular text-5xl font-semibold text-white font-sans text-center">
             ₹{amount}
           </div>
         </div>
@@ -280,11 +280,11 @@ export default function ImprovedSplitExpense() {
             {error}
           </div>
         )}
-        <div className="space-y-2 max-h-[calc(100vh-215px)] overflow-y-auto mb-4">
+        <div className="space-y-1 max-h-[calc(100vh-215px)] overflow-y-auto mb-4">
           {activeFriends.map((friend) => (
             <motion.div
               key={friend._id}
-              className={`flex items-center space-x-4 p-4 rounded-lg cursor-pointer ${
+              className={`flex items-center space-x-4 p-4 py-3 rounded-lg cursor-pointer ${
                 selectedFriends.some((f) => f._id === friend._id)
                   ? "bg-gray-800"
                   : "bg-gray-900"
@@ -306,7 +306,12 @@ export default function ImprovedSplitExpense() {
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-white text-lg font-sans">{friend.name}</p>
+                <p className="text-white text-lg lobster-regular">
+                  {friend.name}
+                </p>
+                <p className="text-green-600 text-md teko-regular">
+                  @{friend.username}
+                </p>
               </div>
             </motion.div>
           ))}
