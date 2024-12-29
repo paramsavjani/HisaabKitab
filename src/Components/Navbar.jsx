@@ -164,6 +164,12 @@ function Navbar() {
     }
   };
 
+  const [path, setPath] = useState(window.location.pathname);
+
+  useEffect(() => {
+    setPath(window.location.pathname);
+  }, []);
+
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (menuOpen && navRef.current && !navRef.current.contains(e.target)) {
@@ -183,9 +189,7 @@ function Navbar() {
       {/* Hamburger Menu Button */}
       <button
         className={`md:hidden text-white text-2xl p-4 fixed top-2 left-2 z-50 ${
-          menuOpen || window.location.pathname === "/split-expense"
-            ? "hidden"
-            : ""
+          menuOpen || path === "/split-expense" ? "hidden" : ""
         }`}
         onClick={() => setMenuOpen(!menuOpen)}
         aria-label="Toggle navigation menu"

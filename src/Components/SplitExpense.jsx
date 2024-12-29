@@ -23,6 +23,14 @@ export default function ImprovedSplitExpense() {
   const amountInputRef = useRef(null);
   const { activeFriends } = useContext(UserContext);
 
+
+  useEffect(() => {
+    if(activeFriends.length === 0) {
+      window.history.pushState({}, "", "/dashboard");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    }
+  }, [activeFriends]);
+
   useEffect(() => {
     if (step === "enterAmount" && amountInputRef.current) {
       amountInputRef.current.focus();
