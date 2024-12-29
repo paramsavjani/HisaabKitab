@@ -74,6 +74,7 @@ io.on("connection", (socket) => {
   onlineUsers.set(socket.user.username, socket.id);
 
   socket.on("newTransaction", (transaction) => {
+    console.log(transaction);
     const receiverSocketId = onlineUsers.get(transaction.friendUsername);
 
     if (receiverSocketId) {
