@@ -249,7 +249,7 @@ export default function ImprovedSplitExpense() {
       {/* Continue Button (Sticky above keyboard) */}
       <div className="w-full max-w-md p-4 fixed bottom-4">
         <button
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 text-base font-medium font-sans transition duration-300 ease-in-out"
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-1 text-2xl  merienda-regular transition duration-300 ease-in-out"
           onClick={handleContinue}
         >
           Continue
@@ -317,7 +317,7 @@ export default function ImprovedSplitExpense() {
           ))}
         </div>
         <button
-          className="w-full md:max-w-[calc(100%-350px)] max-w-[calc(100%-30px)] fixed bottom-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-3 text-base font-medium font-sans transition duration-300 ease-in-out"
+          className="w-full md:max-w-[calc(100%-350px)] max-w-[calc(100%-30px)] merienda-regular fixed bottom-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg py-1 text-2xl transition duration-300 ease-in-out"
           onClick={handleContinue}
         >
           Continue
