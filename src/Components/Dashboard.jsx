@@ -33,7 +33,7 @@ const Dashboard = () => {
   }, [user]);
 
   return (
-    <div className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white">
+    <div className="p-4 md:bg-gray-950 bg-slate-950 h-full text-white">
       {/* Header Section */}
       <div className=" flex items-center justify-center pb-3">
         <Link

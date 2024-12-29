@@ -510,7 +510,7 @@ export default function ImprovedSplitExpense() {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-stretch justify-center">
+    <div className="h-full bg-black text-white flex flex-col items-stretch justify-center">
       <AnimatePresence mode="wait">
         {step === "enterAmount" ? (
           <motion.div
