@@ -11,6 +11,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import "./styles.css";
 import UserContext from "../context/UserContext";
+import { App } from "@capacitor/app";
 
 export default function ImprovedSplitExpense() {
   const [step, setStep] = useState("enterAmount");
@@ -29,6 +30,44 @@ export default function ImprovedSplitExpense() {
       window.dispatchEvent(new PopStateEvent("popstate"));
     }
   }, [activeFriends]);
+
+  useEffect(() => {
+    // Set a flag when the user is on the "splitExpense" step
+    if (step === "splitExpense") {
+      window.isOnSplitExpense = true;
+    } else {
+      window.isOnSplitExpense = false;
+    }
+
+    // Cleanup: revert the flag when the component is unmounted
+    return () => {
+      window.isOnSplitExpense = false; // Ensure we revert the flag when the component is removed
+    };
+  }, [step]); // Ensure this runs every time the step changes
+
+  useEffect(() => {
+    const backButtonListener = App.addListener(
+      "backButton",
+      ({ canGoBack }) => {
+        if (canGoBack) {
+          if (step === "splitExpense") {
+            setStep("selectFriends");
+          } else if (step === "selectFriends") {
+            setStep("enterAmount");
+          } else {
+            window.history.back();
+          }
+        } else {
+          App.exitApp();
+        }
+      }
+    );
+
+    // Cleanup listener on component unmount
+    return () => {
+      backButtonListener.remove(); // Remove the back button listener
+    };
+  }, [step]);
 
   useEffect(() => {
     if (step === "enterAmount" && amountInputRef.current) {
