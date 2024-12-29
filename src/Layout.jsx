@@ -11,6 +11,7 @@ import socket from "./socket.js";
 
 const Layout = () => {
   const {
+    user,
     setUser,
     setAccessToken,
     setRefreshToken,
@@ -165,7 +166,7 @@ const Layout = () => {
         }
       );
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user]);
 
   useEffect(() => {
     initializeApp();
