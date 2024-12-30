@@ -117,7 +117,6 @@ export default function ImprovedSplitExpense() {
       if (isNaN(numValue) || numValue < 1) return;
       setSplitValues({ ...splitValues, [_id]: numValue.toString() });
     } else {
-      console.log(updatedSplitValues);
       setSplitValues(() => updatedSplitValues);
     }
   };
@@ -532,8 +531,6 @@ export default function ImprovedSplitExpense() {
 
                         const newValue =
                           parseFloat(remainingAmount) / totalUnChanged;
-
-                        console.log(newValue);
 
                         const updatedSplitValues = { ...splitValues };
                         selectedFriends.forEach((f) => {
