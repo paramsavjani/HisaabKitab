@@ -95,6 +95,7 @@ export default function ImprovedSplitExpense() {
       setSplitValues(newSplitValues);
     } else {
       setSplitValues({});
+      setIsSetValue({});
     }
   }, [splitType, amount, selectedFriends]);
 
@@ -106,7 +107,7 @@ export default function ImprovedSplitExpense() {
     );
   };
 
-  const handleSplitInput = (_id, value) => {
+  const handleSplitInput = (_id, value, updatedSplitValues) => {
     if (splitType === "percentage") {
       const numValue = parseFloat(value);
       if (isNaN(numValue) || numValue < 0 || numValue > 100) return;
@@ -116,7 +117,8 @@ export default function ImprovedSplitExpense() {
       if (isNaN(numValue) || numValue < 1) return;
       setSplitValues({ ...splitValues, [_id]: numValue.toString() });
     } else {
-      setSplitValues({ ...splitValues, [_id]: value });
+      console.log(updatedSplitValues);
+      setSplitValues(() => updatedSplitValues);
     }
   };
 
@@ -478,10 +480,15 @@ export default function ImprovedSplitExpense() {
                     <span className="mr-0 text-lg">₹</span>
                     <input
                       type="number"
-                      value={splitValues[friend._id] || ""}
-                      onChange={(e) => {
+                      value={
+                        splitValues[friend._id]
+                          ? splitValues[friend._id].replace(/\.00$/, "")
+                          : ""
+                      }
+                      onChange={async (e) => {
                         let input = e.target.value;
-                        if (input === "0" || input === "");
+                        if (input === "0" || input === "") {
+                        }
                         if (input[0] === "0") {
                           input = input.slice(1);
                         }
@@ -493,45 +500,51 @@ export default function ImprovedSplitExpense() {
                         if ((input.match(/\./g) || []).length > 1) return;
                         if (parseFloat(input) > parseFloat(amount)) return;
 
-                        let totalSplit = Object.values(splitValues).reduce(
-                          (sum, val) => sum + parseFloat(val || 0),
+                        let totalSplit = Object.keys(splitValues).reduce(
+                          (sum, key) => {
+                            if (isSetValue[key]) {
+                              return sum + parseFloat(splitValues[key] || 0);
+                            }
+                            return sum;
+                          },
                           0
                         );
 
-                        console.log("totalSplit", totalSplit);
-
                         totalSplit -= parseFloat(splitValues[friend._id] || 0);
-
-                        console.log("final total split", totalSplit);
 
                         if (totalSplit + parseFloat(input) > parseFloat(amount))
                           return;
 
                         if (input.split(".")[0].length > 6) return;
 
-                        setIsSetValue[friend._id] = true;
+                        totalSplit += parseFloat(input);
+
+                        setIsSetValue((prev) => ({
+                          ...prev,
+                          [friend._id]: true,
+                        }));
 
                         const totalUnChanged =
                           selectedFriends.length -
                           Object.keys(isSetValue).length;
 
-                        const remainingAmount = parseFloat(amount) - input;
+                        const remainingAmount = parseFloat(amount) - totalSplit;
 
                         const newValue =
                           parseFloat(remainingAmount) / totalUnChanged;
 
                         console.log(newValue);
 
+                        const updatedSplitValues = { ...splitValues };
                         selectedFriends.forEach((f) => {
-                          if (!isSetValue[f._id]) {
-                            setSplitValues((prev) => ({
-                              ...prev,
-                              [f._id]: newValue.toFixed(2),
-                            }));
+                          if (!isSetValue[f._id] && f._id !== friend._id) {
+                            updatedSplitValues[f._id] = newValue.toFixed(2);
                           }
                         });
 
-                        handleSplitInput(friend._id, input);
+                        updatedSplitValues[friend._id] = input;
+
+                        handleSplitInput(friend._id, input, updatedSplitValues);
                       }}
                       className="bg-gray-800 text-green-500 kranky-regular text-lg font-semibold w-16 px-1 py-1 focus:outline-none"
                       placeholder="0.00"
