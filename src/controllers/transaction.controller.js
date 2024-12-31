@@ -242,11 +242,11 @@ const cancelTransaction = asyncHandler(async (req, res) => {
 });
 
 const splitExpenses = asyncHandler(async (req, res) => {
-  const { splitValues, description } = req.body;
+  const { final:splitValues, description } = req.body;
   const userId = req.user._id;
+  const totalTransactions = [];
 
   try {
-    // Validate each friend's transaction
     for (const friendId of Object.keys(splitValues)) {
       const amount = splitValues[friendId];
 
@@ -254,7 +254,6 @@ const splitExpenses = asyncHandler(async (req, res) => {
         continue;
       }
 
-      // Check if the user and friend are connected
       const isFriend = await Friend.findOne({
         $or: [
           { userId, friendId },
@@ -269,7 +268,6 @@ const splitExpenses = asyncHandler(async (req, res) => {
         });
       }
 
-      // Create a new transaction
       const transaction = await Transaction.create({
         amount,
         description,
@@ -282,15 +280,16 @@ const splitExpenses = asyncHandler(async (req, res) => {
         return res.status(500).json({ message: "Transaction creation failed" });
       }
 
-      // Update friendship details
       isFriend.lastTransactionTime = new Date();
       isFriend.isActive = true;
       await isFriend.save();
+
+      totalTransactions.push(transaction);
     }
 
-    // Respond once all transactions are successfully created
     res.status(200).json({
       message: "All transactions added successfully",
+      transactions: totalTransactions,
     });
   } catch (error) {
     console.error(error);
