@@ -4,10 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import "./styles.css";
 import UserContext from "../context/UserContext";
 import { App } from "@capacitor/app";
-// import equal from "../assets/icons/balance (1).png";
-import percentage from "../assets/icons/money-bag.png";
 import sharing from "../assets/icons/sharing.png";
 import money from "../assets/icons/dollar.png";
+import { toast } from "react-toastify";
 
 export default function ImprovedSplitExpense() {
   const [step, setStep] = useState("enterAmount");
@@ -19,7 +18,14 @@ export default function ImprovedSplitExpense() {
   const [splitValues, setSplitValues] = useState({});
   const [isSetValue, setIsSetValue] = useState({});
   const amountInputRef = useRef(null);
-  const { activeFriends, user } = useContext(UserContext);
+  const {
+    activeFriends,
+    user,
+    accessToken,
+    refreshToken,
+    transactions,
+    setTransactions,
+  } = useContext(UserContext);
 
   const activeFriendsForSplit = useMemo(
     () => [{ ...user, name: "You", username: undefined }, ...activeFriends],
@@ -86,11 +92,10 @@ export default function ImprovedSplitExpense() {
         newSplitValues[friend._id] = evenSplit;
       });
       setSplitValues(newSplitValues);
-    } else if (splitType === "percentage") {
+    } else if (splitType === "shares") {
       const newSplitValues = {};
-      const evenPercentage = (100 / selectedFriends.length).toFixed(2);
       selectedFriends.forEach((friend) => {
-        newSplitValues[friend._id] = evenPercentage;
+        newSplitValues[friend._id] = "1";
       });
       setSplitValues(newSplitValues);
     } else {
@@ -107,15 +112,13 @@ export default function ImprovedSplitExpense() {
     );
   };
 
-  const handleSplitInput = (_id, value, updatedSplitValues) => {
-    if (splitType === "percentage") {
-      const numValue = parseFloat(value);
-      if (isNaN(numValue) || numValue < 0 || numValue > 100) return;
-      setSplitValues({ ...splitValues, [_id]: value });
-    } else if (splitType === "shares") {
+  const handleSplitInput = (_id, value, updatedSplitValues = {}) => {
+    if (splitType === "shares") {
       const numValue = parseInt(value);
       if (isNaN(numValue) || numValue < 1) return;
-      setSplitValues({ ...splitValues, [_id]: numValue.toString() });
+      setSplitValues((p) => {
+        return { ...p, [_id]: numValue.toString() };
+      });
     } else {
       setSplitValues(() => updatedSplitValues);
     }
@@ -155,35 +158,70 @@ export default function ImprovedSplitExpense() {
     }
   };
 
-  const handleSubmit = () => {
-    if (splitType === "percentage") {
-      const totalPercentage = Object.values(splitValues).reduce(
-        (sum, val) => sum + parseFloat(val || 0),
-        0
-      );
-      if (Math.abs(totalPercentage - 100) > 0.01) {
-        setError("Total percentage must equal 100%.");
-        return;
-      }
-    } else if (splitType !== "even") {
+  const handleSubmit = async () => {
+    if (splitType === "amount") {
       const totalSplit = Object.values(splitValues).reduce(
         (sum, val) => sum + parseFloat(val || 0),
         0
       );
       if (Math.abs(totalSplit - parseFloat(amount)) > 0.01) {
-        setError("Split values do not add up to the total amount.");
+        toast.error("The total split amount doesn't match the entered amount.");
         return;
       }
     }
-    alert("Split request submitted successfully!");
-    window.history.pushState({}, "", "/dashboard");
-    window.dispatchEvent(new PopStateEvent("popstate"));
+    let shareFinalValues;
+    if (splitType === "shares") {
+      const totalShares = Object.values(splitValues).reduce(
+        (sum, val) => sum + parseInt(val || 0),
+        0
+      );
+      const perShare = parseFloat(amount) / totalShares;
+      const newSplitValues = {};
+      Object.keys(splitValues).forEach((key) => {
+        newSplitValues[key] = (parseInt(splitValues[key]) * perShare).toFixed(
+          2
+        );
+      });
+      shareFinalValues = newSplitValues;
+    }
+
+    const final = splitType === "shares" ? shareFinalValues : splitValues;
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/splitExpenses`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          description,
+          final,
+          refreshToken,
+          accessToken,
+        }),
+        credentials: "include",
+      }
+    );
+
+    if (!res.ok) {
+      const data = await res.json();
+      toast.error(data.message);
+      return;
+    }
+
+    const data = await res.json();
+
+    setTransactions((prev) => [...data.transactions, ...prev]);
+
     setStep("enterAmount");
     setSelectedFriends([]);
     setAmount("");
     setSplitType("even");
     setDescription("");
     setSplitValues({});
+    window.history.pushState({}, "", "/dashboard");
+    window.dispatchEvent(new PopStateEvent("popstate"));
   };
 
   const handleKeyPress = (e) => {
@@ -330,7 +368,6 @@ export default function ImprovedSplitExpense() {
                   setDescription(e.target.value);
                 }
               }}
-              // maxLength={30}
               className="bg-gray-800 merienda-regular text-center rounded-2xl px-2 py-1 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 transition-all duration-300"
               style={{
                 width: `${Math.max(16, description.length)}ch`,
@@ -343,12 +380,6 @@ export default function ImprovedSplitExpense() {
             { type: "even", icon: "⚖️", label: "Even", isTextIcon: true },
             { type: "amount", icon: money, label: "Amount", isImage: true },
             { type: "shares", icon: sharing, label: "Shares", isImage: true },
-            {
-              type: "percentage",
-              icon: percentage,
-              label: "Percent",
-              isImage: true,
-            },
           ].map(({ type, icon, label, isTextIcon }) => (
             <button
               key={type}
@@ -379,9 +410,7 @@ export default function ImprovedSplitExpense() {
             ? "Split Evenly"
             : splitType === "amount"
             ? "Split by Amount"
-            : splitType === "shares"
-            ? "Split by Shares"
-            : "Split by Percentage"}
+            : "Split by Shares"}
         </div>
       </div>
       <div className="flex-grow overflow-y-auto  px-4 pt-1">
@@ -455,11 +484,9 @@ export default function ImprovedSplitExpense() {
                     >
                       <Minus className="h-4 w-4" />
                     </button>
-                    <input
-                      type="number"
-                      value={splitValues[friend._id] || "1"}
-                      className="bg-gray-800 text-white text-center w-8 py-1 focus:outline-none rounded-md"
-                    />
+                    <div className="bg-gray-800 text-white text-center w-8 py-1 focus:outline-none rounded-md">
+                      {splitValues[friend._id] || "1"}
+                    </div>
                     <button
                       onClick={() =>
                         handleSplitInput(
@@ -545,29 +572,11 @@ export default function ImprovedSplitExpense() {
                       }}
                       className="bg-gray-800 text-green-500 kranky-regular text-lg font-semibold w-16 px-1 py-1 focus:outline-none"
                       placeholder="0.00"
+                      style={{ width: "70px" }}
                     />
-                    {splitType === "percentage" && (
-                      <span className="ml-1">%</span>
-                    )}
                   </div>
                 ) : (
-                  <div className="flex items-center">
-                    {splitType !== "percentage" && (
-                      <span className="mr-0">₹</span>
-                    )}
-                    <input
-                      type="number"
-                      value={splitValues[friend._id] || ""}
-                      onChange={(e) =>
-                        handleSplitInput(friend._id, e.target.value)
-                      }
-                      className="bg-gray-800 text-white kranky-regular font-semibold w-16 px-2 py-1 focus:outline-none"
-                      placeholder={splitType === "percentage" ? "%" : ""}
-                    />
-                    {splitType === "percentage" && (
-                      <span className="ml-1">%</span>
-                    )}
-                  </div>
+                  ""
                 )}
               </div>
             ))}
