@@ -241,10 +241,71 @@ const cancelTransaction = asyncHandler(async (req, res) => {
     .json({ message: "Transaction cancelled successfully" });
 });
 
+const splitExpenses = asyncHandler(async (req, res) => {
+  const { splitValues, description } = req.body;
+  const userId = req.user._id;
+
+  try {
+    // Validate each friend's transaction
+    for (const friendId of Object.keys(splitValues)) {
+      const amount = splitValues[friendId];
+
+      if(friendId == userId) {
+        continue;
+      }
+
+      // Check if the user and friend are connected
+      const isFriend = await Friend.findOne({
+        $or: [
+          { userId, friendId },
+          { userId: friendId, friendId: userId },
+        ],
+      });
+
+      if (!isFriend) {
+        const friend = await User.findOne({ _id: friendId });
+        return res.status(403).json({
+          message: `You are not friends with user: ${friend.username}`,
+        });
+      }
+
+      // Create a new transaction
+      const transaction = await Transaction.create({
+        amount,
+        description,
+        sender: userId,
+        receiver: friendId,
+        status: "pending",
+      });
+
+      if (!transaction) {
+        return res.status(500).json({ message: "Transaction creation failed" });
+      }
+
+      // Update friendship details
+      isFriend.lastTransactionTime = new Date();
+      isFriend.isActive = true;
+      await isFriend.save();
+    }
+
+    // Respond once all transactions are successfully created
+    res.status(200).json({
+      message: "All transactions added successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred", error: error.message });
+  }
+});
+
+
 export {
   addTransaction,
   showTransactions,
   acceptTransaction,
   denyTransaction,
   cancelTransaction,
+  splitExpenses,
 };

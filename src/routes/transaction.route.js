@@ -6,9 +6,11 @@ import {
   acceptTransaction,
   denyTransaction,
   cancelTransaction,
+  splitExpenses,
 } from "../controllers/transaction.controller.js";
 
 const router = Router();
+router.route("/splitExpenses").post(verifyJWT, splitExpenses);
 
 router.route("/:username/add").post(verifyJWT, addTransaction);
 
@@ -19,5 +21,6 @@ router.route("/:transactioinId/accept").post(verifyJWT, acceptTransaction);
 router.route("/:transactioinId/deny").post(verifyJWT, denyTransaction);
 
 router.route("/:transactioinId/cancel").post(verifyJWT, cancelTransaction);
+
 
 export default router;
