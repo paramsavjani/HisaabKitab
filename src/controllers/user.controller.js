@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { Friend } from "../models/Friend.model.js";
 import { Request } from "../models/Request.model.js";
 import { Transaction } from "../models/Transaction.model.js";
+import * as bcrypt from "bcrypt";
 
 const generateAccessAndRefreshTokens = async (id) => {
   const user = await User.findById(id);
@@ -19,6 +20,7 @@ const generateAccessAndRefreshTokens = async (id) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, name, email, password } = req.body;
+  console.log(email, password);
 
   if (
     [username, name, email, password].some(
@@ -67,13 +69,15 @@ const registerUser = asyncHandler(async (req, res) => {
     }
   }
 
-  // const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  console.log("hased password", hashedPassword);
 
   const user = await User.create({
     username,
     name,
     email,
-    password,
+    password: hashedPassword,
     profilePicture: imageUrl,
   });
 
@@ -129,7 +133,7 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const match = password === user.password;
+  const match = await user.isCorrectPassword(password);
 
   if (!match) {
     return res.status(411).json({
