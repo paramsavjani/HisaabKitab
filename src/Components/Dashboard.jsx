@@ -4,7 +4,7 @@ import UserContext from "../context/UserContext.js";
 // import DashboardSkeleton from "./DashboardSkeleton";
 import "./styles.css";
 import "../loading.css";
-import addFriend from "../assets/icons/user.png";
+import split from "../assets/icons/group.png";
 
 const Dashboard = () => {
   const { user, activeFriends } = useContext(UserContext);
@@ -254,17 +254,13 @@ const Dashboard = () => {
           )}
         </ul>
       </div>
-      <div className="md:hidden container-eg-btn-4 uf-border fixed bottom-0 right-0 z-10">
+      <div className="md:hidden uf-border fixed bottom-4 right-4 z-10">
         <Link
-          to="/friends"
-          className="md:hidden button button-9 flex rounded-full"
+          to="/split-expense"
+          className="flex items-center justify-center gap-2 bg-blue-950 text-white rounded-full shadow-lg p-3 transition-transform transform hover:scale-105 active:scale-95"
         >
-          <img
-            src={addFriend}
-            alt="Add friend"
-            className="invert w-6 h-6 mr-2"
-          />
-          <span className="items-center content-center">Add Friend</span>
+          <img src={split} className="w-6 h-6" alt="Split an expense" />
+          <span className="pacifico-regular font-medium">Split an Expense</span>
         </Link>
       </div>
     </div>
