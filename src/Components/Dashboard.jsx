@@ -165,7 +165,7 @@ const Dashboard = () => {
                       {/* User Info */}
                       <div className="flex-1">
                         <p className="text-base font-semibold">{friend.name}</p>
-                        <p className="text-sm text-gray-400">{timeAgo}</p>
+                        <p className="text-xs text-gray-400">{timeAgo}</p>
                       </div>
 
                       {/* Balance */}
