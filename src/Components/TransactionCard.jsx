@@ -246,7 +246,7 @@ const TransactionCard = ({
             src={rejectedIcon}
             alt=""
             className={`absolute top-4 ${
-              isSender ? "right-0" : "md:left-32 left-28"
+              isSender ? "right-28" : "md:left-32 left-28"
             } w-14 h-14`} // Position based on isSender
           />
         )}
