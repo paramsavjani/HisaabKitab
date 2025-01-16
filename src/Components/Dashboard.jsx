@@ -30,7 +30,6 @@ const Dashboard = () => {
   }, [user]);
 
   useEffect(() => {
-    console.log(activeFriends);
     activeFriends.sort((a, b) => {
       if (a.lastTransactionTime < b.lastTransactionTime) {
         return 1;

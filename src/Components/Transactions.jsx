@@ -188,9 +188,6 @@ const Transactions = () => {
   }, [userUsername, friendTransactions, setFriendTransactions]);
 
 
-  console.log(transactions);
-  console.log(friendTransactions)
-
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
       const date = new Date(transaction.createdAt).toLocaleDateString();
@@ -321,6 +318,7 @@ const Transactions = () => {
           setFriendTransactions={setFriendTransactions}
           friend={friend}
           setTransactions={setTransactions}
+          setActiveFriends={setActiveFriends}
         />
       )}
     </div>

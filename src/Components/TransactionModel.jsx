@@ -9,6 +9,7 @@ const TransactionModal = ({
   setFriendTransactions,
   friend,
   setTransactions,
+  setActiveFriends,
 }) => {
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -108,7 +109,16 @@ const TransactionModal = ({
           receiver: data.transaction._doc.receiver,
         },
       ]);
-      console.log(data.transaction);
+
+      setActiveFriends((prev) => {
+        const updatedFriends = [...prev];
+        const friendIndex = updatedFriends.findIndex(
+          (f) => f.username === friend.username
+        );
+        updatedFriends[friendIndex].lastTransactionTime =
+          data.transaction._doc.createdAt;
+        return updatedFriends;
+      });
 
       setAmount("");
       setDescription("");
