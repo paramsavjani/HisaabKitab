@@ -27,18 +27,26 @@ const Dashboard = () => {
 
   useEffect(() => {
     document.title = "Dashboard";
-    // if (!user) {
-    //   window.location.href = "/login";
-    // }
   }, [user]);
+
+  useEffect(() => {
+    console.log(activeFriends);
+    activeFriends.sort((a, b) => {
+      if (a.lastTransactionTime < b.lastTransactionTime) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+  }, [activeFriends]);
 
   return (
     <div className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white">
       {/* Header Section */}
-      <div className=" flex items-center justify-center pb-3">
+      <div className="merienda-regular flex items-center justify-center pb-3">
         <Link
           to="/"
-          className="henny-penny-regular text-4xl px-1 pt-2 pl-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
+          className=" text-4xl px-1 pt-2 pl-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text transform transition-transform duration-300"
           aria-label="Navigate to CashTrack homepage"
         >
           Hisaab <span className="text-white">Kitab</span>
@@ -105,8 +113,37 @@ const Dashboard = () => {
       <div className="block md:hidden">
         <ul className="merienda-regular divide-y divide-gray-700">
           {activeFriends &&
-            activeFriends.map(
-              (friend, index) =>
+            activeFriends.map((friend) => {
+              const lastTransactionTime = new Date(friend.lastTransactionTime);
+              const now = new Date();
+              const diffInSeconds = Math.floor(
+                (now - lastTransactionTime) / 1000
+              );
+
+              let timeAgo;
+
+              if (diffInSeconds < 60) {
+                timeAgo = "a few seconds ago";
+              } else if (diffInSeconds < 3600) {
+                const minutes = Math.floor(diffInSeconds / 60);
+                timeAgo = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+              } else if (diffInSeconds < 86400) {
+                const hours = Math.floor(diffInSeconds / 3600);
+                timeAgo = `${hours} hour${hours > 1 ? "s" : ""} ago`;
+              } else if (diffInSeconds < 2592000) {
+                // 30 days
+                const days = Math.floor(diffInSeconds / 86400);
+                timeAgo = `${days} day${days > 1 ? "s" : ""} ago`;
+              } else if (diffInSeconds < 31536000) {
+                // 365 days
+                const months = Math.floor(diffInSeconds / 2592000);
+                timeAgo = `${months} month${months > 1 ? "s" : ""} ago`;
+              } else {
+                const years = Math.floor(diffInSeconds / 31536000);
+                timeAgo = `${years} year${years > 1 ? "s" : ""} ago`;
+              }
+
+              return (
                 friend.isActive && (
                   <li key={friend.username}>
                     <Link
@@ -129,9 +166,7 @@ const Dashboard = () => {
                       {/* User Info */}
                       <div className="flex-1">
                         <p className="text-base font-semibold">{friend.name}</p>
-                        <p className="text-sm text-gray-400">
-                          {"@" + friend.username}
-                        </p>
+                        <p className="text-sm text-gray-400">{timeAgo}</p>
                       </div>
 
                       {/* Balance */}
@@ -147,7 +182,8 @@ const Dashboard = () => {
                     </Link>
                   </li>
                 )
-            )}
+              );
+            })}
         </ul>
       </div>
 
@@ -207,8 +243,37 @@ const Dashboard = () => {
         {/* User List */}
         {/* Desktop User List */}
         <ul className="space-y-3">
-          {activeFriends.map(
-            (friend, index) =>
+          {activeFriends.map((friend) => {
+            const lastTransactionTime = new Date(friend.lastTransactionTime);
+            const now = new Date();
+            const diffInSeconds = Math.floor(
+              (now - lastTransactionTime) / 1000
+            );
+
+            let timeAgo;
+
+            if (diffInSeconds < 60) {
+              timeAgo = "a few seconds ago";
+            } else if (diffInSeconds < 3600) {
+              const minutes = Math.floor(diffInSeconds / 60);
+              timeAgo = `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+            } else if (diffInSeconds < 86400) {
+              const hours = Math.floor(diffInSeconds / 3600);
+              timeAgo = `${hours} hour${hours > 1 ? "s" : ""} ago`;
+            } else if (diffInSeconds < 2592000) {
+              // 30 days
+              const days = Math.floor(diffInSeconds / 86400);
+              timeAgo = `${days} day${days > 1 ? "s" : ""} ago`;
+            } else if (diffInSeconds < 31536000) {
+              // 365 days
+              const months = Math.floor(diffInSeconds / 2592000);
+              timeAgo = `${months} month${months > 1 ? "s" : ""} ago`;
+            } else {
+              const years = Math.floor(diffInSeconds / 31536000);
+              timeAgo = `${years} year${years > 1 ? "s" : ""} ago`;
+            }
+
+            return (
               friend.isActive && (
                 <li
                   key={friend.username}
@@ -233,9 +298,7 @@ const Dashboard = () => {
                     {/* User Info */}
                     <div className="merienda-regular flex-1">
                       <p className="text-lg font-semibold">{friend.name}</p>
-                      <p className="text-sm text-gray-400">
-                        @{friend.username}
-                      </p>
+                      <p className="text-sm text-gray-400">{timeAgo}</p>
                     </div>
 
                     {/* Balance */}
@@ -251,7 +314,8 @@ const Dashboard = () => {
                   </Link>
                 </li>
               )
-          )}
+            );
+          })}
         </ul>
       </div>
       <div className="md:hidden uf-border fixed bottom-4 right-4 z-10">

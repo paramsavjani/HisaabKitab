@@ -187,6 +187,10 @@ const Transactions = () => {
     setTotal(() => accumulatedTotal);
   }, [userUsername, friendTransactions, setFriendTransactions]);
 
+
+  console.log(transactions);
+  console.log(friendTransactions)
+
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
       const date = new Date(transaction.createdAt).toLocaleDateString();

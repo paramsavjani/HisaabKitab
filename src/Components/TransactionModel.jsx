@@ -93,6 +93,7 @@ const TransactionModal = ({
           createdAt: data.transaction._doc.createdAt,
           status: data.transaction._doc.status,
           sender: data.transaction._doc.sender,
+          receiver: data.transaction._doc.receiver,
         },
       ]);
       setTransactions((prev) => [
@@ -103,9 +104,11 @@ const TransactionModal = ({
           _id: data.transaction._doc._id,
           createdAt: data.transaction._doc.createdAt,
           status: data.transaction._doc.status,
-          sender: data.transaction.sender,
+          sender: data.transaction._doc.sender,
+          receiver: data.transaction._doc.receiver,
         },
       ]);
+      console.log(data.transaction);
 
       setAmount("");
       setDescription("");
