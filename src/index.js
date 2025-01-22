@@ -15,6 +15,7 @@ import User from "./Components/User";
 import IncomingRequests from "./Components/IncomingRequests";
 import Transactions from "./Components/Transactions";
 import SplitExpense from "./Components/SplitExpense";
+import AllTransactions from "./Components/AllTransaction";
 
 import {
   createBrowserRouter,
@@ -67,6 +68,7 @@ const router = createBrowserRouter(
       <Route path="transactions/:chatId" element={<Transactions />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="split-expense" element={<SplitExpense />} />
+      <Route path="all-transactions" element={<AllTransactions />} />
     </Route>
   )
 );
