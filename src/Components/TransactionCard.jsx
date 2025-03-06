@@ -259,7 +259,7 @@ const TransactionCard = ({ transaction, userId, setFriendTransactions, friendUse
           </div>
 
           <div
-            className={`text-2xl font-bold mb-1 ${isSender ? "text-right" : "text-left"} ${getAmountColor()} 
+            className={`text-3xl fredericka-the-great-regular mb-1 ${isSender ? "text-right" : "text-left"} ${getAmountColor()} 
             transition-all duration-300 transform ${status === "completed" ? "scale-105" : ""}`}
           >
             ₹{Math.abs(amount)}
