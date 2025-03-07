@@ -310,20 +310,6 @@ const Dashboard = () => {
                           className={`kranky-regular text-lg font-extrabold ${
                             friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
                           }`}
-                          initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-                          animate={{
-                            opacity: 1,
-                            scale: 1,
-                            rotate: 0,
-                          }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 15,
-                            delay: 0.2 + index * 0.05,
-                          }}
-                          whileHover={{ scale: 1.2, rotate: friend.totalAmount < 0 ? -5 : 5 }}
-                          whileTap={{ scale: 0.9 }}
                         >
                           ₹{Math.abs(friend.totalAmount).toFixed(2)}
                         </motion.div>
@@ -576,7 +562,7 @@ const Dashboard = () => {
       >
         <Link
           to="/split-expense"
-          className="flex items-center justify-center gap-2 bg-blue-950 text-white rounded-full shadow-lg p-4 transition-all"
+          className="flex items-center justify-center gap-2 bg-blue-950 text-white rounded-full shadow-lg p-4 "
           style={{ boxShadow: "0 5px 20px rgba(59, 130, 246, 0.5)" }}
         >
           <motion.img
