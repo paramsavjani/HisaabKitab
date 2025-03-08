@@ -88,9 +88,20 @@ export default function Transactions() {
   const userUsername = chatId?.split("--")[0]
   const friendId = chatId?.split("--")[1]
   const lastTransactionRef = useRef(null)
+  const transactionContainerRef = useRef(null)
+  const transactionIdsRef = useRef(new Set())
+  const initialLoadRef = useRef(true)
+  const shouldScrollRef = useRef(true)
+  const lastActionWasStatusUpdateRef = useRef(false)
   const [friendTransactions, setFriendTransactions] = useState([])
   const [buttonsVisible, setButtonsVisible] = useState(false)
   const { user, activeFriends, setActiveFriends, transactions, setTransactions } = useContext(UserContext)
+
+  // Track transaction IDs to detect new transactions vs. status updates
+
+  // Track if this is initial load
+
+  // Track if we should scroll (on initial load or new transaction)
 
   // Socket connection and button visibility setup
   useEffect(() => {
@@ -99,6 +110,11 @@ export default function Transactions() {
     }, 300)
 
     const handleNewTransaction = (newTransaction) => {
+      console.log("New transaction received:", newTransaction._id)
+      // Mark that we should scroll when this transaction is processed
+      shouldScrollRef.current = true
+      lastActionWasStatusUpdateRef.current = false
+
       setTransactions((prev) => {
         // Check if transaction already exists
         if (prev.some((t) => t._id === newTransaction._id)) return prev
@@ -109,6 +125,10 @@ export default function Transactions() {
     socket.on("newTransaction", handleNewTransaction)
 
     const handleStatusUpdate = (_id, status) => {
+      // Status updates should NOT trigger scrolling
+      lastActionWasStatusUpdateRef.current = true
+      shouldScrollRef.current = false
+
       setTransactions((prev) =>
         prev.map((transaction) => (transaction._id === _id ? { ...transaction, status } : transaction)),
       )
@@ -143,6 +163,25 @@ export default function Transactions() {
         (transaction.receiver === user._id && transaction.sender === friendMain._id),
     )
 
+    // Check if there are any new transactions
+    let hasNewTransactions = false
+    const currentIds = new Set()
+
+    filteredTransactions.forEach((transaction) => {
+      currentIds.add(transaction._id)
+      if (!transactionIdsRef.current.has(transaction._id)) {
+        hasNewTransactions = true
+      }
+    })
+
+    // Update our tracking set
+    transactionIdsRef.current = currentIds
+
+    // If there are new transactions and it's not initial load, we should scroll
+    if (hasNewTransactions && !initialLoadRef.current) {
+      shouldScrollRef.current = true
+    }
+
     // Process and enhance transactions with formatted dates
     const processedTransactions = filteredTransactions.map((transaction) => {
       const parsedDate = parseDate(transaction.createdAt)
@@ -162,7 +201,45 @@ export default function Transactions() {
     })
 
     setFriendTransactions(sortedTransactions)
+
+    // After initial load, mark it as complete
+    if (initialLoadRef.current && filteredTransactions.length > 0) {
+      initialLoadRef.current = false
+    }
   }, [transactions, friendId, user, activeFriends, friendId])
+
+  // Scroll effect that runs when transactions change
+  useEffect(() => {
+    if (friendTransactions.length === 0) return
+
+    // Scroll to bottom if it's initial load or we have new transactions (but not for status updates)
+    if (shouldScrollRef.current && !lastActionWasStatusUpdateRef.current) {
+      console.log("Scrolling to latest transaction")
+
+      // Try to scroll to the last transaction if it exists
+      if (lastTransactionRef.current) {
+        lastTransactionRef.current.scrollIntoView({ behavior: "smooth", block: "end" })
+      }
+      // Fallback to scrolling the container to the bottom
+      else if (transactionContainerRef.current) {
+        transactionContainerRef.current.scrollTop = transactionContainerRef.current.scrollHeight
+      }
+
+      // Reset the scroll flag after scrolling
+      setTimeout(() => {
+        shouldScrollRef.current = false
+      }, 100)
+    }
+  }, [friendTransactions])
+
+  // Reset tracking when changing friends
+  useEffect(() => {
+    // Reset when changing friends
+    initialLoadRef.current = true
+    shouldScrollRef.current = true
+    lastActionWasStatusUpdateRef.current = false
+    transactionIdsRef.current = new Set()
+  }, [friendId])
 
   const handleButtonClick = (type) => {
     setTransactionType(type)
@@ -256,19 +333,6 @@ export default function Transactions() {
 
     return groups
   }
-
-  // Scroll to latest transaction
-  useEffect(() => {
-    if (friendTransactions.length === 0) return
-
-    // Scroll to the bottom of the container on initial load
-    const transactionsContainer = document.getElementById("transactions-container")
-    if (transactionsContainer) {
-      setTimeout(() => {
-        transactionsContainer.scrollTop = transactionsContainer.scrollHeight
-      }, 100)
-    }
-  }, [friendTransactions])
 
   // Function to generate initials for the profile picture
   const getInitials = (name) => {
@@ -430,42 +494,52 @@ export default function Transactions() {
       {/* Transactions Section - Mobile Optimized */}
       <div
         id="transactions-container"
+        ref={transactionContainerRef}
         className="flex-1 pt-20 pb-24 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto"
       >
         {friendTransactions?.length > 0 ? (
           <div className="space-y-4 animate-fade-in">
-            {sortedDateKeys.map((dateKey) => (
-              <div key={dateKey}>
-                <div className="flex justify-center my-3">
-                  <div className="px-3 py-1 rounded-full bg-[#1a2030] text-gray-400 text-xs border border-gray-800/50 shadow-sm">
-                    {formatDateForDisplay(dateKey)}
+            {sortedDateKeys.map((dateKey) => {
+              // Sort transactions within each group (oldest first)
+              groupedTransactions[dateKey].sort((a, b) => {
+                if (!a.parsedDate && !b.parsedDate) return 0
+                if (!a.parsedDate) return 1
+                if (!b.parsedDate) return -1
+                return a.parsedDate.getTime() - b.parsedDate.getTime() // Oldest first
+              })
+
+              return (
+                <div key={dateKey}>
+                  <div className="flex justify-center my-3">
+                    <div className="px-3 py-1 rounded-full bg-[#1a2030] text-gray-400 text-xs border border-gray-800/50 shadow-sm">
+                      {formatDateForDisplay(dateKey)}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {groupedTransactions[dateKey].map((transaction, index) => {
+                      // Determine if this is the very last transaction in the entire list
+                      const isLastTransaction =
+                        dateKey === sortedDateKeys[sortedDateKeys.length - 1] &&
+                        index === groupedTransactions[dateKey].length - 1
+
+                      return (
+                        <div ref={isLastTransaction ? lastTransactionRef : null} key={transaction._id}>
+                          <TransactionCard
+                            transaction={transaction}
+                            userId={user?._id}
+                            setFriendTransactions={setFriendTransactions}
+                            friendUsername={friendId}
+                            fcmToken={friend?.fcmToken}
+                            friendId={friend?._id}
+                          />
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
-
-                <div className="space-y-2">
-                  {groupedTransactions[dateKey].map((transaction, index) => (
-                    <div
-                      ref={
-                        index === groupedTransactions[dateKey].length - 1 &&
-                        dateKey === sortedDateKeys[sortedDateKeys.length - 1]
-                          ? lastTransactionRef
-                          : null
-                      }
-                      key={transaction._id}
-                    >
-                      <TransactionCard
-                        transaction={transaction}
-                        userId={user?._id}
-                        setFriendTransactions={setFriendTransactions}
-                        friendUsername={friendId}
-                        fcmToken={friend?.fcmToken}
-                        friendId={friend?._id}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center animate-fade-in">
