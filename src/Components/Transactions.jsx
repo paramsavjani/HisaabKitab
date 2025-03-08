@@ -88,6 +88,7 @@ export default function Transactions() {
   const userUsername = chatId?.split("--")[0]
   const friendId = chatId?.split("--")[1]
   const lastTransactionRef = useRef(null)
+  const spacerRef = useRef(null)
   const transactionContainerRef = useRef(null)
   const transactionIdsRef = useRef(new Set())
   const initialLoadRef = useRef(true)
@@ -96,12 +97,6 @@ export default function Transactions() {
   const [friendTransactions, setFriendTransactions] = useState([])
   const [buttonsVisible, setButtonsVisible] = useState(false)
   const { user, activeFriends, setActiveFriends, transactions, setTransactions } = useContext(UserContext)
-
-  // Track transaction IDs to detect new transactions vs. status updates
-
-  // Track if this is initial load
-
-  // Track if we should scroll (on initial load or new transaction)
 
   // Socket connection and button visibility setup
   useEffect(() => {
@@ -214,21 +209,34 @@ export default function Transactions() {
 
     // Scroll to bottom if it's initial load or we have new transactions (but not for status updates)
     if (shouldScrollRef.current && !lastActionWasStatusUpdateRef.current) {
-      console.log("Scrolling to latest transaction")
+      console.log("Scrolling to latest transaction with extra space")
 
-      // Try to scroll to the last transaction if it exists
-      if (lastTransactionRef.current) {
-        lastTransactionRef.current.scrollIntoView({ behavior: "smooth", block: "end" })
+      // Try to scroll to the spacer element if it exists (this will give extra space at bottom)
+      if (spacerRef.current) {
+        setTimeout(() => {
+          spacerRef.current.scrollIntoView({ behavior: "smooth", block: "end" })
+          console.log("Scrolled to spacer element")
+        }, 100)
       }
-      // Fallback to scrolling the container to the bottom
+      // Fallback to scrolling to the last transaction
+      else if (lastTransactionRef.current) {
+        setTimeout(() => {
+          lastTransactionRef.current.scrollIntoView({ behavior: "smooth", block: "end" })
+          console.log("Scrolled to last transaction")
+        }, 100)
+      }
+      // Last resort: scroll the container to the bottom
       else if (transactionContainerRef.current) {
-        transactionContainerRef.current.scrollTop = transactionContainerRef.current.scrollHeight
+        setTimeout(() => {
+          transactionContainerRef.current.scrollTop = transactionContainerRef.current.scrollHeight
+          console.log("Scrolled container to bottom")
+        }, 100)
       }
 
       // Reset the scroll flag after scrolling
       setTimeout(() => {
         shouldScrollRef.current = false
-      }, 100)
+      }, 200)
     }
   }, [friendTransactions])
 
@@ -414,6 +422,11 @@ export default function Transactions() {
       .kranky-regular {
         font-family: 'Kranky', cursive;
       }
+      
+      .bottom-spacer {
+        height: 100px; /* Space for buttons */
+        width: 100%;
+      }
     `
     document.head.appendChild(style)
 
@@ -456,7 +469,7 @@ export default function Transactions() {
   return (
     <div className="min-h-screen bg-[#0d1117] text-white flex flex-col">
       {/* Enhanced header design */}
-      <div className="bg-gradient-to-r from-[#161b22] to-[#1a2030] shadow-lg p-3 flex items-center justify-between w-full border-b border-cyan-500/30 fixed top-0 left-0 right-0 z-10">
+      <div className="bg-gradient-to-r from-[#161b22] to-[#1a2030] shadow-lg p-3 pl-12 flex items-center justify-between w-full border-b border-cyan-500/30 fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center space-x-3">
           {friend?.profilePicture ? (
             <img
@@ -495,7 +508,7 @@ export default function Transactions() {
       <div
         id="transactions-container"
         ref={transactionContainerRef}
-        className="flex-1 pt-20 pb-24 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto"
+        className="flex-1 pt-20 pb-0 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto"
       >
         {friendTransactions?.length > 0 ? (
           <div className="space-y-4 animate-fade-in">
@@ -540,6 +553,9 @@ export default function Transactions() {
                 </div>
               )
             })}
+
+            {/* Add extra space at the bottom to ensure buttons don't overlap with content */}
+            <div ref={spacerRef} className="bottom-spacer" aria-hidden="true"></div>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center animate-fade-in">
@@ -566,9 +582,7 @@ export default function Transactions() {
         >
           <div className="relative">
             <Send className="h-6 w-6 transform rotate-180" />
-            <div className="absolute -top-2 -right-2 bg-white text-red-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-red-600 shadow-sm">
-              ₹
-            </div>
+           
           </div>
         </button>
 
@@ -580,9 +594,7 @@ export default function Transactions() {
         >
           <div className="relative">
             <Send className="h-6 w-6" />
-            <div className="absolute -top-2 -right-2 bg-white text-green-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-green-600 shadow-sm">
-              ₹
-            </div>
+           
           </div>
         </button>
       </div>
