@@ -10,6 +10,75 @@ import socket from "../socket.js"
 import TransactionCard from "./TransactionCard"
 import TransactionModal from "./TransactionModel"
 
+// Helper function to safely parse and format date
+const parseDate = (dateString) => {
+  if (!dateString) return null
+
+  try {
+    // Try different date formats
+    let date
+
+    // Try as ISO string
+    date = new Date(dateString)
+    if (!isNaN(date.getTime())) return date
+
+    // Try as timestamp
+    if (typeof dateString === "number" || /^\d+$/.test(dateString)) {
+      date = new Date(Number.parseInt(dateString))
+      if (!isNaN(date.getTime())) return date
+    }
+
+    // Try with manual parsing for different formats
+    const formats = [
+      // MM/DD/YYYY
+      (str) => {
+        const parts = str.split("/")
+        return parts.length === 3 ? new Date(parts[2], parts[0] - 1, parts[1]) : null
+      },
+      // DD/MM/YYYY
+      (str) => {
+        const parts = str.split("/")
+        return parts.length === 3 ? new Date(parts[2], parts[1] - 1, parts[0]) : null
+      },
+      // YYYY-MM-DD
+      (str) => {
+        const parts = str.split("-")
+        return parts.length === 3 ? new Date(parts[0], parts[1] - 1, parts[2]) : null
+      },
+    ]
+
+    for (const format of formats) {
+      const parsedDate = format(dateString)
+      if (parsedDate && !isNaN(parsedDate.getTime())) {
+        return parsedDate
+      }
+    }
+
+    // If all parsing attempts fail
+    console.warn(`Could not parse date: ${dateString}`)
+    return null
+  } catch (error) {
+    console.error("Date parsing error:", error, "for date:", dateString)
+    return null
+  }
+}
+
+// Helper function to format time
+const formatTime = (date) => {
+  if (!date) return "Unknown Time"
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(date)
+  } catch (error) {
+    console.error("Time formatting error:", error)
+    return "Unknown Time"
+  }
+}
+
 export default function Transactions() {
   const { chatId } = useParams()
   const [total, setTotal] = useState(null)
@@ -21,82 +90,86 @@ export default function Transactions() {
   const lastTransactionRef = useRef(null)
   const [friendTransactions, setFriendTransactions] = useState([])
   const [buttonsVisible, setButtonsVisible] = useState(false)
-
   const { user, activeFriends, setActiveFriends, transactions, setTransactions } = useContext(UserContext)
 
+  // Socket connection and button visibility setup
   useEffect(() => {
-    // Show buttons with a slight delay for a nice entrance effect
     const timer = setTimeout(() => {
       setButtonsVisible(true)
     }, 300)
 
-    return () => clearTimeout(timer)
-  }, [])
+    const handleNewTransaction = (newTransaction) => {
+      setTransactions((prev) => {
+        // Check if transaction already exists
+        if (prev.some((t) => t._id === newTransaction._id)) return prev
+        return [...prev, newTransaction]
+      })
+    }
 
-  useEffect(() => {
-    socket.on("newTransaction", (newTransaction) => {
-      setTransactions((prevTransactions) => [...prevTransactions, newTransaction])
-      setFriendTransactions((prevTransactions) => [...prevTransactions, newTransaction])
-    })
+    socket.on("newTransaction", handleNewTransaction)
 
-    socket.on("acceptTransaction", (_id) => {
-      setTransactions((prevTransactions) =>
-        prevTransactions.map((transaction) =>
-          transaction._id === _id ? { ...transaction, status: "completed" } : transaction,
-        ),
+    const handleStatusUpdate = (_id, status) => {
+      setTransactions((prev) =>
+        prev.map((transaction) => (transaction._id === _id ? { ...transaction, status } : transaction)),
       )
-      setFriendTransactions((prevTransactions) =>
-        prevTransactions.map((transaction) =>
-          transaction._id === _id ? { ...transaction, status: "completed" } : transaction,
-        ),
-      )
-    })
+    }
 
-    socket.on("rejectTransaction", (_id) => {
-      setTransactions((prevTransactions) =>
-        prevTransactions.map((transaction) =>
-          transaction._id === _id ? { ...transaction, status: "rejected" } : transaction,
-        ),
-      )
-      setFriendTransactions((prevTransactions) =>
-        prevTransactions.map((transaction) =>
-          transaction._id === _id ? { ...transaction, status: "rejected" } : transaction,
-        ),
-      )
-    })
-
+    socket.on("acceptTransaction", (_id) => handleStatusUpdate(_id, "completed"))
+    socket.on("rejectTransaction", (_id) => handleStatusUpdate(_id, "rejected"))
     socket.on("cancelTransaction", (_id) => {
-      setTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== _id))
-      setFriendTransactions((prevTransactions) => prevTransactions.filter((transaction) => transaction._id !== _id))
+      setTransactions((prev) => prev.filter((transaction) => transaction._id !== _id))
     })
 
     return () => {
-      socket.off("newTransaction")
+      clearTimeout(timer)
+      socket.off("newTransaction", handleNewTransaction)
       socket.off("acceptTransaction")
       socket.off("rejectTransaction")
       socket.off("cancelTransaction")
     }
   }, [])
 
+  // Process transactions when they change
   useEffect(() => {
-    if (user) {
-      const friendMain = activeFriends.find((friend) => friend.username === friendId)
-      if (!friendMain) {
-        window.history.pushState({}, "", "/dashboard")
-        window.dispatchEvent(new PopStateEvent("popstate"))
+    if (!user || !transactions || !friendId || !activeFriends) return
+
+    const friendMain = activeFriends.find((friend) => friend.username === friendId)
+    if (!friendMain) return
+
+    // Filter transactions for this friend
+    const filteredTransactions = transactions.filter(
+      (transaction) =>
+        (transaction.sender === user._id && transaction.receiver === friendMain._id) ||
+        (transaction.receiver === user._id && transaction.sender === friendMain._id),
+    )
+
+    // Process and enhance transactions with formatted dates
+    const processedTransactions = filteredTransactions.map((transaction) => {
+      const parsedDate = parseDate(transaction.createdAt)
+      return {
+        ...transaction,
+        parsedDate,
+        formattedTime: parsedDate ? formatTime(parsedDate) : "Unknown Time",
       }
-      if (userUsername !== user.username) {
-        window.history.pushState({}, "", "/transactions/" + user.username + "--" + friendId)
-        window.dispatchEvent(new PopStateEvent("popstate"))
-      }
-    }
-  })
+    })
+
+    // Sort transactions by date (newest first)
+    const sortedTransactions = processedTransactions.sort((a, b) => {
+      if (!a.parsedDate && !b.parsedDate) return 0
+      if (!a.parsedDate) return 1
+      if (!b.parsedDate) return -1
+      return b.parsedDate.getTime() - a.parsedDate.getTime()
+    })
+
+    setFriendTransactions(sortedTransactions)
+  }, [transactions, friendId, user, activeFriends, friendId])
 
   const handleButtonClick = (type) => {
     setTransactionType(type)
     setIsModalOpen(true)
   }
 
+  // Initial setup
   useEffect(() => {
     document.title = "Transactions"
     if (!user) {
@@ -110,16 +183,6 @@ export default function Transactions() {
 
     const friendMain = activeFriends.find((friend) => friend.username === friendId)
     setFriend(() => friendMain)
-
-    setFriendTransactions(() => {
-      const friendTransactions = transactions?.filter(
-        (transaction) =>
-          (transaction.sender === user?._id && transaction.receiver === friendMain?._id) ||
-          (transaction.receiver === user?._id && transaction.sender === friendMain?._id),
-      )
-
-      return friendTransactions?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-    })
 
     setActiveFriends((prevActiveFriends) => {
       const updatedActiveFriends = prevActiveFriends?.map((friend) => {
@@ -135,21 +198,27 @@ export default function Transactions() {
     })
   }, [friendId, userUsername])
 
+  // Calculate total balance
   useEffect(() => {
+    if (!user?._id || !friendTransactions.length) return
+
     let accumulatedTotal = 0
 
     for (const transaction of friendTransactions) {
       if (transaction.status === "completed") {
-        if (transaction.sender === user?._id) {
-          accumulatedTotal += transaction.amount // Amount to totalGive
+        if (transaction.sender === user._id) {
+          accumulatedTotal += transaction.amount
         } else {
-          accumulatedTotal -= transaction.amount // Amount to totalTake
+          accumulatedTotal -= transaction.amount
         }
       }
     }
 
-    setActiveFriends((prevActiveFriends) => {
-      const updatedActiveFriends = prevActiveFriends?.map((friend) => {
+    setTotal(accumulatedTotal)
+
+    setActiveFriends((prev) => {
+      if (!prev) return prev
+      return prev.map((friend) => {
         if (friend.username === friendId) {
           return {
             ...friend,
@@ -158,33 +227,52 @@ export default function Transactions() {
         }
         return friend
       })
-      return updatedActiveFriends
     })
+  }, [friendTransactions, user?._id, friendId])
 
-    setTotal(() => accumulatedTotal)
-  }, [userUsername, friendTransactions, setFriendTransactions])
-
+  // Group transactions by date
   const groupTransactionsByDate = (transactions) => {
-    return transactions.reduce((groups, transaction) => {
-      const date = new Date(transaction.createdAt).toLocaleDateString()
-      if (!groups[date]) groups[date] = []
-      groups[date].push(transaction)
+    const groups = transactions.reduce((groups, transaction) => {
+      const date = transaction.parsedDate
+
+      if (!date) return groups
+
+      const dateKey = date.toISOString().split("T")[0]
+      if (!groups[dateKey]) groups[dateKey] = []
+      groups[dateKey].push(transaction)
+
       return groups
     }, {})
+
+    // Sort transactions within each group (oldest first)
+    Object.keys(groups).forEach((dateKey) => {
+      groups[dateKey].sort((a, b) => {
+        if (!a.parsedDate && !b.parsedDate) return 0
+        if (!a.parsedDate) return 1
+        if (!b.parsedDate) return -1
+        return a.parsedDate.getTime() - b.parsedDate.getTime() // Oldest first
+      })
+    })
+
+    return groups
   }
 
-  const groupedTransactions = groupTransactionsByDate(friendTransactions)
-
+  // Scroll to latest transaction
   useEffect(() => {
-    if (lastTransactionRef.current) {
-      lastTransactionRef.current.scrollIntoView({
-        block: "end",
-      })
+    if (friendTransactions.length === 0) return
+
+    // Scroll to the bottom of the container on initial load
+    const transactionsContainer = document.getElementById("transactions-container")
+    if (transactionsContainer) {
+      setTimeout(() => {
+        transactionsContainer.scrollTop = transactionsContainer.scrollHeight
+      }, 100)
     }
   }, [friendTransactions])
 
   // Function to generate initials for the profile picture
   const getInitials = (name) => {
+    if (!name) return "FR"
     return name
       .split(" ")
       .map((word) => word[0])
@@ -270,10 +358,41 @@ export default function Transactions() {
     }
   }, [])
 
+  // Format date for display
+  const formatDateForDisplay = (dateKey) => {
+    if (dateKey === "Invalid Date") return "Unknown Date"
+
+    try {
+      // Parse the date key (YYYY-MM-DD)
+      const date = new Date(dateKey)
+
+      return date.toLocaleDateString("en-US", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    } catch (error) {
+      console.error("Error formatting date for display:", error)
+      return dateKey
+    }
+  }
+
+  // Get grouped and sorted transactions
+  const groupedTransactions = groupTransactionsByDate(friendTransactions)
+
+  // Sort date keys (newest first)
+  const sortedDateKeys = Object.keys(groupedTransactions).sort((a, b) => {
+    if (a === "Invalid Date") return 1
+    if (b === "Invalid Date") return -1
+
+    // Compare dates (oldest first)
+    return new Date(a) - new Date(b)
+  })
+
   return (
     <div className="min-h-screen bg-[#0d1117] text-white flex flex-col">
       {/* Enhanced header design */}
-      <div className="bg-gradient-to-r from-[#161b22] to-[#1a2030] shadow-lg p-3 pl-12 flex items-center justify-between w-full border-b border-cyan-500/30 fixed top-0 left-0 right-0 z-10">
+      <div className="bg-gradient-to-r from-[#161b22] to-[#1a2030] shadow-lg p-3 flex items-center justify-between w-full border-b border-cyan-500/30 fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center space-x-3">
           {friend?.profilePicture ? (
             <img
@@ -309,46 +428,48 @@ export default function Transactions() {
       </div>
 
       {/* Transactions Section - Mobile Optimized */}
-      <div className="flex-1 pt-20 pb-24 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto">
+      <div
+        id="transactions-container"
+        className="flex-1 pt-20 pb-24 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto"
+      >
         {friendTransactions?.length > 0 ? (
-          <div className="space-y-4 fade-in">
-            {Object.keys(groupedTransactions)
-              .sort((a, b) => new Date(b) - new Date(a))
-              .map((date) => (
-                <div key={date}>
-                  <div className="flex justify-center my-3">
-                    <div className="px-3 py-1 rounded-full bg-[#1a2030] text-gray-400 text-xs border border-gray-800/50 shadow-sm">
-                      {new Date(date).toLocaleDateString("en-US", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    {groupedTransactions[date]?.map((transaction, index) => (
-                      <div
-                        ref={index === groupedTransactions[date].length - 1 ? lastTransactionRef : null}
-                        key={transaction._id}
-                      >
-                        <TransactionCard
-                          transaction={transaction}
-                          userId={user?._id}
-                          setFriendTransactions={setFriendTransactions}
-                          friendUsername={friendId}
-                          fcmToken={friend?.fcmToken}
-                          friendId={friend?._id}
-                        />
-                      </div>
-                    ))}
+          <div className="space-y-4 animate-fade-in">
+            {sortedDateKeys.map((dateKey) => (
+              <div key={dateKey}>
+                <div className="flex justify-center my-3">
+                  <div className="px-3 py-1 rounded-full bg-[#1a2030] text-gray-400 text-xs border border-gray-800/50 shadow-sm">
+                    {formatDateForDisplay(dateKey)}
                   </div>
                 </div>
-              ))}
+
+                <div className="space-y-2">
+                  {groupedTransactions[dateKey].map((transaction, index) => (
+                    <div
+                      ref={
+                        index === groupedTransactions[dateKey].length - 1 &&
+                        dateKey === sortedDateKeys[sortedDateKeys.length - 1]
+                          ? lastTransactionRef
+                          : null
+                      }
+                      key={transaction._id}
+                    >
+                      <TransactionCard
+                        transaction={transaction}
+                        userId={user?._id}
+                        setFriendTransactions={setFriendTransactions}
+                        friendUsername={friendId}
+                        fcmToken={friend?.fcmToken}
+                        friendId={friend?._id}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center fade-in">
-            <div className="bg-[#1a2030] p-6 rounded-xl border border-cyan-500/20 shadow-md">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center animate-fade-in">
+            <div className="bg-[#161b22] p-6 rounded-xl border border-cyan-500/20 shadow-md">
               <ArrowLeftRight className="h-16 w-16 text-cyan-500 mb-4 mx-auto" />
               <h3 className="text-lg font-medium text-white mb-2">No transactions yet</h3>
               <p className="text-sm text-gray-400 mb-4">
@@ -371,6 +492,9 @@ export default function Transactions() {
         >
           <div className="relative">
             <Send className="h-6 w-6 transform rotate-180" />
+            <div className="absolute -top-2 -right-2 bg-white text-red-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-red-600 shadow-sm">
+              ₹
+            </div>
           </div>
         </button>
 
@@ -382,6 +506,9 @@ export default function Transactions() {
         >
           <div className="relative">
             <Send className="h-6 w-6" />
+            <div className="absolute -top-2 -right-2 bg-white text-green-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-green-600 shadow-sm">
+              ₹
+            </div>
           </div>
         </button>
       </div>
