@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useContext } from "react"
 import { useParams } from "react-router-dom"
-import { Send, DollarSign } from "lucide-react"
+import { Send, ArrowLeftRight, ChevronUp, ChevronDown } from "lucide-react"
 import UserContext from "../context/UserContext.js"
 import socket from "../socket.js"
 
@@ -20,8 +20,18 @@ export default function Transactions() {
   const friendId = chatId?.split("--")[1]
   const lastTransactionRef = useRef(null)
   const [friendTransactions, setFriendTransactions] = useState([])
+  const [buttonsVisible, setButtonsVisible] = useState(false)
 
   const { user, activeFriends, setActiveFriends, transactions, setTransactions } = useContext(UserContext)
+
+  useEffect(() => {
+    // Show buttons with a slight delay for a nice entrance effect
+    const timer = setTimeout(() => {
+      setButtonsVisible(true)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     socket.on("newTransaction", (newTransaction) => {
@@ -173,40 +183,72 @@ export default function Transactions() {
     }
   }, [friendTransactions])
 
+  // Function to generate initials for the profile picture
+  const getInitials = (name) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
   // Format balance to always show 2 decimal places
   const formatBalance = (value) => {
     const numValue = Number(value || 0)
     return Math.abs(numValue).toFixed(2)
   }
 
+  // Get balance status message
+  const getBalanceStatus = (total) => {
+    if (total > 0) {
+      return "You'll receive"
+    } else if (total < 0) {
+      return "You owe"
+    } else {
+      return "All settled"
+    }
+  }
+
+  // Get balance icon
+  const getBalanceIcon = (total) => {
+    if (total > 0) {
+      return <ChevronUp className="h-3 w-3" />
+    } else if (total < 0) {
+      return <ChevronDown className="h-3 w-3" />
+    }
+    return null
+  }
+
   // Inject styles for animations and transitions
   useEffect(() => {
     const style = document.createElement("style")
     style.textContent = `
-      @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
+      @keyframes slideInUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
       }
       
       @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from { opacity: 0; }
+        to { opacity: 1; }
       }
       
-      .scale-105 {
-        transform: scale(1.05);
+      @keyframes slideInRight {
+        from { transform: translateX(20px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
       }
       
-      .scale-95 {
-        transform: scale(0.95);
+      .slide-in-up {
+        animation: slideInUp 0.5s ease forwards;
       }
       
-      .animate-bounce-once {
-        animation: bounce 0.5s ease 1;
+      .slide-in-right {
+        animation: slideInRight 0.5s ease forwards;
       }
       
-      .animate-fade-in {
-        animation: fadeIn 0.3s ease-out forwards;
+      .fade-in {
+        animation: fadeIn 0.5s ease forwards;
       }
       
       .fredericka-the-great-regular {
@@ -230,46 +272,53 @@ export default function Transactions() {
 
   return (
     <div className="min-h-screen bg-[#0d1117] text-white flex flex-col">
-      {/* Simple Profile Section - Keeping existing navbar */}
-      <div className="pl-14 merienda-regular bg-[#161b22] shadow-lg p-3 flex items-center justify-between w-full border-b border-cyan-500/20 sticky top-0 z-10">
+      {/* Enhanced header design */}
+      <div className="bg-gradient-to-r from-[#161b22] to-[#1a2030] shadow-lg p-3 pl-12 flex items-center justify-between w-full border-b border-cyan-500/30 fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center space-x-3">
-          <img
-            src={friend?.profilePicture ? `${friend?.profilePicture}` : "/placeholder.svg?height=40&width=40"}
-            alt="Profile"
-            className="w-10 h-10 rounded-full border border-cyan-500/30"
-          />
+          {friend?.profilePicture ? (
+            <img
+              src={friend.profilePicture || "/placeholder.svg"}
+              alt="Profile"
+              className="w-10 h-10 rounded-full border-2 border-cyan-500/70 shadow-md"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+              {getInitials(friend?.name || "Friend")}
+            </div>
+          )}
           <div>
-            <h1 className="text-lg font-medium">{friend?.name || "Friend"}</h1>
-            <p className="text-xs text-gray-400">@{friend?.username}</p>
+            <h1 className="text-base font-semibold text-white">{friend?.name || "Friend"}</h1>
+            <p className="text-xs text-cyan-300/70">@{friend?.username}</p>
           </div>
         </div>
 
-        <div className="flex items-center">
-          <div className="text-right">
-            <p className="text-xs text-gray-400">Balance</p>
-            <p
-              className={`kranky-regular text-lg font-bold ${
-                (total ? total : friend?.totalAmount) < 0 ? "text-red-400" : "text-green-400"
-              }`}
-            >
-              ₹{formatBalance(total ? total : friend?.totalAmount)}
-            </p>
+        <div className="flex flex-col items-end">
+          <div className="flex items-center space-x-1 text-xs text-gray-300">
+            <span>{getBalanceStatus(total ? total : friend?.totalAmount)}</span>
+            {getBalanceIcon(total ? total : friend?.totalAmount)}
           </div>
+          <p
+            className={`text-base font-bold flex items-center ${
+              (total ? total : friend?.totalAmount) < 0 ? "text-red-400" : "text-green-400"
+            }`}
+          >
+            <span className="text-xs mr-0.5">₹</span>
+            {formatBalance(total ? total : friend?.totalAmount)}
+          </p>
         </div>
       </div>
 
       {/* Transactions Section - Mobile Optimized */}
-      <div className="flex-1 pt-4 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto">
+      <div className="flex-1 pt-20 pb-24 mx-auto w-full p-3 space-y-4 bg-[#0d1117] overflow-y-auto">
         {friendTransactions?.length > 0 ? (
-          <div className="space-y-4 animate-fade-in">
+          <div className="space-y-4 fade-in">
             {Object.keys(groupedTransactions)
-              .sort((a, b) => new Date(a) - new Date(b))
+              .sort((a, b) => new Date(b) - new Date(a))
               .map((date) => (
                 <div key={date}>
-                  {/* Date Separator - Compact for mobile */}
                   <div className="flex justify-center my-3">
-                    <div className="px-3 py-1 rounded-full bg-[#161b22] text-gray-400 text-xs border border-gray-800/50 shadow-sm">
-                      {new Date(groupedTransactions[date][0].createdAt).toLocaleDateString("en-US", {
+                    <div className="px-3 py-1 rounded-full bg-[#1a2030] text-gray-400 text-xs border border-gray-800/50 shadow-sm">
+                      {new Date(date).toLocaleDateString("en-US", {
                         day: "numeric",
                         month: "short",
                         year: "numeric",
@@ -277,11 +326,10 @@ export default function Transactions() {
                     </div>
                   </div>
 
-                  <div className="space-y-0">
+                  <div className="space-y-2">
                     {groupedTransactions[date]?.map((transaction, index) => (
                       <div
                         ref={index === groupedTransactions[date].length - 1 ? lastTransactionRef : null}
-                        className={`${index === groupedTransactions[date].length - 1 ? "pb-24" : ""}`}
                         key={transaction._id}
                       >
                         <TransactionCard
@@ -299,35 +347,41 @@ export default function Transactions() {
               ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-[60vh] text-center animate-fade-in">
-            <div className="bg-[#161b22] p-5 rounded-xl border border-cyan-500/20 shadow-md">
-              <DollarSign className="h-12 w-12 text-gray-400 mb-3 mx-auto" />
-              <h3 className="text-base font-medium text-white mb-1">No transactions yet</h3>
-              <p className="text-xs text-gray-400 mb-3">Start by creating your first transaction</p>
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center fade-in">
+            <div className="bg-[#1a2030] p-6 rounded-xl border border-cyan-500/20 shadow-md">
+              <ArrowLeftRight className="h-16 w-16 text-cyan-500 mb-4 mx-auto" />
+              <h3 className="text-lg font-medium text-white mb-2">No transactions yet</h3>
+              <p className="text-sm text-gray-400 mb-4">
+                Start by creating your first transaction with {friend?.name || "your friend"}
+              </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Button Bar - Simplified for mobile */}
-      <div className="fixed bottom-0 w-full bg-[#161b22] p-3 flex space-x-3 border-t border-cyan-500/20 shadow-lg">
+      {/* Side by side beautiful buttons with entrance animation */}
+      <div
+        className={`fixed bottom-6 right-6 flex space-x-4 ${buttonsVisible ? "opacity-100" : "opacity-0"} transition-opacity duration-500`}
+      >
         <button
           onClick={() => handleButtonClick("give")}
-          className="bg-red-500 text-white px-3 py-2.5 rounded-lg flex-1 shadow-md transition-all duration-200 transform active:scale-95 focus:outline-none text-sm font-medium"
+          className={`bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none flex items-center justify-center ${buttonsVisible ? "slide-in-right" : ""}`}
+          style={{ animationDelay: "0.1s" }}
+          aria-label="You Gave"
         >
-          <div className="flex items-center justify-center">
-            <Send className="h-4 w-4 mr-1.5 transform rotate-180" />
-            <span>You Gave</span>
+          <div className="relative">
+            <Send className="h-6 w-6 transform rotate-180" />
           </div>
         </button>
 
         <button
           onClick={() => handleButtonClick("get")}
-          className="bg-green-500 text-white px-3 py-2.5 rounded-lg flex-1 shadow-md transition-all duration-200 transform active:scale-95 focus:outline-none text-sm font-medium"
+          className={`bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110 focus:outline-none flex items-center justify-center ${buttonsVisible ? "slide-in-right" : ""}`}
+          style={{ animationDelay: "0.2s" }}
+          aria-label="You Got"
         >
-          <div className="flex items-center justify-center">
-            <Send className="h-4 w-4 mr-1.5" />
-            <span>You Got</span>
+          <div className="relative">
+            <Send className="h-6 w-6" />
           </div>
         </button>
       </div>

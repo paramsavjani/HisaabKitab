@@ -182,7 +182,7 @@ function Navbar() {
     <div className="flex">
       {/* Hamburger Menu Button */}
       <button
-        className={`md:hidden text-white text-2xl p-4 pt-3 pl-3 fixed top-2 left-2 z-50 ${
+        className={`md:hidden text-white text-2xl p-4 pt-2 pl-2 fixed top-2 left-2 z-50 ${
           menuOpen ? "hidden" : ""
         }`}
         onClick={() => setMenuOpen(!menuOpen)}
