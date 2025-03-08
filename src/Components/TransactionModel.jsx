@@ -21,23 +21,26 @@ const TransactionModal = ({
   const [calculationResult, setCalculationResult] = useState("")
   const [calculationError, setCalculationError] = useState("")
   const [amountError, setAmountError] = useState("")
+  const [isClosing, setIsClosing] = useState(false)
   const { accessToken, refreshToken } = React.useContext(UserContext)
   const amountInputRef = useRef(null)
   const modalRef = useRef(null)
   const expressionRef = useRef(null)
+  const backdropRef = useRef(null)
 
   useEffect(() => {
-    // Focus on the amount input when the modal opens
+    // Make modal visible immediately without any animation delay
+    if (modalRef.current) {
+      modalRef.current.classList.add("modal-active")
+    }
+    if (backdropRef.current) {
+      backdropRef.current.classList.add("backdrop-active")
+    }
+
+    // Focus immediately with no delay
     if (amountInputRef.current) {
       amountInputRef.current.focus()
     }
-
-    // Add animation class after a small delay
-    const timer = setTimeout(() => {
-      if (modalRef.current) {
-        modalRef.current.classList.add("modal-active")
-      }
-    }, 10)
 
     // Close modal on escape key
     const handleEscKey = (e) => {
@@ -47,10 +50,11 @@ const TransactionModal = ({
     }
 
     document.addEventListener("keydown", handleEscKey)
+    document.body.style.overflow = "hidden" // Prevent scrolling behind modal
 
     return () => {
-      clearTimeout(timer)
       document.removeEventListener("keydown", handleEscKey)
+      document.body.style.overflow = "" // Restore scrolling
     }
   }, [])
 
@@ -117,29 +121,28 @@ const TransactionModal = ({
       setCalculatedAmount(null)
       setCalculationError("")
 
-      // Add a subtle animation to the input
+      // Add a subtle animation to the input but without timeout
       if (amountInputRef.current) {
         amountInputRef.current.classList.add("pulse-animation")
-        setTimeout(() => {
-          amountInputRef.current.classList.remove("pulse-animation")
-        }, 10)
+        // Remove the class immediately after the next render
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (amountInputRef.current) {
+              amountInputRef.current.classList.remove("pulse-animation")
+            }
+          })
+        })
       }
     }
   }
 
   const handleClose = () => {
-    // Add exit animation
-    if (modalRef.current) {
-      modalRef.current.classList.remove("modal-active")
-      modalRef.current.classList.add("modal-exit")
+    // Prevent multiple close attempts
+    if (isClosing) return
+    setIsClosing(true)
 
-      // Wait for animation to complete before closing
-      setTimeout(() => {
-        setIsModalOpen(false)
-      }, 10)
-    } else {
-      setIsModalOpen(false)
-    }
+    // Close immediately without waiting for animation
+    setIsModalOpen(false)
   }
 
   const handleSubmit = async () => {
@@ -158,12 +161,17 @@ const TransactionModal = ({
     if (!finalAmount || isNaN(finalAmount) || Number.parseFloat(finalAmount) <= 0) {
       setAmountError("Please enter a valid amount")
 
-      // Highlight the input field
+      // Highlight the input field without timeout
       if (amountInputRef.current) {
         amountInputRef.current.classList.add("error-shake")
-        setTimeout(() => {
-          amountInputRef.current.classList.remove("error-shake")
-        }, 100)
+        // Remove the class immediately after the animation would complete
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (amountInputRef.current) {
+              amountInputRef.current.classList.remove("error-shake")
+            }
+          })
+        })
       }
       return
     }
@@ -273,8 +281,9 @@ const TransactionModal = ({
     style.textContent = `
       .modal-container {
         opacity: 0;
-        transform: scale(0.95);
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: scale(0.98);
+        transition: all 0.05s linear;
+        will-change: opacity, transform;
       }
       
       .modal-active {
@@ -283,12 +292,21 @@ const TransactionModal = ({
       }
       
       .modal-exit {
-        opacity: 0;
-        transform: scale(0.95);
+        display: none;
       }
       
       .modal-backdrop {
         backdrop-filter: blur(8px);
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      
+      .backdrop-active {
+        backdrop-filter: blur(8px);
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      
+      .backdrop-exiting {
+        display: none;
       }
       
       .input-focus-ring {
@@ -354,8 +372,7 @@ const TransactionModal = ({
       }
       
       .calculator-tip {
-        animation: fadeIn 0.5s ease forwards;
-        opacity: 0;
+        opacity: 1;
       }
       
       .error-message {
@@ -365,12 +382,6 @@ const TransactionModal = ({
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        animation: fadeIn 0.3s ease forwards;
-      }
-      
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
       }
       
       @keyframes pulse {
@@ -391,7 +402,7 @@ const TransactionModal = ({
       }
       
       .error-shake {
-        animation: shake 0.4s ease-in-out;
+        animation: shake 0.3s ease-in-out;
         border-color: #ef4444 !important;
       }
       
@@ -417,7 +428,8 @@ const TransactionModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 modal-"
+      ref={backdropRef}
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 modal-backdrop"
       onClick={handleClose}
     >
       <div
@@ -425,173 +437,179 @@ const TransactionModal = ({
         className="modal-container bg-gradient-to-b from-[#1a2030] to-[#161b22] rounded-xl p-6 w-11/12 sm:w-96 space-y-6 shadow-xl max-w-lg border border-cyan-500/20"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with icon */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div
-              className={`p-2 rounded-full ${
-                transactionType === "give" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
-              }`}
-            >
-              {transactionType === "give" ? (
-                <Send className="h-5 w-5 transform rotate-180" />
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </div>
-            <h2 className="text-xl font-semibold text-white">{transactionType === "give" ? "You Gave" : "You Got"}</h2>
-          </div>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white transition-colors p-1 rounded-full hover:bg-gray-700/50"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        {/* Friend info */}
-        <div className="flex items-center space-x-3 bg-[#0d1117] p-3 rounded-lg">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-            {friend?.name
-              ?.split(" ")
-              .map((word) => word[0])
-              .join("")
-              .toUpperCase()
-              .slice(0, 2) || "FR"}
-          </div>
-          <div>
-            <h3 className="text-white font-medium">{friend?.name || "Friend"}</h3>
-            <p className="text-xs text-cyan-300/70">@{friend?.username}</p>
-          </div>
-        </div>
-
-        {/* Calculator tip */}
-        <div className="calculator-tip bg-blue-500/10 text-blue-300 p-3 rounded-lg text-xs flex items-start space-x-2">
-          <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          <p>
-            You can enter calculations directly (e.g., <span className="text-white font-medium">23+45</span> or{" "}
-            <span className="text-white font-medium">100/2</span>) and we'll do the math for you!
-          </p>
-        </div>
-
-        {/* Amount input with currency symbol and calculation result */}
-        <div className="space-y-1">
-          <div className="amount-input-container">
-            <input
-              ref={amountInputRef}
-              type="text"
-              value={amount}
-              onChange={handleAmountChange}
-              onKeyDown={handleKeyDown}
-              placeholder="Amount"
-              className={`w-full p-4 bg-[#0d1117] text-white rounded-lg outline-none input-focus-ring amount-input text-lg ${
-                amountError ? "input-error" : ""
-              }`}
-            />
-
-            {showCalculation && !calculationError && (
-              <button
-                ref={expressionRef}
-                onClick={applyCalculation}
-                className="calculation-result"
-                disabled={calculatedAmount === null}
+        <div className="space-y-6">
+          {/* Header with icon */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div
+                className={`p-2 rounded-full ${
+                  transactionType === "give" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
+                }`}
               >
-                {calculationResult} <Check className="h-4 w-4 ml-1" />
-              </button>
-            )}
+                {transactionType === "give" ? (
+                  <Send className="h-5 w-5 transform rotate-180" />
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
+              </div>
+              <h2 className="text-xl font-semibold text-white">
+                {transactionType === "give" ? "You Gave" : "You Got"}
+              </h2>
+            </div>
+            <button
+              onClick={handleClose}
+              className="text-gray-400 hover:text-white transition-colors p-1 rounded-full hover:bg-gray-700/50"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
-            {showCalculation && calculationError && (
-              <div className="calculation-error">
-                <AlertCircle className="h-4 w-4 mr-1" /> {calculationError}
+          {/* Friend info */}
+          <div className="flex items-center space-x-3 bg-[#0d1117] p-3 rounded-lg">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
+              {friend?.name
+                ?.split(" ")
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2) || "FR"}
+            </div>
+            <div>
+              <h3 className="text-white font-medium">{friend?.name || "Friend"}</h3>
+              <p className="text-xs text-cyan-300/70">@{friend?.username}</p>
+            </div>
+          </div>
+
+          {/* Calculator tip */}
+          <div className="calculator-tip bg-blue-500/10 text-blue-300 p-3 rounded-lg text-xs flex items-start space-x-2">
+            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <p>
+              You can enter calculations directly (e.g., <span className="text-white font-medium">23+45</span> or{" "}
+              <span className="text-white font-medium">100/2</span>) and we'll do the math for you!
+            </p>
+          </div>
+
+          {/* Amount input with currency symbol and calculation result */}
+          <div className="space-y-1">
+            <div className="amount-input-container">
+              <input
+                ref={amountInputRef}
+                type="text"
+                value={amount}
+                onChange={handleAmountChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Amount"
+                className={`w-full p-4 bg-[#0d1117] text-white rounded-lg outline-none input-focus-ring amount-input text-lg ${
+                  amountError ? "input-error" : ""
+                }`}
+              />
+
+              {showCalculation && !calculationError && (
+                <button
+                  ref={expressionRef}
+                  onClick={applyCalculation}
+                  className="calculation-result"
+                  disabled={calculatedAmount === null}
+                >
+                  {calculationResult} <Check className="h-4 w-4 ml-1" />
+                </button>
+              )}
+
+              {showCalculation && calculationError && (
+                <div className="calculation-error">
+                  <AlertCircle className="h-4 w-4 mr-1" /> {calculationError}
+                </div>
+              )}
+
+              {!showCalculation && !calculationError && <Calculator className="h-5 w-5 calculator-icon" />}
+            </div>
+
+            {/* Inline error message */}
+            {amountError && (
+              <div className="error-message">
+                <AlertCircle className="h-4 w-4" />
+                <span>{amountError}</span>
               </div>
             )}
-
-            {!showCalculation && !calculationError && <Calculator className="h-5 w-5 calculator-icon" />}
           </div>
 
-          {/* Inline error message */}
-          {amountError && (
-            <div className="error-message">
-              <AlertCircle className="h-4 w-4" />
-              <span>{amountError}</span>
-            </div>
-          )}
-        </div>
+          {/* Description textarea */}
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add a description (optional)"
+            className="w-full p-4 bg-[#0d1117] text-white rounded-lg outline-none input-focus-ring resize-none min-h-[80px]"
+          ></textarea>
 
-        {/* Description textarea */}
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Add a description (optional)"
-          className="w-full p-4 bg-[#0d1117] text-white rounded-lg outline-none input-focus-ring resize-none min-h-[80px]"
-        ></textarea>
+          {/* Quick amount buttons */}
+          <div className="grid grid-cols-3 gap-2">
+            {[100, 200, 500].map((quickAmount) => (
+              <button
+                key={quickAmount}
+                onClick={() => {
+                  setAmount(quickAmount.toString())
+                  setShowCalculation(false)
+                  setCalculatedAmount(null)
+                  setCalculationError("")
+                  setAmountError("")
 
-        {/* Quick amount buttons */}
-        <div className="grid grid-cols-3 gap-2">
-          {[100, 200, 500].map((quickAmount) => (
+                  // No animation needed, just set the amount immediately
+                }}
+                className="bg-[#0d1117] hover:bg-[#1a2030] text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+              >
+                ₹{quickAmount}
+              </button>
+            ))}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex justify-between items-center pt-2 space-x-4">
             <button
-              key={quickAmount}
-              onClick={() => {
-                setAmount(quickAmount.toString())
-                setShowCalculation(false)
-                setCalculatedAmount(null)
-                setCalculationError("")
-                setAmountError("")
-
-                // Add pulse animation to the button
-                const button = document.activeElement
-                button.classList.add("pulse-animation")
-                setTimeout(() => {
-                  button.classList.remove("pulse-animation")
-                }, 500)
-              }}
-              className="bg-[#0d1117] hover:bg-[#1a2030] text-white py-2 px-3 rounded-lg text-sm font-medium transition-colors"
+              onClick={handleClose}
+              className="w-1/2 bg-[#0d1117] border border-gray-700 px-4 py-3 rounded-lg text-white font-medium hover:bg-gray-800 transition duration-200"
             >
-              ₹{quickAmount}
+              Cancel
             </button>
-          ))}
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex justify-between items-center pt-2 space-x-4">
-          <button
-            onClick={handleClose}
-            className="w-1/2 bg-[#0d1117] border border-gray-700 px-4 py-3 rounded-lg text-white font-medium hover:bg-gray-800 transition duration-200"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={isLoading}
-            className={`w-1/2 ${
-              transactionType === "give"
-                ? "bg-gradient-to-r from-red-500 to-red-600"
-                : "bg-gradient-to-r from-green-500 to-green-600"
-            } px-4 py-3 rounded-lg text-white font-medium transition duration-200 ${
-              isLoading ? "opacity-70" : "hover:shadow-lg"
-            }`}
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg
-                  className="animate-spin h-5 w-5 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  ></path>
-                </svg>
-                Processing...
-              </span>
-            ) : (
-              "Submit"
-            )}
-          </button>
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className={`w-1/2 ${
+                transactionType === "give"
+                  ? "bg-gradient-to-r from-red-500 to-red-600"
+                  : "bg-gradient-to-r from-green-500 to-green-600"
+              } px-4 py-3 rounded-lg text-white font-medium transition duration-200 ${
+                isLoading ? "opacity-70" : "hover:shadow-lg"
+              }`}
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                "Submit"
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
