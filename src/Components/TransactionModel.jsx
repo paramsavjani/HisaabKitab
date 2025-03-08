@@ -1,8 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { toast } from "react-toastify"
-import { X, Send, Calculator, Check, Info } from "lucide-react"
+import { X, Send, Calculator, Check, Info, AlertCircle } from "lucide-react"
 import UserContext from "../context/UserContext.js"
 import socket from "../socket.js"
 
@@ -20,6 +19,8 @@ const TransactionModal = ({
   const [isLoading, setIsLoading] = useState(false)
   const [showCalculation, setShowCalculation] = useState(false)
   const [calculationResult, setCalculationResult] = useState("")
+  const [calculationError, setCalculationError] = useState("")
+  const [amountError, setAmountError] = useState("")
   const { accessToken, refreshToken } = React.useContext(UserContext)
   const amountInputRef = useRef(null)
   const modalRef = useRef(null)
@@ -83,15 +84,28 @@ const TransactionModal = ({
     const value = e.target.value
     setAmount(value)
 
+    // Clear any previous errors
+    setAmountError("")
+    setCalculationError("")
+
     // Check if the input contains any mathematical operators
     if (/[+\-*/×÷]/.test(value)) {
       const result = evaluateExpression(value)
       setCalculatedAmount(result)
-      setCalculationResult(result !== null ? `= ₹${result.toFixed(2)}` : "")
-      setShowCalculation(true)
+
+      if (result !== null) {
+        setCalculationResult(`= ₹${result.toFixed(2)}`)
+        setShowCalculation(true)
+        setCalculationError("")
+      } else {
+        setCalculationResult("")
+        setCalculationError("Invalid calculation")
+        setShowCalculation(true)
+      }
     } else {
       setCalculatedAmount(null)
       setShowCalculation(false)
+      setCalculationError("")
     }
   }
 
@@ -101,6 +115,15 @@ const TransactionModal = ({
       setAmount(calculatedAmount.toString())
       setShowCalculation(false)
       setCalculatedAmount(null)
+      setCalculationError("")
+
+      // Add a subtle animation to the input
+      if (amountInputRef.current) {
+        amountInputRef.current.classList.add("pulse-animation")
+        setTimeout(() => {
+          amountInputRef.current.classList.remove("pulse-animation")
+        }, 10)
+      }
     }
   }
 
@@ -113,13 +136,16 @@ const TransactionModal = ({
       // Wait for animation to complete before closing
       setTimeout(() => {
         setIsModalOpen(false)
-      }, 200)
+      }, 10)
     } else {
       setIsModalOpen(false)
     }
   }
 
   const handleSubmit = async () => {
+    // Clear previous errors
+    setAmountError("")
+
     // If there's a calculation pending, apply it first
     let finalAmount = amount
     if (calculatedAmount !== null) {
@@ -128,16 +154,17 @@ const TransactionModal = ({
       setShowCalculation(false)
     }
 
+    // Validate amount
     if (!finalAmount || isNaN(finalAmount) || Number.parseFloat(finalAmount) <= 0) {
-      toast.error("Please enter a valid amount", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        theme: "dark",
-      })
+      setAmountError("Please enter a valid amount")
+
+      // Highlight the input field
+      if (amountInputRef.current) {
+        amountInputRef.current.classList.add("error-shake")
+        setTimeout(() => {
+          amountInputRef.current.classList.remove("error-shake")
+        }, 100)
+      }
       return
     }
 
@@ -165,15 +192,7 @@ const TransactionModal = ({
 
       const data = await res.json()
       if (!res.ok) {
-        toast.error(data.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          theme: "dark",
-        })
+        setAmountError(data.message || "Something went wrong. Please try again.")
         setIsLoading(false)
         return
       }
@@ -229,15 +248,7 @@ const TransactionModal = ({
       setDescription("")
     } catch (err) {
       console.error(err.message)
-      toast.error("Something went wrong. Please try again.", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        theme: "dark",
-      })
+      setAmountError("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -327,9 +338,34 @@ const TransactionModal = ({
         background: rgba(16, 185, 129, 0.2);
       }
       
+      .calculation-error {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #ef4444;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        background: rgba(239, 68, 68, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      
       .calculator-tip {
         animation: fadeIn 0.5s ease forwards;
         opacity: 0;
+      }
+      
+      .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: fadeIn 0.3s ease forwards;
       }
       
       @keyframes fadeIn {
@@ -347,12 +383,29 @@ const TransactionModal = ({
         animation: pulse 0.5s ease-in-out;
       }
       
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        50% { transform: translateX(4px); }
+        75% { transform: translateX(-4px); }
+      }
+      
+      .error-shake {
+        animation: shake 0.4s ease-in-out;
+        border-color: #ef4444 !important;
+      }
+      
       .calculator-icon {
         color: #9ca3af;
         position: absolute;
         right: 12px;
         top: 50%;
         transform: translateY(-50%);
+      }
+      
+      .input-error {
+        border-color: #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.05) !important;
       }
     `
     document.head.appendChild(style)
@@ -364,7 +417,7 @@ const TransactionModal = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 modal-backdrop"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 modal-"
       onClick={handleClose}
     >
       <div
@@ -376,7 +429,9 @@ const TransactionModal = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div
-              className={`p-2 rounded-full ${transactionType === "give" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}
+              className={`p-2 rounded-full ${
+                transactionType === "give" ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"
+              }`}
             >
               {transactionType === "give" ? (
                 <Send className="h-5 w-5 transform rotate-180" />
@@ -410,29 +465,56 @@ const TransactionModal = ({
           </div>
         </div>
 
-        {/* Amount input with currency symbol and calculation result */}
-        <div className="amount-input-container">
-          <input
-            ref={amountInputRef}
-            type="text"
-            value={amount}
-            onChange={handleAmountChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Amount"
-            className="w-full p-4 bg-[#0d1117] text-white rounded-lg outline-none input-focus-ring amount-input text-lg"
-          />
+        {/* Calculator tip */}
+        <div className="calculator-tip bg-blue-500/10 text-blue-300 p-3 rounded-lg text-xs flex items-start space-x-2">
+          <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+          <p>
+            You can enter calculations directly (e.g., <span className="text-white font-medium">23+45</span> or{" "}
+            <span className="text-white font-medium">100/2</span>) and we'll do the math for you!
+          </p>
+        </div>
 
-          {showCalculation ? (
-            <button
-              ref={expressionRef}
-              onClick={applyCalculation}
-              className="calculation-result"
-              disabled={calculatedAmount === null}
-            >
-              {calculationResult} <Check className="h-4 w-4 ml-1" />
-            </button>
-          ) : (
-            <Calculator className="h-5 w-5 calculator-icon" />
+        {/* Amount input with currency symbol and calculation result */}
+        <div className="space-y-1">
+          <div className="amount-input-container">
+            <input
+              ref={amountInputRef}
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Amount"
+              className={`w-full p-4 bg-[#0d1117] text-white rounded-lg outline-none input-focus-ring amount-input text-lg ${
+                amountError ? "input-error" : ""
+              }`}
+            />
+
+            {showCalculation && !calculationError && (
+              <button
+                ref={expressionRef}
+                onClick={applyCalculation}
+                className="calculation-result"
+                disabled={calculatedAmount === null}
+              >
+                {calculationResult} <Check className="h-4 w-4 ml-1" />
+              </button>
+            )}
+
+            {showCalculation && calculationError && (
+              <div className="calculation-error">
+                <AlertCircle className="h-4 w-4 mr-1" /> {calculationError}
+              </div>
+            )}
+
+            {!showCalculation && !calculationError && <Calculator className="h-5 w-5 calculator-icon" />}
+          </div>
+
+          {/* Inline error message */}
+          {amountError && (
+            <div className="error-message">
+              <AlertCircle className="h-4 w-4" />
+              <span>{amountError}</span>
+            </div>
           )}
         </div>
 
@@ -453,6 +535,8 @@ const TransactionModal = ({
                 setAmount(quickAmount.toString())
                 setShowCalculation(false)
                 setCalculatedAmount(null)
+                setCalculationError("")
+                setAmountError("")
 
                 // Add pulse animation to the button
                 const button = document.activeElement
