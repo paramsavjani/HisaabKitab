@@ -464,32 +464,7 @@ const TransactionModal = ({
             </button>
           </div>
 
-          {/* Friend info */}
-          <div className="flex items-center space-x-3 bg-[#0d1117] p-3 rounded-lg">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-sm">
-              {friend?.name
-                ?.split(" ")
-                .map((word) => word[0])
-                .join("")
-                .toUpperCase()
-                .slice(0, 2) || "FR"}
-            </div>
-            <div>
-              <h3 className="text-white font-medium">{friend?.name || "Friend"}</h3>
-              <p className="text-xs text-cyan-300/70">@{friend?.username}</p>
-            </div>
-          </div>
 
-          {/* Calculator tip */}
-          <div className="calculator-tip bg-blue-500/10 text-blue-300 p-3 rounded-lg text-xs flex items-start space-x-2">
-            <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <p>
-              You can enter calculations directly (e.g., <span className="text-white font-medium">23+45</span> or{" "}
-              <span className="text-white font-medium">100/2</span>) and we'll do the math for you!
-            </p>
-          </div>
-
-          {/* Amount input with currency symbol and calculation result */}
           <div className="space-y-1">
             <div className="amount-input-container">
               <input
@@ -617,4 +592,3 @@ const TransactionModal = ({
 }
 
 export default TransactionModal
-

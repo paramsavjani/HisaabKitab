@@ -221,9 +221,10 @@ export default function Transactions() {
       // Fallback to scrolling to the last transaction
       else if (lastTransactionRef.current) {
         setTimeout(() => {
-          lastTransactionRef.current.scrollIntoView({ behavior: "smooth", block: "end" })
-          console.log("Scrolled to last transaction")
-        }, 100)
+            lastTransactionRef.current.scrollIntoView({ behavior: "unset", block: "end" })
+            console.log("Scrolled to last transaction")
+            shouldScrollRef.current = false
+        }, 10)
       }
       // Last resort: scroll the container to the bottom
       else if (transactionContainerRef.current) {

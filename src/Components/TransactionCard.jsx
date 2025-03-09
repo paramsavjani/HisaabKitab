@@ -275,17 +275,6 @@ const TransactionCard = ({ transaction, userId, setFriendTransactions, friendUse
             </div>
           )}
 
-          {status === "rejected" && (
-            <img
-              src={rejectedIcon || "/placeholder.svg"}
-              alt="Rejected"
-              className={`absolute top-2 ${isSender ? "right-16" : "left-16"} w-8 h-8 animate-bounce-once opacity-80`}
-              style={{
-                animation: "bounce 0.5s ease 1",
-              }}
-            />
-          )}
-
           {status === "pending" && (
             <ActionButtons
               isSender={isSender}
