@@ -21,7 +21,7 @@ WORKDIR /app
 
 # Copy Backend
 COPY Backend ./Backend
-COPY index.js ./Backend/src
+COPY app.js ./Backend/src/app.js
 WORKDIR /app/Backend
 
 RUN npm ci --only=production && rm -rf ~/.npm
@@ -33,7 +33,7 @@ WORKDIR /app
 COPY --from=frontend-build /app/Frontend/build /app/Backend/build
 
 # Expose ports
-EXPOSE 1000
+EXPOSE 9000
 
 # Command to start the apps
 CMD ["sh", "-c", "cd Backend && node src/index.js"]
