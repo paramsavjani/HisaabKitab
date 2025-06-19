@@ -1,328 +1,375 @@
-"use client"
+import React, { useState, useContext } from "react";
+import { toast } from "react-toastify";
+import "./styles.css";
+import UserContext from "../context/UserContext.js";
+import socket from "../socket.js";
+import rejectedIcon from "../assets/icons/rejected.png";
 
-import { useState, useContext, useEffect } from "react"
-import { toast } from "react-toastify"
-import UserContext from "../context/UserContext.js"
-import socket from "../socket.js"
-import rejectedIcon from "../assets/icons/rejected.png"
-
-// Custom hook for transaction actions
-const useTransactionActions = (
+const TransactionCard = ({
   transaction,
   userId,
-  setTransactions,
   setFriendTransactions,
   friendUsername,
   fcmToken,
-  accessToken,
-  refreshToken,
-) => {
-  const { _id, sender, amount } = transaction
-  const [loading, setLoading] = useState({ accept: false, reject: false, cancel: false })
+}) => {
+  const { createdAt, amount, description, status, _id, sender } = transaction;
+  const { setTransactions, accessToken, refreshToken } =
+    useContext(UserContext);
+  const isSender = sender === userId;
 
-  const updateTransactionStatus = (newStatus) => {
-    const updateFunction = (prevTransactions) =>
-      prevTransactions.map((prevTransaction) =>
-        prevTransaction._id === _id ? { ...prevTransaction, status: newStatus } : prevTransaction,
-      )
+  // Loading states for buttons
+  const [loading, setLoading] = useState({
+    accept: false,
+    reject: false,
+    cancel: false,
+  });
 
-    setTransactions(updateFunction)
-    setFriendTransactions(updateFunction)
-  }
-
-  const handleApiError = (error, message = "An error occurred") => {
-    console.error(error)
-    toast.error(message, {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      theme: "dark",
-    })
-  }
-
-  const apiRequest = async (endpoint, actionType, onSuccess) => {
-    setLoading((prev) => ({ ...prev, [actionType]: true }))
-
+  // Handlers with loading logic
+  const handleAccept = async () => {
+    setLoading((prev) => ({ ...prev, accept: true }));
     try {
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ accessToken, refreshToken }),
-      })
-
-      const data = await res.json()
-
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/accept`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
+        }
+      );
+      const data = await res.json();
       if (!res.ok) {
-        handleApiError(data, data.message)
-        return
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+        return;
       }
+      const transactionAmount = transaction.amount;
 
-      onSuccess()
+      socket.emit("acceptTransaction", {
+        _id,
+        friendUsername,
+        fcmToken,
+        transactionAmount,
+      });
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction._id === _id) {
+            return {
+              ...prevTransaction,
+              status: "completed",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction._id === _id) {
+            return {
+              ...prevTransaction,
+              status: "completed",
+            };
+          }
+          return prevTransaction;
+        })
+      );
     } catch (err) {
-      handleApiError(err)
+      console.log(err);
     } finally {
-      setLoading((prev) => ({ ...prev, [actionType]: false }))
+      setLoading((prev) => ({ ...prev, accept: false }));
     }
-  }
+  };
 
-  const handleAccept = () =>
-    apiRequest("accept", "accept", () => {
-      socket.emit("acceptTransaction", { _id, friendUsername, fcmToken, transactionAmount: amount })
-      updateTransactionStatus("completed")
-    })
+  const handleReject = async () => {
+    setLoading((prev) => ({ ...prev, reject: true }));
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/deny`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
+        }
+      );
 
-  const handleReject = () =>
-    apiRequest("deny", "reject", () => {
-      socket.emit("rejectTransaction", { _id, friendUsername, fcmToken, transactionAmount: amount })
-      updateTransactionStatus("rejected")
-    })
-
-  const handleCancel = () =>
-    apiRequest("cancel", "cancel", () => {
-      socket.emit("cancelTransaction", { _id, friendUsername })
-
-      const element = document.getElementById(`transaction-${_id}`)
-      if (element) {
-        element.style.opacity = "0"
-        element.style.transform = "scale(0.9) translateY(10px)"
-
-        setTimeout(() => {
-          setTransactions((prev) => prev.filter((t) => t._id !== _id))
-          setFriendTransactions((prev) => prev.filter((t) => t._id !== _id))
-        }, 300)
-      } else {
-        setTransactions((prev) => prev.filter((t) => t._id !== _id))
-        setFriendTransactions((prev) => prev.filter((t) => t._id !== _id))
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+        return;
       }
-    })
 
-  return { loading, handleAccept, handleReject, handleCancel }
-}
+      const transactionAmount = transaction.amount;
 
-const LoadingSpinner = () => (
-  <svg
-    className="animate-spin h-4 w-4 mr-1.5 text-white"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 100 8v4a8 8 0 01-8-8z"></path>
-  </svg>
-)
+      socket.emit("rejectTransaction", {
+        _id,
+        friendUsername,
+        fcmToken,
+        transactionAmount,
+      });
 
-const StatusIndicator = ({ status, isSender }) => (
-  <div
-    className={`h-2 w-2 rounded-full ${
-      status === "completed"
-        ? "bg-green-400 animate-pulse"
-        : status === "rejected"
-          ? "bg-red-500"
-          : isSender
-            ? "bg-cyan-400 animate-pulse"
-            : "bg-pink-400 animate-pulse"
-    }`}
-  ></div>
-)
-
-const ActionButton = ({ onClick, disabled, loading, color, hoverColor, children }) => (
-  <button
-    onClick={onClick}
-    className={`bg-${color}-500 hover:bg-${hoverColor}-600 text-white px-3 py-1 rounded-md text-sm font-medium flex items-center justify-center transition-all duration-200 transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-${color}-400 focus:ring-opacity-50 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed`}
-    disabled={disabled}
-  >
-    {loading ? <LoadingSpinner /> : children}
-  </button>
-)
-
-const ActionButtons = ({ isSender, loading, handleAccept, handleReject, handleCancel }) => (
-  <div className={`flex space-x-2 mt-3 ${isSender ? "justify-end" : "justify-start"}`}>
-    {isSender ? (
-      <ActionButton
-        onClick={handleCancel}
-        disabled={loading.cancel}
-        loading={loading.cancel}
-        color="yellow"
-        hoverColor="yellow"
-      >
-        Cancel
-      </ActionButton>
-    ) : (
-      <>
-        <ActionButton
-          onClick={handleAccept}
-          disabled={loading.accept}
-          loading={loading.accept}
-          color="green"
-          hoverColor="green"
-        >
-          Accept
-        </ActionButton>
-        <ActionButton
-          onClick={handleReject}
-          disabled={loading.reject}
-          loading={loading.reject}
-          color="red"
-          hoverColor="red"
-        >
-          Reject
-        </ActionButton>
-      </>
-    )}
-  </div>
-)
-
-const DateSeparator = ({ date }) => (
-  <div className="flex justify-center my-4">
-    <div className="px-4 py-1 rounded-full bg-gray-800/50 text-gray-400 text-sm">
-      {new Date(date).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })}
-    </div>
-  </div>
-)
-
-const TransactionCard = ({ transaction, userId, setFriendTransactions, friendUsername, fcmToken, showDate }) => {
-  const { createdAt, amount, description, status, _id, sender } = transaction
-  const { setTransactions, accessToken, refreshToken } = useContext(UserContext)
-  const isSender = sender === userId
-
-  const { loading, handleAccept, handleReject, handleCancel } = useTransactionActions(
-    transaction,
-    userId,
-    setTransactions,
-    setFriendTransactions,
-    friendUsername,
-    fcmToken,
-    accessToken,
-    refreshToken,
-  )
-
-  useEffect(() => {
-    const element = document.getElementById(`transaction-${_id}`)
-    if (element) {
-      element.style.opacity = "0"
-      element.style.transform = isSender ? "translateX(20px)" : "translateX(-20px)"
-
-      setTimeout(() => {
-        element.style.opacity = "1"
-        element.style.transform = "translateX(0)"
-      }, 10)
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction._id === _id) {
+            return {
+              ...prevTransaction,
+              status: "rejected",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.map((prevTransaction) => {
+          if (prevTransaction._id === _id) {
+            return {
+              ...prevTransaction,
+              status: "rejected",
+            };
+          }
+          return prevTransaction;
+        })
+      );
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading((prev) => ({ ...prev, reject: false }));
     }
-  }, [_id, isSender])
+  };
 
-  const getAmountColor = () => {
-    if (status === "rejected") return "text-gray-400 line-through"
-    const isPositive = (isSender && amount > 0) || (!isSender && amount < 0)
-    return isPositive ? "text-green-400" : "text-red-400"
-  }
-
-  const getCardBackground = () => {
-    const baseColor = "bg-[#0d1117]"
-    const borderColor =
-      (isSender && amount > 0) || (!isSender && amount < 0) ? "border-green-500/30" : "border-red-500/30"
-
-    if (status === "completed") return `${baseColor} border-2 border-green-500/30`
-    if (status === "rejected") return `${baseColor} border-2 border-red-500/30 opacity-80`
-    return `${baseColor} border border-[1px] ${borderColor}`
-  }
+  const handleCancel = async () => {
+    setLoading((prev) => ({ ...prev, cancel: true }));
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/transactions/${_id}/cancel`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ accessToken, refreshToken }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          theme: "colored",
+        });
+        return;
+      }
+      socket.emit("cancelTransaction", { _id, friendUsername });
+      setTransactions((prevTransactions) =>
+        prevTransactions.filter((t) => t._id !== _id)
+      );
+      setFriendTransactions((prevTransactions) =>
+        prevTransactions.filter((t) => t._id !== _id)
+      );
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading((prev) => ({ ...prev, cancel: false }));
+    }
+  };
 
   return (
-    <>
-      {showDate && <DateSeparator date={createdAt} />}
+    <div
+      className={`w-full px-4 py-3 flex ${
+        isSender ? "justify-end" : "justify-start"
+      }`}
+    >
       <div
-        id={`transaction-${_id}`}
-        className={`w-full px-4 py-2 flex ${isSender ? "justify-end" : "justify-start"} transition-all duration-300`}
+        className={`relative p-5 pb-10 ${
+          status === "rejected" ? "pb-4" : ""
+        } rounded-xl shadow-md min-w-[200px] md:min-w-[300px] max-w-[200px] ${
+          isSender ? "bg-gray-700" : "bg-gray-800"
+        }`}
       >
+        {/* Tail Design */}
         <div
-          className={`relative p-3 rounded-2xl shadow-lg min-w-[180px] max-w-[250px] 
-            transition-all duration-300 transform ${getCardBackground()}
-            ${isSender ? "rounded-tr-sm" : "rounded-tl-sm"}
-            ${status === "pending" ? "hover:shadow-lg hover:shadow-cyan-500/10" : ""}`}
+          className={`absolute w-4 h-4 ${
+            isSender ? "bg-gray-700 right-[-8px]" : "bg-gray-800 left-[-8px]"
+          } top-4 rotate-45`}
+        ></div>
+
+        {/* Amount Section */}
+        <div
+          className={`text-3xl kranky-regular font-extrabold mb-4 ${
+            status === "rejected" ? "mb-0" : ""
+          } ${isSender ? "text-right" : "text-left"} ${
+            (isSender && transaction.amount > 0) ||
+            (!isSender && transaction.amount < 0)
+              ? "text-green-500"
+              : "text-red-500"
+          } ${status === "rejected" ? "line-through text-white" : ""}`}
         >
-          <div className={`flex items-center justify-between mb-2`}>
-            <StatusIndicator status={status} isSender={isSender} />
-            <span className="text-gray-400 text-sm">
-              {new Date(createdAt)
-                .toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-                .toLowerCase()}
-            </span>
-          </div>
+          ₹{Math.abs(amount)}
+        </div>
 
+        {/* Description Section */}
+        {description && (
           <div
-            className={`text-3xl fredericka-the-great-regular mb-1 ${isSender ? "text-right" : "text-left"} ${getAmountColor()} 
-            transition-all duration-300 transform ${status === "completed" ? "scale-105" : ""}`}
+            className={`text-lg italic caveat-regular text-gray-300 truncate ${
+              isSender ? "text-right pl-5" : "text-left pr-5"
+            }`}
           >
-            ₹{Math.abs(amount)}
+            {description}
           </div>
+        )}
+        {status === "rejected" && (
+          <img
+            src={rejectedIcon}
+            alt=""
+            className={`absolute top-4 ${
+              isSender ? "right-0" : "md:left-32 left-28"
+            } w-14 h-14`} // Position based on isSender
+          />
+        )}
 
-          {description && (
-            <div
-              className={`text-sm text-gray-400 ${
-                isSender ? "text-right" : "text-left"
-              } transition-all duration-300 mb-2`}
-            >
-              {description}
-            </div>
-          )}
+        {/* Action Buttons */}
+        {status === "pending" && (
+          <div
+            className={`flex space-x-0 mt-4 ${
+              isSender ? "justify-end" : "justify-start"
+            }`}
+          >
+            {isSender ? (
+              <button
+                onClick={handleCancel}
+                className="bg-yellow-600 hover:bg-yellow-700 border-2 border-yellow-400 text-white px-3 py-1 w-full rounded-md text-sm flex items-center justify-center"
+                disabled={loading.cancel}
+              >
+                {loading.cancel ? (
+                  <svg
+                    className="animate-spin h-4 w-4 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 100 8v4a8 8 0 01-8-8z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Cancel"
+                )}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleAccept}
+                  className="bg-blue-600 mr-1 hover:bg-blue-700 border-2 border-blue-400 text-white px-3 py-1 w-1/2 rounded-md text-sm flex items-center justify-center"
+                  disabled={loading.accept}
+                >
+                  {loading.accept ? (
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 100 8v4a8 8 0 01-8-8z"
+                      ></path>
+                    </svg>
+                  ) : (
+                    "Accept"
+                  )}
+                </button>
+                <button
+                  onClick={handleReject}
+                  className="bg-red-600 ml-1 hover:bg-red-700 border-2 border-red-400 text-white px-3 py-1 w-1/2 rounded-md text-sm flex items-center justify-center"
+                  disabled={loading.reject}
+                >
+                  {loading.reject ? (
+                    <svg
+                      className="animate-spin h-4 w-4 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 100 8v4a8 8 0 01-8-8z"
+                      ></path>
+                    </svg>
+                  ) : (
+                    "Reject"
+                  )}
+                </button>
+              </>
+            )}
+          </div>
+        )}
 
-          {status === "pending" && (
-            <ActionButtons
-              isSender={isSender}
-              loading={loading}
-              handleAccept={handleAccept}
-              handleReject={handleReject}
-              handleCancel={handleCancel}
-            />
-          )}
+        {/* Timestamp Section */}
+        <div
+          className={`absolute bottom-2 w-full ${
+            isSender ? "text-right pr-10" : "text-left"
+          } text-xs text-gray-400`}
+        >
+          {new Date(createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </div>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};
 
-const injectStyles = () => {
-  const style = document.createElement("style")
-  style.textContent = `
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .scale-105 {
-      transform: scale(1.05);
-    }
-    
-    .scale-95 {
-      transform: scale(0.95);
-    }
-    
-    .animate-bounce-once {
-      animation: bounce 0.5s ease 1;
-    }
-    
-    .animate-fade-in {
-      animation: fadeIn 0.3s ease-out forwards;
-    }
-  `
-  document.head.appendChild(style)
-}
-
-injectStyles()
-
-export default TransactionCard
-
+export default TransactionCard;

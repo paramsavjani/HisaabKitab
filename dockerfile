@@ -21,6 +21,7 @@ WORKDIR /app
 
 # Copy Backend
 COPY Backend ./Backend
+COPY index.js ./Backend/src
 WORKDIR /app/Backend
 
 RUN npm ci --only=production && rm -rf ~/.npm
