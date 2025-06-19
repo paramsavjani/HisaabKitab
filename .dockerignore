@@ -1,0 +1,8 @@
+.git
+Dockerfile
+.dockerignore
+/Frontend/node_modules
+/Frontend/build
+/Frontend/icons
+/Frontend/android
+/Backend/node_modules
