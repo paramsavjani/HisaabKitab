@@ -4,10 +4,10 @@ import { Outlet } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { Preferences } from "@capacitor/preferences";
 import UserContext from "./context/UserContext.js";
-import "./loading.css";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
 import socket from "./socket.js";
+import LoadingPage from "./loading.jsx";
 
 const Layout = () => {
   const {
@@ -206,11 +206,7 @@ const Layout = () => {
   return (
     <>
       {loading ? (
-        <div className="loader">
-          <div className="inner one"></div>
-          <div className="inner two"></div>
-          <div className="inner three"></div>
-        </div>
+        <LoadingPage />
       ) : (
         <div className="flex">
           {/* Navbar */}

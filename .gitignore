@@ -35,3 +35,10 @@ yarn-error.log*
 
 /Backend/node_modules
 /Backend/.env
+
+/Frontend/build
+/Frontend/android/.idea
+/Frontend/android/.gradle
+/Frontend/android/build
+/Frontend/android/capacitor-cordova-android-plugins
+

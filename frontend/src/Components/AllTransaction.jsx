@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import UserContext from "../context/UserContext.js";
 import "./styles.css";
-import "../loading.css";
 
 const AllTransactions = () => {
   const { user, activeFriends } = useContext(UserContext);
