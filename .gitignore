@@ -9,7 +9,9 @@
 
 .env
 /.env
-
+.Frontend/.env
+./Frontend/.env.local
+.Backend/.env
 # testing
 /coverage
 
