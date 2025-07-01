@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 
 const serviceAccount = JSON.parse(
   readFileSync(
-    "./hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json",
+    "./utils/hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json",
     "utf8"
   )
 );

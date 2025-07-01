@@ -14,7 +14,7 @@
 .Backend/.env
 # testing
 /coverage
-/Backend/src/hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json
+/Backend/src/utils/hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json
 # production
 /build
 
