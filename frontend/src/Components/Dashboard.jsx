@@ -233,16 +233,24 @@ const Dashboard = () => {
       </motion.div>
 
       {/* Mobile User List with Enhanced Staggered Animation */}
-      <motion.div className="block md:hidden" variants={containerVariants} initial="hidden" animate="visible">
+      <motion.div className="block md:hidden" variants={containerVariants}>
         <motion.ul
           className="merienda-regular divide-y divide-gray-700/40 rounded-xl overflow-hidden backdrop-blur-sm"
           style={{
             backgroundColor: "rgba(30, 30, 30, 0.6)",
             boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
           }}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
+          animate={{ 
+            y: 0, 
+            opacity: 1,
+            transition: {
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              delay: 0.2,
+              when: "beforeChildren"
+            }
+          }}
         >
           <AnimatePresence>
             {activeFriends &&
