@@ -16,9 +16,10 @@ const Dashboard = () => {
     setTotalGive(() => 0)
     activeFriends.forEach((friend) => {
       if (friend.totalAmount < 0) {
-        setTotalGive((prev) => prev + friend.totalAmount)
+        setTotalGive((prev) => prev + Number(friend.totalAmount))
       } else {
-        setTotalTake((prev) => prev + friend.totalAmount)
+        console.log(friend.totalAmount)
+        setTotalTake((prev) => prev + Number(friend.totalAmount))
       }
     })
   }, [activeFriends])

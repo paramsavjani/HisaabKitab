@@ -170,13 +170,14 @@ const Transactions = () => {
         }
       }
     }
+    accumulatedTotal = Number(accumulatedTotal.toFixed(2))
 
     setActiveFriends((prevActiveFriends) => {
       const updatedActiveFriends = prevActiveFriends?.map((friend) => {
         if (friend.username === friendId) {
           return {
             ...friend,
-            totalAmount: accumulatedTotal,
+            totalAmount: accumulatedTotal.toFixed(2),
           };
         }
         return friend;
