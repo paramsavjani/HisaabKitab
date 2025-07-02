@@ -306,7 +306,7 @@ function Navbar() {
                     src={
                       user.profilePicture
                         ? `${user.profilePicture}`
-                        : "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        : "/user2.png"
                     }
                     alt="User Profile"
                     className="w-full h-full object-cover"

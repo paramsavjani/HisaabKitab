@@ -282,7 +282,7 @@ const Dashboard = () => {
                             src={
                               friend.profilePicture
                                 ? `${friend.profilePicture}`
-                                : "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                                : "/user2.png"
                             }
                             alt={friend.username}
                             className="w-full h-full rounded-full object-cover shadow-md border border-gray-700"
@@ -485,7 +485,7 @@ const Dashboard = () => {
                         <img
                           src={
                             friend.profilePicture ||
-                            "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain" ||
+                            "/user2.png" ||
                             "/placeholder.svg"
                            || "/placeholder.svg"}
                           alt={friend.username}

@@ -293,7 +293,7 @@ const User = () => {
             <img
               src={
                 profile.profilePicture ||
-                "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                "/user2.png"
               } // fallback image if no profile picture is available
               alt={profile.profilePicture}
               className="w-full h-full object-cover"

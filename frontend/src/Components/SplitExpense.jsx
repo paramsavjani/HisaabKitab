@@ -319,7 +319,7 @@ export default function ImprovedSplitExpense() {
                 <img
                   src={
                     friend.profilePicture ||
-                    "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                    "/user2.png"
                   }
                   alt=""
                   className="rounded-full"
@@ -433,7 +433,7 @@ export default function ImprovedSplitExpense() {
                     <img
                       src={
                         friend.profilePicture ||
-                        "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        "/user2.png"
                       }
                       alt=""
                       className="rounded-full object-cover"

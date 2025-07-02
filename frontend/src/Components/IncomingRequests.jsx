@@ -101,7 +101,7 @@ function IncomingRequests() {
                     src={
                       request.profilePicture
                         ? `${request.profilePicture}`
-                        : "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+                        : "/user2.png"
                     }
                     alt={`${request.username}'s profile`}
                     className="w-12 h-12 rounded-full object-cover border-2 border-green-500"

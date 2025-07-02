@@ -220,7 +220,7 @@ const Transactions = () => {
         <img
           src={
             friend?.profilePicture ? `${friend?.profilePicture}` :
-            "https://tse1.mm.bing.net/th/id/OIP.aYhGylaZyL4Dj0CIenZPlAHaHa?rs=1&pid=ImgDetMain"
+            "/user2.png"
           }
           alt="Profile"
           className="w-12 h-12 sm:w-16 sm:h-16 rounded-full"
