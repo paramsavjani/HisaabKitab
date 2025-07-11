@@ -47,7 +47,6 @@ app.use("/api/v1/friendRequests", friendRequestRouter);
 app.use("/api/v1/friends", friendRouter);
 app.use("/api/v1/transactions", transactionRouter);
 
-// Serve frontend static files
 const frontendPath = path.join(__dirname, "../build");
 app.use(express.static(frontendPath));
 

@@ -8,7 +8,7 @@ RUN npm install  && npm run build
 
 FROM node:23-alpine AS backend
 
-ENV DEBIAN_FRONTEND=noninteractive
+# ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
