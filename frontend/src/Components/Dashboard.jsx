@@ -460,13 +460,7 @@ const Dashboard = () => {
                     custom={index}
                     className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden"
                     whileHover={{
-                      scale: 1.02,
                       backgroundColor: "rgba(45, 45, 45, 0.9)",
-                      boxShadow:
-                        friend.totalAmount < 0
-                          ? "0 10px 30px rgba(255, 69, 69, 0.2)"
-                          : "0 10px 30px rgba(69, 255, 144, 0.2)",
-                      x: 5,
                       transition: { duration: 0.2 },
                     }}
                     whileTap={{ scale: 0.98, x: 0 }}
