@@ -43,10 +43,7 @@ const userSchema = new mongoose.Schema(
 );
 
 userSchema.methods.isCorrectPassword = async function (password) {
-  console.log(password, this.password);
-
   const res =  await bcrypt.compare(password, this.password);
-  console.log(res)
   return res;
 };
 
