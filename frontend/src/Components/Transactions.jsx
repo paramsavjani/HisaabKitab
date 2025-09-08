@@ -170,7 +170,7 @@ const Transactions = () => {
         }
       }
     }
-    accumulatedTotal = Number(accumulatedTotal.toFixed(2))
+    accumulatedTotal = Number(accumulatedTotal.toFixed(2));
 
     setActiveFriends((prevActiveFriends) => {
       const updatedActiveFriends = prevActiveFriends?.map((friend) => {
@@ -187,7 +187,6 @@ const Transactions = () => {
 
     setTotal(() => accumulatedTotal);
   }, [userUsername, friendTransactions, setFriendTransactions]);
-
 
   const groupTransactionsByDate = (transactions) => {
     return transactions.reduce((groups, transaction) => {
@@ -216,18 +215,19 @@ const Transactions = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col">
       {/* Profile Section */}
-      <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-4 pl-16 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
+      <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-3 pl-14 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
         <img
           src={
-            friend?.profilePicture ? `${friend?.profilePicture}` :
-            "/user2.png"
+            friend?.profilePicture ? `${friend?.profilePicture}` : "/user2.png"
           }
           alt="Profile"
-          className="w-12 h-12 sm:w-16 sm:h-16 rounded-full"
+          className="w-10 h-10 sm:w-16 sm:h-16 rounded-full"
         />
         <Link to={`/users/${friend?.username}`} className="flex-1">
           <h1 className="text-xl font-bold sm:text-3xl">
-            {friend?.name || "Friend"}
+            {friend?.name.length > 8
+              ? friend?.name.substr(0, 5) + "..."
+              : friend?.name || "Friend"}
           </h1>
         </Link>
         <p
@@ -245,13 +245,13 @@ const Transactions = () => {
       {
         <div className="flex-1 pt-24 md:pt-28 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
           {transactions?.length > 0 && (
-            <div className="space-y-6">
+            <div className="space-y-0">
               {Object.keys(groupedTransactions)
                 .sort((a, b) => new Date(a) - new Date(b)) // Sort dates in descending order
                 .map((date) => (
                   <div key={date}>
                     <div className="flex justify-center items-center">
-                      <div className="flex justify-center items-center bg-gray-800 text-gray-400 text-sm h-8 w-36 rounded shadow-lg">
+                      <div className="flex justify-center items-center bg-gray-800 backdrop-blur-2xl text-gray-400 text-sm h-8 w-36 rounded-3xl shadow-lg">
                         {new Date(
                           groupedTransactions[date][0].createdAt
                         ).toLocaleDateString("en-US", {
