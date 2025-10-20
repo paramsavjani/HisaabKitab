@@ -1,14 +1,15 @@
 import asyncHandler from "../utils/asyncHandler.js";
-import { User } from "../models/User.model.js";
-import { Transaction } from "../models/Transaction.model.js";
-import { Friend } from "../models/Friend.model.js";
+import { UserDAL } from "../dal/UserDAL.js";
+import { TransactionDAL } from "../dal/TransactionDAL.js";
+import { FriendDAL } from "../dal/FriendDAL.js";
 
 const addTransaction = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  const user = await User.findOne({ _id: userId }).select(
-    "username name profilePicture email"
-  );
+  const user = await UserDAL.findById(userId);
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
 
   const friendUsername = req.params.username;
 
@@ -18,21 +19,12 @@ const addTransaction = asyncHandler(async (req, res) => {
     });
   }
 
-  const friend = await User.findOne({ username: friendUsername }).select(
-    "username name profilePicture email"
-  );
-
+  const friend = await UserDAL.findByUsername(friendUsername);
   if (!friend) {
     return res.status(402).json({ message: "Friend not found" });
   }
 
-  const friendship = await Friend.findOne({
-    $or: [
-      { userId: user._id, friendId: friend._id },
-      { userId: friend._id, friendId: user._id },
-    ],
-  });
-
+  const friendship = await FriendDAL.findByUsers(user._id, friend._id);
   if (!friendship) {
     return res
       .status(403)
@@ -61,83 +53,99 @@ const addTransaction = asyncHandler(async (req, res) => {
     return res.status(406).json({ message: "Amount should be greater than 1" });
   }
 
-  const isAdded = await Transaction.create({
+  // Generate a proper MongoDB ObjectId
+  const { ObjectId } = await import('mongodb');
+  const transactionId = new ObjectId();
+  
+  const transactionData = {
+    _id: transactionId,
     amount: roundedAmount,
     description: description,
     sender: user._id,
     receiver: friend._id,
     status: amount < 0 ? "completed" : "pending",
+    createdAt: new Date(),
+  };
+  
+  console.log("addTransaction - Creating transaction:", {
+    sender: user._id,
+    receiver: friend._id,
+    amount: roundedAmount,
+    userUsername: user.username,
+    friendUsername: friend.username
   });
 
+  const isAdded = await TransactionDAL.create(transactionData);
   if (!isAdded) {
     return res.status(500).json({ message: "Transaction failed" });
   }
 
-  friendship.lastTransactionTime = new Date();
-  friendship.isActive = true;
-  await friendship.save();
+  const updatedFriendship = await FriendDAL.update(friendship._id, {
+    lastTransactionTime: new Date(),
+    isActive: true,
+  });
+
+  // Emit socket event for real-time updates
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('newTransaction', {
+      ...isAdded,
+      sender: isAdded.sender, // Keep the actual sender ID
+      receiver: isAdded.receiver, // Keep the actual receiver ID
+      friendUsername: friend.username,
+    });
+  }
 
   return res.status(200).json({
     message: "Transaction added successfully",
-    transaction: { ...isAdded, sender: user },
+    transaction: { ...isAdded, sender: isAdded.sender, receiver: isAdded.receiver },
   });
 });
 
 const showTransactions = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const user = await User.findOne({ _id: userId }).select(
-    "username name profilePicture email fcmToken"
-  );
-
+  const user = await UserDAL.findById(userId);
   if (!user) {
     return res.status(400).json({ message: "User not found" });
   }
 
   const friendUsername = req.params.username;
-
   if (friendUsername === user.username) {
     return res.status(401).json({
       message: "You cannot view transactions with yourself",
     });
   }
 
-  const friend = await User.findOne({ username: friendUsername }).select(
-    "username name profilePicture email fcmToken"
-  );
-
+  const friend = await UserDAL.findByUsername(friendUsername);
   if (!friend) {
     return res.status(402).json({ message: "Friend not found" });
   }
 
-  const friendship = await Friend.findOne({
-    $or: [
-      { userId: user._id, friendId: friend._id },
-      { userId: friend._id, friendId: user._id },
-    ],
-  });
-
+  const friendship = await FriendDAL.findByUsers(user._id, friend._id);
   if (!friendship) {
     return res
       .status(403)
       .json({ message: "You are not friends with this user" });
   }
 
-  const transactions = await Transaction.find({
-    $or: [
-      { sender: user._id, receiver: friend._id },
-      { sender: friend._id, receiver: user._id },
-    ],
-  }).sort({ createdAt: -1 });
-
+  const transactions = await TransactionDAL.findByUsers(user._id, friend._id);
   const allTransaction = transactions.map((transaction) => {
+    console.log("showTransactions - Transaction data:", {
+      _id: transaction._id,
+      sender: transaction.sender,
+      receiver: transaction.receiver,
+      currentUserId: user._id,
+      friendId: friend._id
+    });
+    
     return {
       _id: transaction._id,
       amount: transaction.amount,
       description: transaction.description,
       status: transaction.status,
       createdAt: transaction.createdAt,
-      sender:
-        transaction.sender.toString() === user._id.toString() ? user : friend,
+      sender: transaction.sender, // Keep the actual sender ID
+      receiver: transaction.receiver, // Keep the actual receiver ID
     };
   });
 
@@ -146,11 +154,13 @@ const showTransactions = asyncHandler(async (req, res) => {
 
 const acceptTransaction = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-  const user = await User.findOne({ _id: userId });
+  const user = await UserDAL.findById(userId);
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
 
   const transactionId = req.params.transactioinId;
-
-  const transaction = await Transaction.findOne({ _id: transactionId });
+  const transaction = await TransactionDAL.findById(transactionId);
 
   if (!transaction) {
     return res.status(404).json({ message: "Transaction not found" });
@@ -168,8 +178,15 @@ const acceptTransaction = asyncHandler(async (req, res) => {
       .json({ message: "Transaction already completed or rejected" });
   }
 
-  transaction.status = "completed";
-  await transaction.save();
+  const updatedTransaction = await TransactionDAL.update(transactionId, {
+    status: "completed",
+  });
+
+  // Emit socket event for real-time updates
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('acceptTransaction', transactionId);
+  }
 
   return res.status(200).json({ message: "Transaction accepted successfully" });
 });
@@ -177,11 +194,11 @@ const acceptTransaction = asyncHandler(async (req, res) => {
 const denyTransaction = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  const user = await User.findOne({ _id: userId });
+  const user = await UserDAL.findById(userId);
 
   const transactionId = req.params.transactioinId;
 
-  const transaction = await Transaction.findOne({ _id: transactionId });
+  const transaction = await TransactionDAL.findById(transactionId);
 
   if (!transaction) {
     return res.status(404).json({ message: "Transaction not found" });
@@ -199,25 +216,30 @@ const denyTransaction = asyncHandler(async (req, res) => {
       .json({ message: "Transaction already completed or rejected" });
   }
 
-  transaction.status = "rejected";
-  await transaction.save();
+  const updatedTransaction = await TransactionDAL.update(transactionId, { status: "rejected" });
+
+  // Emit socket event for real-time updates
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('rejectTransaction', transactionId);
+  }
 
   return res.status(200).json({ message: "Transaction denied successfully" });
 });
 
 const cancelTransaction = asyncHandler(async (req, res) => {
   const userId = req.user._id;
+  const user = await UserDAL.findById(userId);
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
 
-  const user = await User.findOne({ _id: userId });
   const transactionId = req.params.transactioinId;
   if (!transactionId.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({ message: "Invalid transaction ID" });
   }
 
-  const transaction = await Transaction.findOne({
-    _id: transactionId,
-  });
-
+  const transaction = await TransactionDAL.findById(transactionId);
   if (!transaction) {
     return res.status(401).json({ message: "Transaction not found" });
   }
@@ -230,10 +252,15 @@ const cancelTransaction = asyncHandler(async (req, res) => {
     return res.status(403).json({ message: "Transaction already completed" });
   }
 
-  const deleted = await Transaction.deleteOne({ _id: transactionId });
-
+  const deleted = await TransactionDAL.delete(transactionId);
   if (!deleted) {
     return res.status(500).json({ message: "Transaction cancel failed" });
+  }
+
+  // Emit socket event for real-time updates
+  const io = req.app.get('io');
+  if (io) {
+    io.emit('cancelTransaction', transactionId);
   }
 
   return res
@@ -254,35 +281,38 @@ const splitExpenses = asyncHandler(async (req, res) => {
         continue;
       }
 
-      const isFriend = await Friend.findOne({
-        $or: [
-          { userId, friendId },
-          { userId: friendId, friendId: userId },
-        ],
-      });
+      const isFriend = await FriendDAL.findByUsers(userId, friendId);
 
       if (!isFriend) {
-        const friend = await User.findOne({ _id: friendId });
+        const friend = await UserDAL.findById(friendId);
         return res.status(403).json({
           message: `You are not friends with user: ${friend.username}`,
         });
       }
 
-      const transaction = await Transaction.create({
+      // Generate a proper MongoDB ObjectId
+      const { ObjectId } = await import('mongodb');
+      const transactionId = new ObjectId();
+      
+      const transactionData = {
+        _id: transactionId,
         amount,
         description,
         sender: userId,
         receiver: friendId,
         status: "pending",
-      });
+        createdAt: new Date(),
+      };
 
+      const transaction = await TransactionDAL.create(transactionData);
       if (!transaction) {
         return res.status(500).json({ message: "Transaction creation failed" });
       }
 
-      isFriend.lastTransactionTime = new Date();
-      isFriend.isActive = true;
-      await isFriend.save();
+      const updatedFriendship = await FriendDAL.update(isFriend._id, {
+        lastTransactionTime: new Date(),
+        isActive: true,
+      });
 
       totalTransactions.push(transaction);
     }

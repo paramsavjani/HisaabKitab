@@ -53,6 +53,9 @@ const io = new Server(httpServer, {
   },
 });
 
+// Store io instance in app for access in controllers
+app.set('io', io);
+
 const onlineUsers = new Map();
 
 io.use((socket, next) => {
