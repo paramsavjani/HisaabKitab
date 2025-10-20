@@ -1,26 +1,26 @@
 FROM node:23-alpine AS frontend-build
 
 WORKDIR /app
-COPY frontend ./Frontend
-WORKDIR /app/Frontend
+COPY frontend ./frontend
+WORKDIR /app/frontend
 RUN npm install  && npm run build
 
 
 FROM node:23-alpine AS backend
 
-# ENV DEBIAN_FRONTEND=noninteractive
+# ENV DEBIAN_fRONTEND=noninteractive
 
 WORKDIR /app
 
-COPY backend ./Backend
-COPY app.js ./Backend/src/app.js
-WORKDIR /app/Backend
+COPY backend ./backend
+COPY app.js ./backend/src/app.js
+WORKDIR /app/backend
 
 RUN npm ci --only=production && rm -rf ~/.npm
 
 WORKDIR /app
-COPY --from=frontend-build /app/Frontend/build /app/Backend/build
+COPY --from=frontend-build /app/frontend/build /app/backend/build
 
 EXPOSE 9000
 
-CMD ["sh", "-c", "cd Backend/src && node index.js"]
+CMD ["sh", "-c", "cd backend/src && node index.js"]
