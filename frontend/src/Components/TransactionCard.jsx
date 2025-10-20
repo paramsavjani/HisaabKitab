@@ -217,14 +217,6 @@ const TransactionCard = ({
           boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
         }}
       >
-        {/* Enhanced Tail Design */}
-        <div
-          className={`absolute w-3 h-3 ${
-            isSender 
-              ? "bg-gray-800 right-[-6px]" 
-              : "bg-gray-900 left-[-6px]"
-          } top-4 rotate-45 shadow-lg`}
-        ></div>
 
         {/* Status Badge */}
         {status === "completed" && (

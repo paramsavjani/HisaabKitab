@@ -274,33 +274,45 @@ const Transactions = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-900 shadow-lg p-1 pl-14 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
-        <img
-          src={
-            friend?.profilePicture ? `${friend?.profilePicture}` : "/user2.png"
-          }
-          alt="Profile"
-          className="w-10 h-10 sm:w-16 sm:h-16 rounded-full"
-        />
-        <Link to={`/users/${friend?.username}`} className="flex-1">
-          <h1 className="text-xl font-bold sm:text-3xl">
-            {friend?.name.length > 8
-              ? friend?.name.substr(0, 5) + "..."
-              : friend?.name || "Friend"}
-          </h1>
-        </Link>
-        <p
-          className={`kranky-regular text-2xl font-bold ${(total ? total : friend?.totalAmount) < 0
-              ? "text-red-500"
-              : "text-green-500"
-            }`}
-        >
-          ₹{Math.abs(total ? total : friend?.totalAmount)}
-        </p>
+      <div className="merienda-regular w-full bg-gradient-to-r pl-14 from-slate-950 via-gray-900 to-slate-950 shadow-2xl p-4 mb-6 flex items-center justify-between fixed top-0 left-0 right-0 z-10 border-b border-slate-600/30">
+        {/* Left Section - Menu and Profile */}
+        <div className="flex items-center space-x-4">
+          
+          <img
+            src={
+              friend?.profilePicture ? `${friend?.profilePicture}` : "/user2.png"
+            }
+            alt="Profile"
+            className="w-12 h-12 rounded-full border-2 border-slate-500 shadow-xl object-cover"
+          />
+          <div>
+            <h1 className="text-lg font-bold text-white">
+              {friend?.name.length > 12
+                ? friend?.name.substr(0, 10) + "..."
+                : friend?.name || "Friend"}
+            </h1>
+            <p className="text-xs text-slate-300">@{friend?.username}</p>
+          </div>
+        </div>
+        
+        {/* Right Section - Balance */}
+        <div className="text-right">
+          <p
+            className={`kranky-regular text-xl font-bold ${(total ? total : friend?.totalAmount) < 0
+                ? "text-red-400"
+                : "text-green-400"
+              }`}
+          >
+            ₹{Math.abs(total ? total : friend?.totalAmount)}
+          </p>
+          <p className="text-xs text-slate-300">
+            {(total ? total : friend?.totalAmount) < 0 ? "You owe" : "You're owed"}
+          </p>
+        </div>
       </div>
 
       {/* Mobile Transactions List with Dashboard-style Animation */}
-      <motion.div className="block md:hidden pt-4" variants={containerVariants}>
+      <motion.div className="block md:hidden pt-20" variants={containerVariants}>
         <motion.ul
           className="merienda-regular divide-y divide-gray-700/40 rounded-xl overflow-hidden backdrop-blur-sm"
           style={{
