@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import TransactionCard from "./TransactionCard";
 import TransactionModal from "./TransactionModel";
 import UserContext from "../context/UserContext.js";
 import "./styles.css";
 import socket from "../socket.js";
 import { motion, AnimatePresence } from "framer-motion";
+import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -402,42 +403,36 @@ const Transactions = () => {
         </motion.ul>
       </motion.div>
 
-      {/* Mobile Bottom Action Bar with Dashboard-style */}
+      {/* Mobile Bottom Action Bar - Icon Only */}
       <motion.div
-        className="md:hidden fixed bottom-4 left-4 right-4 z-40"
+        className="md:hidden fixed bottom-4 right-4 z-40"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
       >
-        <div className="flex space-x-3">
+        <div className="flex space-x-2">
           <motion.button
             onClick={() => handleButtonClick("give")}
-            className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-6 rounded-xl shadow-lg font-bold flex items-center justify-center space-x-2"
+            className="w-14 h-14 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full shadow-xl flex items-center justify-center"
             whileHover={{
-              scale: 1.05,
+              scale: 1.1,
               boxShadow: "0 10px 25px rgba(239, 68, 68, 0.5)",
             }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.9 }}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-            </svg>
-            <span>You Gave</span>
+            <ArrowUpRight className="w-6 h-6" />
           </motion.button>
-          <motion.button
-            onClick={() => handleButtonClick("get")}
-            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl shadow-lg font-bold flex items-center justify-center space-x-2"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 10px 25px rgba(34, 197, 94, 0.5)",
-            }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-            </svg>
-            <span>You Got</span>
-          </motion.button>
+            <motion.button
+              onClick={() => handleButtonClick("get")}
+              className="w-14 h-14 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full shadow-xl flex items-center justify-center"
+              whileHover={{
+                scale: 1.1,
+                boxShadow: "0 10px 25px rgba(34, 197, 94, 0.5)",
+              }}
+              whileTap={{ scale: 0.9 }}
+            >
+              <ArrowDownLeft className="w-6 h-6" />
+            </motion.button>
         </div>
       </motion.div>
 
