@@ -220,8 +220,8 @@ const TransactionCard = ({
 
         {/* Status Badge */}
         {status === "completed" && (
-          <div className={`absolute top-2 ${isSender ? "left-2" : "right-2"} bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold`}>
-            ✓
+          <div className={`absolute top-2 ${isSender ? "left-2" : "right-2"} bg-green-500 text-white text-xs font-extrabold px-2 py-1 rounded-full`}>
+            ✔
           </div>
         )}
 

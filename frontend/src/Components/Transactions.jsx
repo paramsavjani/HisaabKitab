@@ -275,7 +275,7 @@ const Transactions = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="merienda-regular w-full bg-gradient-to-r pl-14 from-slate-950 via-gray-900 to-slate-950 shadow-2xl p-4 mb-6 flex items-center justify-between fixed top-0 left-0 right-0 z-10 border-b border-slate-600/30">
+      <div className="merienda-regular w-full bg-gradient-to-r pl-14 from-slate-900 via-gray-950 to-slate-900 shadow-2xl p-4 mb-6 flex items-center justify-between fixed top-0 left-0 right-0 z-10 border-b border-slate-600/30">
         {/* Left Section - Menu and Profile */}
         <div className="flex items-center space-x-4">
           
@@ -340,7 +340,7 @@ const Transactions = () => {
                   <motion.div key={date} className="space-y-2">
                     {/* Date Header */}
                     <motion.div
-                      className="px-4 py-2 bg-gray-900/50 text-center"
+                      className="mx-auto w-fit px-2 py-2 bg-gray-800/50 text-center rounded-md"
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.1 }}
@@ -420,7 +420,7 @@ const Transactions = () => {
             }}
             whileTap={{ scale: 0.9 }}
           >
-            <ArrowUpRight className="w-6 h-6" />
+            <ArrowDownLeft className="w-6 h-6" />
           </motion.button>
             <motion.button
               onClick={() => handleButtonClick("get")}
@@ -431,7 +431,7 @@ const Transactions = () => {
               }}
               whileTap={{ scale: 0.9 }}
             >
-              <ArrowDownLeft className="w-6 h-6" />
+              <ArrowUpRight className="w-6 h-6" />
             </motion.button>
         </div>
       </motion.div>

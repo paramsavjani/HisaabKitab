@@ -182,7 +182,7 @@ function Navbar() {
     <div className="flex">
       {/* Hamburger Menu Button */}
       <button
-        className={`md:hidden text-white text-2xl p-2 pt-3 pl-2 fixed top-3 left-2 z-50 ${
+        className={`md:hidden text-white text-2xl p-2 pt-3 pl-2 fixed top-3 left-2 z-50 rounded-full shadow-[0_6px_20px_rgba(0,0,0,0.35)] ${
           menuOpen ? "hidden" : ""
         }`}
         onClick={() => setMenuOpen(!menuOpen)}
@@ -205,9 +205,13 @@ function Navbar() {
       {/* Navbar */}
       <nav
         ref={navRef}
-        className={`bg-slate-900 p-4 shadow-xl fixed left-0 top-0 max-w-[90%] w-80 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out ${
+        className={`p-4 fixed left-0 top-0 max-w-[90%] w-80 h-full z-40 flex flex-col justify-between transition-transform duration-500 ease-in-out border-r border-white/5 backdrop-blur-0 shadow-[0_20px_60px_rgba(0,0,0,0.6)] ${
           menuOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
+        style={{
+          background:
+            "radial-gradient(900px 400px at 100% 0%, rgba(59,130,246,0.06), rgba(0,0,0,0) 55%), radial-gradient(700px 350px at 0% 100%, rgba(34,197,94,0.06), rgba(0,0,0,0) 55%), linear-gradient(180deg, rgba(10,10,11,0.92) 0%, rgba(5,5,5,0.92) 100%)",
+        }}
       >
         {/* Logo */}
         <div className="flex items-center space-x-1 py-6">
@@ -244,8 +248,8 @@ function Navbar() {
               className={({ isActive }) =>
                 `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
                   isActive
-                    ? "bg-gray-700 text-white"
-                    : "text-gray-300 hover:bg-gray-800"
+                    ? "bg-white/10 text-white border border-white/10"
+                    : "text-gray-300 hover:bg-white/5"
                 }`
               }
               onClick={() => setMenuOpen(false)}
@@ -269,8 +273,8 @@ function Navbar() {
               className={({ isActive }) =>
                 `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
                   isActive
-                    ? "bg-gray-700 text-white"
-                    : "text-gray-300 hover:bg-gray-800"
+                    ? "bg-white/10 text-white border border-white/10"
+                    : "text-gray-300 hover:bg-white/5"
                 }`
               }
               onClick={() => setMenuOpen(false)}
@@ -301,7 +305,7 @@ function Navbar() {
                 className="flex items-center space-x-3"
               >
                 {/* Profile Picture */}
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-700">
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-white/10">
                   <img
                     src={
                       user.profilePicture
@@ -331,8 +335,8 @@ function Navbar() {
                 className={({ isActive }) =>
                   `flex items-center justify-between w-full px-4 py-2 rounded-lg transition duration-300 ${
                     isActive
-                      ? "bg-gray-700 text-white"
-                      : "text-gray-300 hover:bg-gray-800"
+                      ? "bg-white/10 text-white border border-white/10"
+                      : "text-gray-300 hover:bg-white/5"
                   }`
                 }
               >
@@ -388,7 +392,12 @@ function Navbar() {
             <Link
               to="/login"
               onClick={() => setMenuOpen(false)}
-              className="w-full flex items-center justify-center px-4 py-3 rounded-lg bg-gradient-to-r from-green-500 to-blue-500 shadow-lg text-white font-bold tracking-wide hover:scale-105 transform transition-transform duration-300"
+              className="w-full flex items-center justify-center px-4 py-3 rounded-lg text-white font-bold tracking-wide hover:scale-105 transform transition-transform duration-300 border border-white/10 backdrop-blur-md"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(2,6,23,0.75) 0%, rgba(3,7,18,0.75) 100%)",
+                boxShadow: "0 5px 20px rgba(59,130,246,0.35)",
+              }}
             >
               Login
             </Link>
