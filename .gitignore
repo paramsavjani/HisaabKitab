@@ -39,8 +39,5 @@ yarn-error.log*
 /backend/.env
 
 /frontend/build
-/frontend/android/.idea
-/frontend/android/.gradle
-/frontend/android/build
-/frontend/android/capacitor-cordova-android-plugins
-
+/frontend/android/*
+/frontend/icons/*

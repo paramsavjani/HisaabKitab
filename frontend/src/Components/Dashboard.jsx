@@ -97,10 +97,14 @@ const Dashboard = () => {
 
   return (
     <motion.div
-      className="p-4 md:bg-gray-950 bg-slate-950 min-h-screen text-white"
+      className="p-4 min-h-screen text-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
+      style={{
+        background:
+          "radial-gradient(1200px 600px at 10% -10%, rgba(34,197,94,0.06), rgba(0,0,0,0) 60%), radial-gradient(1000px 500px at 110% 10%, rgba(59,130,246,0.06), rgba(0,0,0,0) 55%), linear-gradient(180deg, #0a0a0b 0%, #050505 100%)",
+      }}
     >
       {/* Header Section with Enhanced Animation */}
       <motion.div
@@ -116,19 +120,17 @@ const Dashboard = () => {
         }}
         className="merienda-regular flex items-center justify-center pb-3"
       >
-        <Link
-          to="/"
-          className="text-4xl px-1 pt-2 pl-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-br from-green-400 to-blue-500 animate-text"
-        >
+        <Link to="/" className="px-3 py-1 rounded-2xl border border-white/5 bg-black/30 backdrop-blur-md shadow-[0_0_0_1px_rgba(255,255,255,0.03)]">
           <motion.span
-            initial={{ scale: 0.8 }}
+            className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-cyan-300 to-blue-400"
+            initial={{ scale: 0.92 }}
             animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.45 }}
             whileHover={{
-              scale: 1.05,
-              textShadow: "0 0 8px rgba(104, 211, 145, 0.6)",
+              scale: 1.04,
+              textShadow: "0 0 14px rgba(16,185,129,0.35)",
             }}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.97 }}
           >
             Hisaab <span className="text-white">Kitab</span>
           </motion.span>
@@ -151,22 +153,20 @@ const Dashboard = () => {
         }}
       >
         <motion.div
-          className="flex items-center justify-center rounded-xl shadow-lg overflow-hidden backdrop-blur-sm"
+          className="flex items-center justify-center rounded-2xl overflow-hidden backdrop-blur-md border border-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
           style={{
-            backgroundColor: "rgba(30, 30, 30, 0.8)",
-            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(8, 8, 9, 0.75)",
           }}
         >
           {/* Left Side - Total Owe with Enhanced Animation */}
           <motion.div
-            className="flex-1 text-center py-4 px-3 transform transition-all duration-300"
+            className="flex-1 text-center py-4 px-3 transform transition-all duration-300 border-r border-white/5"
             style={{
-              borderRight: "1px solid rgba(255, 255, 255, 0.1)",
-              boxShadow: "inset 0px 0 15px -5px rgba(255, 69, 69, 0.5)",
+              boxShadow: "inset 0px 0 12px -6px rgba(239,68,68,0.35)",
             }}
             whileHover={{
               scale: 1.05,
-              backgroundColor: "rgba(50, 30, 30, 0.5)",
+              backgroundColor: "rgba(40, 18, 18, 0.4)",
               transition: { duration: 0.2 },
             }}
             whileTap={{ scale: 0.98 }}
@@ -174,7 +174,7 @@ const Dashboard = () => {
             <motion.p
               className="text-lg font-semibold lobster-regular"
               style={{
-                background: "linear-gradient(to right, #FF7A7A, #FF4B4B)",
+                background: "linear-gradient(to right, #ff7a7a, #ff4b4b)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -198,11 +198,11 @@ const Dashboard = () => {
           <motion.div
             className="flex-1 text-center py-4 px-3 transform transition-all duration-300"
             style={{
-              boxShadow: "inset 0px 0 15px -5px rgba(69, 255, 144, 0.5)",
+              boxShadow: "inset 0px 0 12px -6px rgba(16,185,129,0.35)",
             }}
             whileHover={{
               scale: 1.05,
-              backgroundColor: "rgba(30, 50, 30, 0.5)",
+              backgroundColor: "rgba(18, 40, 32, 0.4)",
               transition: { duration: 0.2 },
             }}
             whileTap={{ scale: 0.98 }}
@@ -210,7 +210,7 @@ const Dashboard = () => {
             <motion.p
               className="text-lg font-semibold lobster-regular"
               style={{
-                background: "linear-gradient(to right, #77FFD9, #45FF8F)",
+                background: "linear-gradient(to right, #77ffd9, #45ff8f)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -235,10 +235,9 @@ const Dashboard = () => {
       {/* Mobile User List with Enhanced Staggered Animation */}
       <motion.div className="block md:hidden" variants={containerVariants}>
         <motion.ul
-          className="merienda-regular divide-y divide-gray-700/40 rounded-xl overflow-hidden backdrop-blur-sm"
+          className="merienda-regular divide-y divide-white/5 rounded-2xl overflow-hidden backdrop-blur-md border border-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.55)]"
           style={{
-            backgroundColor: "rgba(30, 30, 30, 0.6)",
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+            backgroundColor: "rgba(10, 10, 11, 0.55)",
           }}
           animate={{ 
             y: 0, 
@@ -261,7 +260,7 @@ const Dashboard = () => {
                       key={friend.username}
                       variants={itemVariants}
                       whileHover={{
-                        backgroundColor: "rgba(50, 50, 50, 0.8)",
+                        backgroundColor: "rgba(18, 18, 19, 0.75)",
                         x: 5,
                         transition: { duration: 0.2 },
                       }}
@@ -285,12 +284,16 @@ const Dashboard = () => {
                                 : "/user2.png"
                             }
                             alt={friend.username}
-                            className="w-full h-full rounded-full object-cover shadow-md border border-gray-700"
+                            className="w-full h-full rounded-full object-cover shadow-md border"
                             style={{
+                              borderColor:
+                                friend.totalAmount < 0
+                                  ? "rgba(239,68,68,0.45)"
+                                  : "rgba(16,185,129,0.45)",
                               boxShadow:
                                 friend.totalAmount < 0
-                                  ? "0 0 10px rgba(255, 69, 69, 0.4)"
-                                  : "0 0 10px rgba(69, 255, 144, 0.4)",
+                                  ? "0 0 12px rgba(239,68,68,0.35)"
+                                  : "0 0 12px rgba(16,185,129,0.35)",
                             }}
                           />
                         </motion.div>
@@ -305,7 +308,7 @@ const Dashboard = () => {
                           <motion.p
                             className="text-base font-semibold truncate"
                             whileHover={{
-                              color: friend.totalAmount < 0 ? "#FF7A7A" : "#77FFD9",
+                              color: friend.totalAmount < 0 ? "#ff7a7a" : "#77ffd9",
                               transition: { duration: 0.2 },
                             }}
                           >
@@ -317,7 +320,7 @@ const Dashboard = () => {
                         {/* Balance with Enhanced Animation */}
                         <motion.div
                           className={`kranky-regular text-lg font-extrabold ${
-                            friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
+                            friend.totalAmount < 0 ? "text-red-400" : "text-emerald-400"
                           }`}
                         >
                           ₹{Math.abs(friend.totalAmount).toFixed(2)}
@@ -341,18 +344,15 @@ const Dashboard = () => {
         >
           {/* Total Owe with Enhanced Hover Effects */}
           <motion.div
-            className="p-8 rounded-xl shadow-lg w-full md:w-1/3 text-center transform transition-all duration-300"
+            className="p-8 rounded-2xl w-full md:w-1/3 text-center transform transition-all duration-300 border border-white/5 backdrop-blur-md shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
             style={{
-              backgroundColor: "rgba(30, 30, 30, 0.7)",
-              border: "1px solid rgba(255, 69, 69, 0.5)",
-              boxShadow: "0px 0px 20px rgba(255, 69, 69, 0.2)",
-              backdropFilter: "blur(8px)",
+              backgroundColor: "rgba(10, 10, 11, 0.6)",
+              boxShadow: "0px 0px 22px rgba(239,68,68,0.15)",
             }}
             whileHover={{
               ...hoverScale,
-              backgroundColor: "rgba(40, 25, 25, 0.8)",
-              border: "1px solid rgba(255, 69, 69, 0.8)",
-              boxShadow: "0px 0px 30px rgba(255, 69, 69, 0.3)",
+              backgroundColor: "rgba(24, 12, 12, 0.65)",
+              boxShadow: "0px 0px 34px rgba(239,68,68,0.25)",
             }}
             whileTap={{ scale: 0.98 }}
           >
@@ -366,7 +366,7 @@ const Dashboard = () => {
               transition={{ delay: 0.2 }}
               className="text-xl font-semibold"
               style={{
-                background: "linear-gradient(to right, #FF7A7A, #FF4B4B)",
+                background: "linear-gradient(to right, #ff7a7a, #ff4b4b)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -395,18 +395,15 @@ const Dashboard = () => {
 
           {/* Total Receive with Enhanced Hover Effects */}
           <motion.div
-            className="p-8 rounded-xl shadow-lg w-full md:w-1/3 text-center transform transition-all duration-300"
+            className="p-8 rounded-2xl w-full md:w-1/3 text-center transform transition-all duration-300 border border-white/5 backdrop-blur-md shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
             style={{
-              backgroundColor: "rgba(30, 30, 30, 0.7)",
-              border: "1px solid rgba(69, 255, 144, 0.5)",
-              boxShadow: "0px 0px 20px rgba(69, 255, 144, 0.2)",
-              backdropFilter: "blur(8px)",
+              backgroundColor: "rgba(10, 10, 11, 0.6)",
+              boxShadow: "0px 0px 22px rgba(16,185,129,0.15)",
             }}
             whileHover={{
               ...hoverScale,
-              backgroundColor: "rgba(25, 40, 25, 0.8)",
-              border: "1px solid rgba(69, 255, 144, 0.8)",
-              boxShadow: "0px 0px 30px rgba(69, 255, 144, 0.3)",
+              backgroundColor: "rgba(12, 24, 18, 0.65)",
+              boxShadow: "0px 0px 34px rgba(16,185,129,0.25)",
             }}
             whileTap={{ scale: 0.98 }}
           >
@@ -420,7 +417,7 @@ const Dashboard = () => {
               transition={{ delay: 0.2 }}
               className="text-xl font-semibold"
               style={{
-                background: "linear-gradient(to right, #77FFD9, #45FF8F)",
+                background: "linear-gradient(to right, #77ffd9, #45ff8f)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -428,7 +425,7 @@ const Dashboard = () => {
               Total Receive
             </motion.p>
             <motion.p
-              className="kranky-regular text-4xl font-bold text-green-400 mt-4"
+              className="kranky-regular text-4xl font-bold text-emerald-400 mt-4"
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{
                 scale: 1,
@@ -458,9 +455,9 @@ const Dashboard = () => {
                     key={friend.username}
                     variants={itemVariants}
                     custom={index}
-                    className="bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden"
+                    className="rounded-2xl overflow-hidden border border-white/5 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.55)]"
                     whileHover={{
-                      backgroundColor: "rgba(45, 45, 45, 0.9)",
+                      backgroundColor: "rgba(14, 14, 15, 0.75)",
                       transition: { duration: 0.2 },
                     }}
                     whileTap={{ scale: 0.98, x: 0 }}
@@ -483,9 +480,9 @@ const Dashboard = () => {
                             "/placeholder.svg"
                            || "/placeholder.svg"}
                           alt={friend.username}
-                          className="w-full h-full rounded-full object-cover border-2"
+                          className="w-full h-full rounded-full object-cover border"
                           style={{
-                            borderColor: friend.totalAmount < 0 ? "rgba(255, 69, 69, 0.7)" : "rgba(69, 255, 144, 0.7)",
+                            borderColor: friend.totalAmount < 0 ? "rgba(239,68,68,0.45)" : "rgba(16,185,129,0.45)",
                           }}
                         />
                       </motion.div>
@@ -500,7 +497,7 @@ const Dashboard = () => {
                         <motion.p
                           className="text-lg font-semibold"
                           whileHover={{
-                            color: friend.totalAmount < 0 ? "#FF7A7A" : "#77FFD9",
+                            color: friend.totalAmount < 0 ? "#ff7a7a" : "#77ffd9",
                             x: 3,
                             transition: { duration: 0.2 },
                           }}
@@ -515,7 +512,7 @@ const Dashboard = () => {
                       {/* Balance with Enhanced Animation */}
                       <motion.div
                         className={`text-2xl kranky-regular font-bold ${
-                          friend.totalAmount < 0 ? "text-red-400" : "text-green-400"
+                          friend.totalAmount < 0 ? "text-red-400" : "text-emerald-400"
                         }`}
                         initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
                         animate={{
@@ -523,8 +520,8 @@ const Dashboard = () => {
                           scale: 1,
                           rotate: 0,
                           textShadow: friend.totalAmount < 0 
-                            ? "0 0 10px rgba(255,69,69,0.6)" 
-                            : "0 0 10px rgba(69,255,144,0.6)",
+                            ? "0 0 10px rgba(239,68,68,0.6)" 
+                            : "0 0 10px rgba(16,185,129,0.6)",
                         }}
                         transition={{
                           type: "spring",
@@ -536,8 +533,8 @@ const Dashboard = () => {
                           scale: 1.2,
                           rotate: friend.totalAmount < 0 ? -5 : 5,
                           textShadow: friend.totalAmount < 0 
-                            ? "0 0 15px rgba(255,69,69,0.8)" 
-                            : "0 0 15px rgba(69,255,144,0.8)",
+                            ? "0 0 15px rgba(239,68,68,0.8)" 
+                            : "0 0 15px rgba(16,185,129,0.8)",
                         }}
                         whileTap={{ scale: 0.9 }}
                       >
@@ -565,8 +562,12 @@ const Dashboard = () => {
       >
         <Link
           to="/split-expense"
-          className="flex items-center justify-center gap-2 bg-blue-950 text-white rounded-full shadow-lg p-4 "
-          style={{ boxShadow: "0 5px 20px rgba(59, 130, 246, 0.5)" }}
+          className="flex items-center justify-center gap-2 text-white rounded-full p-4 border border-white/10 backdrop-blur-md"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(2,6,23,0.75) 0%, rgba(3,7,18,0.75) 100%)",
+            boxShadow: "0 5px 20px rgba(59,130,246,0.35)",
+          }}
         >
           <motion.img
             src={split}
