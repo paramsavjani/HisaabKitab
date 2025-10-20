@@ -82,11 +82,9 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log(`A user connected: ${socket.user.username}`);
   onlineUsers.set(socket.user.username, socket.id);
 
   socket.on("newTransaction", (transaction) => {
-    console.log(transaction);
     const receiverSocketId = onlineUsers.get(transaction.friendUsername);
 
     if (receiverSocketId) {
@@ -293,7 +291,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     onlineUsers.delete(socket.user.username);
-    console.log(`A user disconnected: ${socket.user.username}`);
   });
 });
 

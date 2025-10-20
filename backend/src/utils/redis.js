@@ -216,5 +216,4 @@ export const clearAllRedisData = async () => {
   if (keys.length > 0) {
     await redis.del(keys);
   }
-  console.log("All Redis data cleared");
 };

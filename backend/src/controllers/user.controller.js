@@ -26,7 +26,6 @@ const generateAccessAndRefreshTokens = async (id) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, name, email, password } = req.body;
-  console.log(email, password);
 
   if (
     [username, name, email, password].some(
@@ -76,8 +75,6 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
-  console.log("hased password", hashedPassword);
 
   // Generate a proper MongoDB ObjectId
   const { ObjectId } = await import('mongodb');

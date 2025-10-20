@@ -66,14 +66,7 @@ const addTransaction = asyncHandler(async (req, res) => {
     status: amount < 0 ? "completed" : "pending",
     createdAt: new Date(),
   };
-  
-  console.log("addTransaction - Creating transaction:", {
-    sender: user._id,
-    receiver: friend._id,
-    amount: roundedAmount,
-    userUsername: user.username,
-    friendUsername: friend.username
-  });
+
 
   const isAdded = await TransactionDAL.create(transactionData);
   if (!isAdded) {
@@ -122,13 +115,6 @@ const showTransactions = asyncHandler(async (req, res) => {
 
   const transactions = await TransactionDAL.findByUsers(user._id, friend._id);
   const allTransaction = transactions.map((transaction) => {
-    console.log("showTransactions - Transaction data:", {
-      _id: transaction._id,
-      sender: transaction.sender,
-      receiver: transaction.receiver,
-      currentUserId: user._id,
-      friendId: friend._id
-    });
     
     return {
       _id: transaction._id,

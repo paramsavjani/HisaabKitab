@@ -18,7 +18,6 @@ const Dashboard = () => {
       if (friend.totalAmount < 0) {
         setTotalGive((prev) => prev + Number(friend.totalAmount))
       } else {
-        console.log(friend.totalAmount)
         setTotalTake((prev) => prev + Number(friend.totalAmount))
       }
     })
