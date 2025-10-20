@@ -20,7 +20,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debug
         }
     }
 }
@@ -41,12 +40,7 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
     implementation project(':capacitor-cordova-android-plugins')
-
-    // Firebase dependencies
-    implementation platform('com.google.firebase:firebase-bom:32.0.0') // Add Firebase BOM
-    implementation 'com.google.firebase:firebase-messaging'           // Add Firebase Messaging
 }
-
 
 apply from: 'capacitor.build.gradle'
 

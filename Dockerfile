@@ -1,7 +1,7 @@
 FROM node:23-alpine AS frontend-build
 
 WORKDIR /app
-COPY Frontend ./Frontend
+COPY frontend ./Frontend
 WORKDIR /app/Frontend
 RUN npm install  && npm run build
 
@@ -12,7 +12,7 @@ FROM node:23-alpine AS backend
 
 WORKDIR /app
 
-COPY Backend ./Backend
+COPY backend ./Backend
 COPY app.js ./Backend/src/app.js
 WORKDIR /app/Backend
 
