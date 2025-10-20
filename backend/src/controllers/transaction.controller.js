@@ -85,16 +85,8 @@ const addTransaction = asyncHandler(async (req, res) => {
     isActive: true,
   });
 
-  // Emit socket event for real-time updates
-  const io = req.app.get('io');
-  if (io) {
-    io.emit('newTransaction', {
-      ...isAdded,
-      sender: isAdded.sender, // Keep the actual sender ID
-      receiver: isAdded.receiver, // Keep the actual receiver ID
-      friendUsername: friend.username,
-    });
-  }
+  // Socket event will be handled by the socket handler in app.js
+  // No need to emit here as it would cause duplicates
 
   return res.status(200).json({
     message: "Transaction added successfully",

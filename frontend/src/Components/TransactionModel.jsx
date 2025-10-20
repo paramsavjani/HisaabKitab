@@ -208,47 +208,35 @@ const TransactionModal = ({
       handleClose()
 
       socket.emit("newTransaction", {
-        amount: data.transaction._doc.amount,
-        description: data.transaction._doc.description,
-        _id: data.transaction._doc._id,
-        createdAt: data.transaction._doc.createdAt,
-        status: data.transaction._doc.status,
-        sender: data.transaction._doc.sender,
+        amount: data.transaction.amount,
+        description: data.transaction.description,
+        _id: data.transaction._id,
+        createdAt: data.transaction.createdAt,
+        status: data.transaction.status,
+        sender: data.transaction.sender,
+        receiver: data.transaction.receiver,
         friendUsername: friend.username,
         fcmToken: friend.fcmToken,
         friendName: friend.name,
       })
 
-      setFriendTransactions((prev) => [
-        ...prev,
-        {
-          amount: data.transaction._doc.amount,
-          description: data.transaction._doc.description,
-          _id: data.transaction._doc._id,
-          createdAt: data.transaction._doc.createdAt,
-          status: data.transaction._doc.status,
-          sender: data.transaction._doc.sender,
-          receiver: data.transaction._doc.receiver,
-        },
-      ])
+      const newTransaction = {
+        amount: data.transaction.amount,
+        description: data.transaction.description,
+        _id: data.transaction._id,
+        createdAt: data.transaction.createdAt,
+        status: data.transaction.status,
+        sender: data.transaction.sender,
+        receiver: data.transaction.receiver,
+      }
 
-      setTransactions((prev) => [
-        ...prev,
-        {
-          amount: data.transaction._doc.amount,
-          description: data.transaction._doc.description,
-          _id: data.transaction._doc._id,
-          createdAt: data.transaction._doc.createdAt,
-          status: data.transaction._doc.status,
-          sender: data.transaction._doc.sender,
-          receiver: data.transaction._doc.receiver,
-        },
-      ])
+      setTransactions((prev) => [...prev, newTransaction])
+      // Let the effect in Transactions.jsx handle friendTransactions update
 
       setActiveFriends((prev) => {
         const updatedFriends = [...prev]
         const friendIndex = updatedFriends.findIndex((f) => f.username === friend.username)
-        updatedFriends[friendIndex].lastTransactionTime = data.transaction._doc.createdAt
+        updatedFriends[friendIndex].lastTransactionTime = data.transaction.createdAt
         return updatedFriends
       })
 

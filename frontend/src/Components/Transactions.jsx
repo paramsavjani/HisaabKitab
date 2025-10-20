@@ -28,14 +28,81 @@ const Transactions = () => {
 
   useEffect(() => {
     socket.on("newTransaction", (newTransaction) => {
-      setTransactions((prevTransactions) => [
-        ...prevTransactions,
-        newTransaction,
-      ]);
-      setFriendTransactions((prevTransactions) => [
-        ...prevTransactions,
-        newTransaction,
-      ]);
+      console.log("Socket received newTransaction:", newTransaction);
+      console.log("Current user:", user?.username);
+      console.log("Current friend:", friend?.username);
+      console.log("Transaction sender:", newTransaction.sender);
+      console.log("Transaction receiver:", newTransaction.receiver);
+      
+      // Only add to main transactions state - let the effect handle friendTransactions
+      setTransactions((prevTransactions) => {
+        const exists = prevTransactions.some(t => t._id === newTransaction._id);
+        if (exists) {
+          console.log("Transaction already exists, skipping duplicate");
+          return prevTransactions;
+        }
+        console.log("Adding transaction via socket");
+        return [...prevTransactions, newTransaction];
+      });
+      
+      // If friend data is not available yet, try to set it from activeFriends
+      if (!friend && user && activeFriends) {
+        const friendMain = activeFriends.find(f => f.username === friendId);
+        if (friendMain) {
+          console.log("Setting friend data from activeFriends in socket handler:", friendMain);
+          setFriend(friendMain);
+        }
+      }
+      
+      // Efficiently update friendTransactions directly if we can determine the friend
+      if (user && (friend || activeFriends)) {
+        const currentFriend = friend || activeFriends.find(f => f.username === friendId);
+        if (currentFriend) {
+          console.log("Directly updating friendTransactions for socket event");
+          console.log("Transaction matching details:", {
+            transactionId: newTransaction._id,
+            transactionSender: newTransaction.sender,
+            transactionReceiver: newTransaction.receiver,
+            userId: user._id,
+            friendId: currentFriend._id,
+            userUsername: user.username,
+            friendUsername: currentFriend.username,
+            senderType: typeof newTransaction.sender,
+            receiverType: typeof newTransaction.receiver,
+            userIdType: typeof user._id,
+            friendIdType: typeof currentFriend._id
+          });
+          
+          setFriendTransactions((prevTransactions) => {
+            const exists = prevTransactions.some(t => t._id === newTransaction._id);
+            if (exists) {
+              console.log("Transaction already exists in friendTransactions, skipping");
+              return prevTransactions;
+            }
+            
+            // Check if this transaction is for the current friend
+            const isForThisFriend = (newTransaction.sender === user._id && newTransaction.receiver === currentFriend._id) ||
+                                   (newTransaction.receiver === user._id && newTransaction.sender === currentFriend._id);
+            
+            console.log("Transaction matching check:", {
+              senderMatch: newTransaction.sender === user._id,
+              receiverMatch: newTransaction.receiver === currentFriend._id,
+              reverseSenderMatch: newTransaction.sender === currentFriend._id,
+              reverseReceiverMatch: newTransaction.receiver === user._id,
+              isForThisFriend: isForThisFriend
+            });
+            
+            if (isForThisFriend) {
+              console.log("✅ Adding transaction directly to friendTransactions");
+              return [...prevTransactions, newTransaction];
+            } else {
+              console.log("❌ Transaction is not for this friend");
+            }
+            
+            return prevTransactions;
+          });
+        }
+      }
     });
 
     socket.on("acceptTransaction", (_id) => {
@@ -46,6 +113,8 @@ const Transactions = () => {
             : transaction
         )
       );
+      
+      // Efficiently update friendTransactions directly
       setFriendTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
           transaction._id === _id
@@ -63,6 +132,8 @@ const Transactions = () => {
             : transaction
         )
       );
+      
+      // Efficiently update friendTransactions directly
       setFriendTransactions((prevTransactions) =>
         prevTransactions.map((transaction) =>
           transaction._id === _id
@@ -76,6 +147,8 @@ const Transactions = () => {
       setTransactions((prevTransactions) =>
         prevTransactions.filter((transaction) => transaction._id !== _id)
       );
+      
+      // Efficiently update friendTransactions directly
       setFriendTransactions((prevTransactions) =>
         prevTransactions.filter((transaction) => transaction._id !== _id)
       );
@@ -88,6 +161,31 @@ const Transactions = () => {
       socket.off("cancelTransaction");
     };
   }, []);
+
+  // Update friendTransactions when transactions change
+  useEffect(() => {
+    if (user && friend) {
+      console.log("Filtering transactions for friend:", {
+        userId: user._id,
+        friendId: friend._id,
+        totalTransactions: transactions?.length
+      });
+      
+      const friendTransactions = transactions?.filter(
+        (transaction) => {
+          const isMatch = (transaction.sender === user?._id &&
+            transaction.receiver === friend?._id) ||
+          (transaction.receiver === user?._id &&
+            transaction.sender === friend?._id);
+          return isMatch;
+        }
+      );
+      
+      setFriendTransactions(friendTransactions?.sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      ) || []);
+    }
+  }, [transactions, user, friend]);
 
   useEffect(() => {
     if (user) {
@@ -133,14 +231,28 @@ const Transactions = () => {
     setFriend(() => friendMain);
 
     setFriendTransactions(() => {
+      console.log("Filtering transactions for friend:", {
+        userId: user?._id,
+        friendId: friendMain?._id,
+        totalTransactions: transactions?.length,
+        transactions: transactions
+      });
+      
       const friendTransactions = transactions?.filter(
-        (transaction) =>
-          (transaction.sender === user?._id &&
+        (transaction) => {
+          const isMatch = (transaction.sender === user?._id &&
             transaction.receiver === friendMain?._id) ||
           (transaction.receiver === user?._id &&
-            transaction.sender === friendMain?._id)
+            transaction.sender === friendMain?._id);
+          
+          if (isMatch) {
+            console.log("Transaction matches friend:", transaction);
+          }
+          return isMatch;
+        }
       );
 
+      console.log("Filtered friend transactions:", friendTransactions);
       return friendTransactions?.sort(
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
       );
