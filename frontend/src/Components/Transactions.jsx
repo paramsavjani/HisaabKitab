@@ -405,7 +405,7 @@ const Transactions = () => {
 
       {/* Mobile Bottom Action Bar - Icon Only */}
       <motion.div
-        className="md:hidden fixed bottom-4 right-4 z-40"
+        className="md:hidden fixed bottom-4 right-4 z-10"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
