@@ -5,6 +5,7 @@ import TransactionModal from "./TransactionModel";
 import UserContext from "../context/UserContext.js";
 import "./styles.css";
 import socket from "../socket.js";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Transactions = () => {
   const { chatId } = useParams();
@@ -207,15 +208,73 @@ const Transactions = () => {
   }, [friendTransactions]);
 
   const EmptyState = () => (
-    <div className="text-center text-lg text-gray-400">
-      No transactions found with this user.
-    </div>
+    <motion.div
+      className="flex flex-col items-center justify-center py-16 px-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mb-4"
+        whileHover={{ scale: 1.1, rotate: 5 }}
+        transition={{ duration: 0.3 }}
+      >
+        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </motion.div>
+      <motion.h3
+        className="text-xl font-semibold text-white mb-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        No transactions yet
+      </motion.h3>
+      <motion.p
+        className="text-gray-400 text-center max-w-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        Start your financial journey by adding your first transaction with this friend.
+      </motion.p>
+    </motion.div>
   );
 
+  // Animation variants from Dashboard
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 260,
+        damping: 20,
+      },
+    },
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-      {/* Profile Section */}
-      <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-800 shadow-lg p-3 pl-14 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
+    <motion.div
+      className="p-4 bg-black min-h-screen text-white"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="merienda-regular md:w-[calc(100%-320px)] bg-gray-900 shadow-lg p-1 pl-14 md:pl-6 mb-6 flex items-center space-x-4 mx-auto w-full justify-start fixed top-0 z-10">
         <img
           src={
             friend?.profilePicture ? `${friend?.profilePicture}` : "/user2.png"
@@ -231,27 +290,49 @@ const Transactions = () => {
           </h1>
         </Link>
         <p
-          className={`kranky-regular text-2xl font-bold ${
-            (total ? total : friend?.totalAmount) < 0
+          className={`kranky-regular text-2xl font-bold ${(total ? total : friend?.totalAmount) < 0
               ? "text-red-500"
               : "text-green-500"
-          }`}
+            }`}
         >
           ₹{Math.abs(total ? total : friend?.totalAmount)}
         </p>
       </div>
 
-      {/* Transactions Section */}
-      {
-        <div className="flex-1 pt-24 md:pt-28 mx-auto w-full p-4 sm:p-6 space-y-6 bg-gray-900 overflow-y-auto">
-          {transactions?.length > 0 && (
-            <div className="space-y-0">
-              {Object.keys(groupedTransactions)
-                .sort((a, b) => new Date(a) - new Date(b)) // Sort dates in descending order
+      {/* Mobile Transactions List with Dashboard-style Animation */}
+      <motion.div className="block md:hidden pt-4" variants={containerVariants}>
+        <motion.ul
+          className="merienda-regular divide-y divide-gray-700/40 rounded-xl overflow-hidden backdrop-blur-sm"
+          style={{
+            backgroundColor: "rgba(10, 10, 10, 0.8)",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.5)",
+          }}
+          animate={{
+            y: 0,
+            opacity: 1,
+            transition: {
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              delay: 0.2,
+              when: "beforeChildren"
+            }
+          }}
+        >
+          <AnimatePresence>
+            {transactions?.length > 0 ? (
+              Object.keys(groupedTransactions)
+                .sort((a, b) => new Date(a) - new Date(b))
                 .map((date) => (
-                  <div key={date}>
-                    <div className="flex justify-center items-center">
-                      <div className="flex justify-center items-center bg-gray-800 backdrop-blur-2xl text-gray-400 text-sm h-8 w-36 rounded-3xl shadow-lg">
+                  <motion.div key={date} className="space-y-2">
+                    {/* Date Header */}
+                    <motion.div
+                      className="px-4 py-2 bg-gray-900/50 text-center"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <p className="text-sm text-gray-400 font-medium">
                         {new Date(
                           groupedTransactions[date][0].createdAt
                         ).toLocaleDateString("en-US", {
@@ -259,58 +340,94 @@ const Transactions = () => {
                           month: "long",
                           year: "numeric",
                         })}
-                      </div>
-                    </div>
+                      </p>
+                    </motion.div>
 
-                    <div className="space-y-0">
-                      {groupedTransactions[date]?.map((transaction, index) => (
-                        <div
-                          ref={
-                            index === groupedTransactions[date].length - 1
-                              ? lastTransactionRef
-                              : null
-                          }
-                          className={`${
-                            index === groupedTransactions[date].length - 1
-                              ? "md:pb-20 pb-20"
-                              : ""
+                    {/* Transactions for this date */}
+                    {groupedTransactions[date]?.map((transaction, index) => (
+                      <motion.li
+                        key={transaction._id}
+                        variants={itemVariants}
+                        whileHover={{
+                          backgroundColor: "rgba(20, 20, 20, 0.8)",
+                          x: 5,
+                          transition: { duration: 0.2 },
+                        }}
+                        exit={{ opacity: 0, x: -100 }}
+                        custom={index}
+                        ref={
+                          index === groupedTransactions[date].length - 1
+                            ? lastTransactionRef
+                            : null
+                        }
+                        className={`${index === groupedTransactions[date].length - 1
+                            ? "pb-20"
+                            : ""
                           }`}
-                          key={transaction._id}
-                        >
-                          <TransactionCard
-                            transaction={transaction}
-                            userId={user._id}
-                            setFriendTransactions={setFriendTransactions}
-                            friendUsername={friendId}
-                            fcmToken={friend?.fcmToken}
-                            friendId={friend?._id}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          )}
-          {transactions.length === 0 && <EmptyState />}
-        </div>
-      }
+                      >
+                        <TransactionCard
+                          transaction={transaction}
+                          userId={user._id}
+                          setFriendTransactions={setFriendTransactions}
+                          friendUsername={friendId}
+                          fcmToken={friend?.fcmToken}
+                          friendId={friend?._id}
+                        />
+                      </motion.li>
+                    ))}
+                  </motion.div>
+                ))
+            ) : (
+              <motion.li
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-8 text-center"
+              >
+                <EmptyState />
+              </motion.li>
+            )}
+          </AnimatePresence>
+        </motion.ul>
+      </motion.div>
 
-      {/* Bottom Button Bar */}
-      <div className="merienda-regular fixed bottom-0 w-full md:left-320 bg-gray-900 p-4 flex flex-row justify-between space-x-2 sm:space-x-4 md:w-[calc(100%-320px)]">
-        <button
-          onClick={() => handleButtonClick("give")}
-          className="bg-gradient-to-r from-red-500 via-red-600 to-red-500 hover:from-pink-600 hover:via-red-600 hover:to-yellow-600 text-white py-2 px-4 rounded-lg flex-1 shadow-lg transform hover:scale-105 transition duration-300"
-        >
-          You Gave
-        </button>
-        <button
-          onClick={() => handleButtonClick("get")}
-          className="bg-gradient-to-r from-green-500 via-green-600 to-green-500 hover:from-green-500 hover:via-teal-600 hover:to-cyan-600 text-white py-2 px-4 rounded-lg flex-1 shadow-lg transform hover:scale-105 transition duration-300"
-        >
-          You Got
-        </button>
-      </div>
+      {/* Mobile Bottom Action Bar with Dashboard-style */}
+      <motion.div
+        className="md:hidden fixed bottom-4 left-4 right-4 z-40"
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, type: "spring", stiffness: 300, damping: 20 }}
+      >
+        <div className="flex space-x-3">
+          <motion.button
+            onClick={() => handleButtonClick("give")}
+            className="flex-1 bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-6 rounded-xl shadow-lg font-bold flex items-center justify-center space-x-2"
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0 10px 25px rgba(239, 68, 68, 0.5)",
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            </svg>
+            <span>You Gave</span>
+          </motion.button>
+          <motion.button
+            onClick={() => handleButtonClick("get")}
+            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-4 px-6 rounded-xl shadow-lg font-bold flex items-center justify-center space-x-2"
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0 10px 25px rgba(34, 197, 94, 0.5)",
+            }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            </svg>
+            <span>You Got</span>
+          </motion.button>
+        </div>
+      </motion.div>
 
       {isModalOpen && (
         <TransactionModal
@@ -322,7 +439,7 @@ const Transactions = () => {
           setActiveFriends={setActiveFriends}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 

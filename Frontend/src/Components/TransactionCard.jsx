@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import "./styles.css";
 import UserContext from "../context/UserContext.js";
 import socket from "../socket.js";
+import rejectedIcon from "../assets/icons/rejected.png";
 
 const TransactionCard = ({
   transaction,
@@ -198,89 +199,113 @@ const TransactionCard = ({
 
   return (
     <div
-      className={`w-full px-2 py-2 flex ${
+      className={`w-full px-4 sm:px-6 py-4 flex ${
         isSender ? "justify-end" : "justify-start"
       }`}
     >
       <div
-        className={`group relative p-4 pb-8 ${
-          status === "rejected" ? "pb-4" : ""
-        } rounded-xl shadow-lg backdrop-blur-sm border min-w-[180px] max-w-[85vw] ${
+        className={`relative p-6 pb-16 ${
+          status === "rejected" ? "pb-8" : ""
+        } rounded-3xl shadow-2xl backdrop-blur-sm border border-gray-800/40 min-w-[240px] sm:min-w-[280px] md:min-w-[320px] max-w-[95vw] sm:max-w-[280px] md:max-w-[320px] ${
           isSender 
-            ? "bg-gray-800/80 border-gray-700/50" 
-            : "bg-gray-900/80 border-gray-600/50"
-        } transition-all duration-300 hover:shadow-xl hover:scale-[1.02]`}
+            ? "bg-gradient-to-br from-black via-gray-900 to-black" 
+            : "bg-gradient-to-br from-gray-900 via-black to-gray-900"
+        } transition-all duration-500 hover:shadow-3xl hover:scale-[1.02] hover:border-gray-700/50`}
         style={{
-          backgroundColor: isSender 
-            ? "rgba(30, 30, 30, 0.8)" 
-            : "rgba(20, 20, 20, 0.8)",
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+          boxShadow: isSender 
+            ? '0 30px 60px -12px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1)' 
+            : '0 30px 60px -12px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
         }}
       >
-        {/* Enhanced Tail Design */}
+        {/* Premium Modern Tail Design - Fixed positioning */}
         <div
-          className={`absolute w-3 h-3 ${
+          className={`absolute w-8 h-8 ${
             isSender 
-              ? "bg-gray-800 right-[-6px]" 
-              : "bg-gray-900 left-[-6px]"
-          } top-4 rotate-45 shadow-lg`}
+              ? "bg-gradient-to-br from-black via-gray-900 to-black right-[-16px] border-r border-b border-gray-700/40" 
+              : "bg-gradient-to-br from-gray-900 via-black to-gray-900 left-[-16px] border-l border-b border-gray-700/40"
+          } top-8 rotate-45 shadow-2xl`}
+          style={{
+            boxShadow: '0 15px 30px -5px rgba(0, 0, 0, 0.9)'
+          }}
         ></div>
 
-        {/* Status Badge */}
+        {/* Status Badge - Fixed positioning to avoid overlap */}
         {status === "completed" && (
-          <div className={`absolute top-2 ${isSender ? "left-2" : "right-2"} bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold`}>
-            ✓
+          <div className={`absolute top-4 ${isSender ? "left-4" : "right-4"} bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs px-3 py-2 rounded-full font-bold shadow-xl border border-green-500/40 z-10`}>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>Completed</span>
+            </div>
           </div>
         )}
 
-        {/* Amount Display */}
+        {/* Amount Section - Fixed positioning and spacing */}
         <div
-          className={`text-2xl font-bold mb-3 ${
-            status === "rejected" ? "mb-0" : ""
+          className={`text-4xl sm:text-5xl kranky-regular font-black mb-6 ${
+            status === "rejected" ? "mb-4" : ""
           } ${isSender ? "text-right" : "text-left"} ${
             (isSender && transaction.amount > 0) ||
             (!isSender && transaction.amount < 0)
-              ? "text-green-400"
-              : "text-red-400"
-          } ${status === "rejected" ? "line-through text-gray-300" : ""} drop-shadow-lg`}
+              ? "text-green-300"
+              : "text-red-300"
+          } ${status === "rejected" ? "line-through text-gray-400" : ""} drop-shadow-2xl`}
+          style={{
+            textShadow: (isSender && transaction.amount > 0) || (!isSender && transaction.amount < 0)
+              ? '0 0 30px rgba(34, 197, 94, 0.5), 0 0 60px rgba(34, 197, 94, 0.3)'
+              : '0 0 30px rgba(239, 68, 68, 0.5), 0 0 60px rgba(239, 68, 68, 0.3)',
+            filter: 'drop-shadow(0 0 15px rgba(0, 0, 0, 0.8))'
+          }}
         >
           ₹{Math.abs(amount)}
         </div>
 
-        {/* Description Section */}
+        {/* Description Section - Better spacing */}
         {description && (
           <div
-            className={`text-sm text-gray-200 break-words ${
-              isSender ? "text-right pl-2" : "text-left pr-2"
-            } leading-relaxed italic`}
+            className={`text-lg sm:text-xl italic caveat-regular text-gray-200 break-words ${
+              isSender ? "text-right pl-4 sm:pl-8" : "text-left pr-4 sm:pr-8"
+            } leading-relaxed font-medium mb-4`}
+            style={{
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.9)'
+            }}
           >
             {description}
           </div>
         )}
 
-        {/* Rejected Status */}
+        {/* Enhanced Rejected Icon - Fixed positioning */}
         {status === "rejected" && (
-          <div className={`absolute top-2 ${isSender ? "left-2" : "right-2"} bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold`}>
-            ✗
+          <div className={`absolute top-6 ${isSender ? "left-6" : "right-6"} flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-red-900/50 to-red-800/50 rounded-full backdrop-blur-sm border border-red-600/40 shadow-2xl z-10`}>
+            <div className="relative">
+              <img
+                src={rejectedIcon}
+                alt="Rejected"
+                className="w-12 h-12 sm:w-14 sm:h-14 filter drop-shadow-2xl"
+              />
+              <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full animate-pulse border-2 border-black"></div>
+            </div>
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Premium Action Buttons - Better spacing */}
         {status === "pending" && (
           <div
-            className={`flex space-x-1 mt-3 ${
+            className={`flex space-x-3 sm:space-x-4 mt-6 ${
               isSender ? "justify-end" : "justify-start"
             }`}
           >
             {isSender ? (
               <button
                 onClick={handleCancel}
-                className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-4 py-2 w-full rounded-xl text-sm font-semibold flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-500 hover:via-orange-500 hover:to-red-500 text-white px-8 py-4 w-full rounded-2xl text-base font-bold flex items-center justify-center transition-all duration-500 hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed border border-amber-500/40 shadow-xl"
                 disabled={loading.cancel}
+                style={{
+                  boxShadow: '0 15px 35px -5px rgba(245, 158, 11, 0.5), 0 0 0 1px rgba(245, 158, 11, 0.3)'
+                }}
               >
                 {loading.cancel ? (
                   <svg
-                    className="animate-spin h-4 w-4 mr-2 text-white"
+                    className="animate-spin h-6 w-6 mr-3 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -307,12 +332,15 @@ const TransactionCard = ({
               <>
                 <button
                   onClick={handleAccept}
-                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-3 py-2 w-1/2 rounded-xl text-sm font-semibold flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-500 hover:via-emerald-500 hover:to-teal-500 text-white px-6 py-4 w-1/2 rounded-2xl text-base font-bold flex items-center justify-center transition-all duration-500 hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed border border-green-500/40 shadow-xl"
                   disabled={loading.accept}
+                  style={{
+                    boxShadow: '0 15px 35px -5px rgba(34, 197, 94, 0.5), 0 0 0 1px rgba(34, 197, 94, 0.3)'
+                  }}
                 >
                   {loading.accept ? (
                     <svg
-                      className="animate-spin h-4 w-4 mr-1 text-white"
+                      className="animate-spin h-5 w-5 mr-2 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -337,12 +365,15 @@ const TransactionCard = ({
                 </button>
                 <button
                   onClick={handleReject}
-                  className="bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white px-3 py-2 w-1/2 rounded-xl text-sm font-semibold flex items-center justify-center transition-all duration-300 hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-gradient-to-r from-red-600 via-pink-600 to-rose-600 hover:from-red-500 hover:via-pink-500 hover:to-rose-500 text-white px-6 py-4 w-1/2 rounded-2xl text-base font-bold flex items-center justify-center transition-all duration-500 hover:shadow-2xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed border border-red-500/40 shadow-xl"
                   disabled={loading.reject}
+                  style={{
+                    boxShadow: '0 15px 35px -5px rgba(239, 68, 68, 0.5), 0 0 0 1px rgba(239, 68, 68, 0.3)'
+                  }}
                 >
                   {loading.reject ? (
                     <svg
-                      className="animate-spin h-4 w-4 mr-1 text-white"
+                      className="animate-spin h-5 w-5 mr-2 text-white"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -370,11 +401,14 @@ const TransactionCard = ({
           </div>
         )}
 
-        {/* Timestamp Section */}
+        {/* Premium Timestamp Section - Fixed positioning */}
         <div
-          className={`absolute bottom-2 w-full ${
-            isSender ? "text-right pr-8" : "text-left pl-2"
-          } text-xs text-gray-400 font-medium`}
+          className={`absolute bottom-4 w-full ${
+            isSender ? "text-right pr-12 sm:pr-16" : "text-left pl-4 sm:pl-0"
+          } text-sm text-gray-400 font-bold`}
+          style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.9)'
+          }}
         >
           {new Date(createdAt).toLocaleTimeString([], {
             hour: "2-digit",
