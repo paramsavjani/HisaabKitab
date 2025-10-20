@@ -12,8 +12,14 @@ function Friends() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black py-10 px-4">
-      <h2 className="text-3xl font-semibold text-white mb-6" data-aos="fade-up">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center py-10 px-4 text-white"
+      style={{
+        background:
+          "radial-gradient(1200px 600px at 10% -10%, rgba(34,197,94,0.06), rgba(0,0,0,0) 60%), radial-gradient(1000px 500px at 110% 10%, rgba(59,130,246,0.06), rgba(0,0,0,0) 55%), linear-gradient(180deg, #0a0a0b 0%, #050505 100%)",
+      }}
+    >
+      <h2 className="text-3xl font-semibold mb-6" data-aos="fade-up">
         Your Friends
       </h2>
 
@@ -21,8 +27,9 @@ function Friends() {
       {
         // Friend List
         <div
-          className="w-full max-w-xl bg-gray-900 md:p-6 p-3 rounded-lg shadow-lg"
+          className="w-full max-w-xl md:p-6 p-3 bg-gray-950 rounded-2xl border border-white/5 backdrop-blur-md shadow-[0_20px_60px_rgba(0,0,0,0.6)]"
           data-aos="fade-up"
+          // style={{ backgroundColor: "rgba(10,10,11,0.6)" }}
         >
           {activeFriends.length > 0 ? (
             <ul className="space-y-4">
@@ -33,7 +40,7 @@ function Friends() {
                   key={index}
                 >
                   <li
-                    className="flex items-center space-x-4 border-b hover:bg-slate-800 hover:rounded-lg p-3 border-gray-700 py-4"
+                    className="flex items-center space-x-4 p-3 py-4 rounded-xl border border-white/5 bg-black/20 hover:bg-white/5 transition-colors duration-200"
                     data-aos="zoom-in"
                     data-aos-delay={index * 100} // Staggered animations for each friend
                   >
@@ -46,13 +53,13 @@ function Friends() {
                             : "/user2.png"
                         }
                         alt={friend.username}
-                        className="w-full h-full rounded-full object-cover"
+                        className="w-full h-full rounded-full object-cover border border-white/10 shadow-[0_0_12px_rgba(0,0,0,0.4)]"
                         data-aos="flip-left"
                       />
                     </div>
                     <div className="flex-1">
-                      <p className="text-white font-semibold">{friend.name}</p>
-                      <p className="text-sm text-green-400">
+                      <p className="font-semibold">{friend.name}</p>
+                      <p className="text-sm text-emerald-400/90">
                         {"@" + friend.username}
                       </p>
                     </div>
