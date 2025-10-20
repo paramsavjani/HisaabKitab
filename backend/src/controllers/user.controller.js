@@ -1,20 +1,26 @@
 import asyncHandler from "../utils/asyncHandler.js";
-import { User } from "../models/User.model.js";
+import { UserDAL } from "../dal/UserDAL.js";
+import { FriendDAL } from "../dal/FriendDAL.js";
+import { TransactionDAL } from "../dal/TransactionDAL.js";
+import { RequestDAL } from "../dal/RequestDAL.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
-import { Friend } from "../models/Friend.model.js";
-import { Request } from "../models/Request.model.js";
-import { Transaction } from "../models/Transaction.model.js";
 import * as bcrypt from "bcrypt";
 
 const generateAccessAndRefreshTokens = async (id) => {
-  const user = await User.findById(id);
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
+  const user = await UserDAL.findById(id);
+  const accessToken = jwt.sign(
+    { _id: user._id, username: user.username },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
+  );
+  const refreshToken = jwt.sign(
+    { _id: user._id },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
+  );
 
-  user.refreshToken = refreshToken;
-  await user.save({ validateBeforeSave: false });
-
+  const updatedUser = await UserDAL.update(id, { refreshToken });
   return { accessToken, refreshToken };
 };
 
@@ -40,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const exist = await User.findOne({ username });
+  const exist = await UserDAL.findByUsername(username);
   if (exist) {
     return res.status(400).json({
       status: "error",
@@ -48,8 +54,8 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const existEmail = await User.findOne({ email });
-  if (existEmail) {
+  const existEmail = await UserDAL.search(email);
+  if (existEmail.length > 0) {
     return res.status(400).json({
       status: "error",
       message: "Email already exists",
@@ -73,21 +79,24 @@ const registerUser = asyncHandler(async (req, res) => {
 
   console.log("hased password", hashedPassword);
 
-  const user = await User.create({
+  // Generate a proper MongoDB ObjectId
+  const { ObjectId } = await import('mongodb');
+  const userId = new ObjectId();
+  
+  const userData = {
+    _id: userId,
     username,
     name,
     email,
     password: hashedPassword,
     profilePicture: imageUrl,
-  });
+  };
 
-  const createdUser = await User.findById(user._id).select(
-    "email username name profilePicture"
-  );
+  const createdUser = await UserDAL.create(userData);
   if (!createdUser) {
     return res.status(500).json({
       status: "error",
-      message: "Failed to fetch created user",
+      message: "Failed to create user",
     });
   }
 
@@ -124,7 +133,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username });
+  const user = await UserDAL.findByUsername(username);
 
   if (!user) {
     return res.status(410).json({
@@ -133,7 +142,7 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   }
 
-  const match = await user.isCorrectPassword(password);
+  const match = await bcrypt.compare(password, user.password);
 
   if (!match) {
     return res.status(411).json({
@@ -146,9 +155,12 @@ const loginUser = asyncHandler(async (req, res) => {
     user._id
   );
 
-  const loggedInUser = await User.findById(user._id).select(
-    "username email name profilePicture -_id"
-  );
+  const loggedInUser = {
+    username: user.username,
+    email: user.email,
+    name: user.name,
+    profilePicture: user.profilePicture,
+  };
 
   const options = {
     httpOnly: false,
@@ -260,10 +272,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 const getUser = asyncHandler(async (req, res) => {
   const username = req.user?.username;
 
-  const user = await User.findOne({ username }).select(
-    "username email name profilePicture fcmToken _id"
-  );
-
+  const user = await UserDAL.findByUsername(username);
   if (!user) {
     res.status(410).json({
       status: "error",
@@ -272,15 +281,8 @@ const getUser = asyncHandler(async (req, res) => {
     return;
   }
 
-  const friends = await Friend.find({
-    $or: [{ userId: user._id }, { friendId: user._id }],
-  }).select("userId friendId lastTransactionTime isActive _id");
-
-  const transactions = await Transaction.find({
-    $or: [{ sender: user._id }, { receiver: user._id }],
-  })
-    .sort({ createdAt: -1 })
-    .select("sender receiver amount createdAt _id status description");
+  const friends = await FriendDAL.findByUserId(user._id);
+  const transactions = await TransactionDAL.findByUserId(user._id);
 
   const friendMap = {};
   const isActiveMap = {};
@@ -292,21 +294,13 @@ const getUser = asyncHandler(async (req, res) => {
         : connection.userId.toString();
 
     friendMap[friendId] = connection.lastTransactionTime;
-    isActiveMap[friendId] = connection.isActive; // Store isActive status
+    isActiveMap[friendId] = connection.isActive;
   });
 
   const friendIds = Object.keys(friendMap);
 
   // Fetch user details
-  const friendsDetail = await User.find(
-    { _id: { $in: friendIds } },
-    {
-      username: 1,
-      name: 1,
-      profilePicture: 1,
-      fcmToken: 1,
-    }
-  ).lean();
+  const friendsDetail = await UserDAL.findByIds(friendIds);
 
   const finalFriends = friendsDetail.map((friend) => {
     return {
@@ -355,12 +349,7 @@ const getUser = asyncHandler(async (req, res) => {
 const searchUser = asyncHandler(async (req, res) => {
   const searchQuery = req.query.search;
 
-  const users = await User.find({
-    $or: [
-      { username: { $regex: searchQuery, $options: "i" } },
-      { name: { $regex: searchQuery, $options: "i" } },
-    ],
-  });
+  const users = await UserDAL.search(searchQuery);
 
   return res.status(200).json({
     status: "success",
