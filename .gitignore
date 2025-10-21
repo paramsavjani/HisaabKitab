@@ -9,35 +9,64 @@
 
 .env
 /.env
-.Frontend/.env
-./Frontend/.env.local
-.Backend/.env
-# testing
-/coverage
-/backend/src/utils/hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json
-# production
-/build
 
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+/backend/src/utils/hisaab--kitab-firebase-adminsdk-k7ftp-c8981318fa.json
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
 /frontend/node_modules
-/frontend/.env
-/frontend/.env.local
-/frontend/.cache
-
 /backend/node_modules
 /backend/.env
 
 /frontend/build
-/frontend/android/*
 /frontend/icons/*
+
+# Android build files and folders
+/frontend/android/app/build/
+/frontend/android/app/release/
+/frontend/android/build/
+/frontend/android/capacitor-cordova-android-plugins/build/
+/frontend/android/.gradle/
+/frontend/android/local.properties
+/frontend/android/app/local.properties
+/frontend/android/gradle.properties
+/frontend/android/app/gradle.properties
+
+# Android generated files
+/frontend/android/app/src/main/assets/
+/frontend/android/app/src/main/res/
+/frontend/android/app/src/main/java/
+/frontend/android/app/src/androidTest/
+/frontend/android/app/src/test/
+
+# Android intermediates and outputs
+/frontend/android/app/build/intermediates/
+/frontend/android/app/build/outputs/
+/frontend/android/app/build/tmp/
+/frontend/android/app/build/generated/
+
+# Android APK files
+*.apk
+*.aab
+
+# Android signing files
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# Android IDE files
+.idea/
+*.iml
+.vscode/
+
+# Android logs
+/frontend/android/app/build/logs/
+/frontend/android/build/logs/
+
+# Android temporary files
+/frontend/android/app/build/tmp/
+/frontend/android/app/build/incremental/
+/frontend/android/app/build/lint-cache/
