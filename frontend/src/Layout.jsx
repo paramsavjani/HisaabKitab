@@ -100,26 +100,28 @@ const Layout = () => {
         setRefreshToken(updatedRefreshToken);
       }
 
-      const res = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            updatedAccessToken,
-            updatedRefreshToken,
-          }),
-        }
-      );
-      const data = await res.json();
-      setIncomingRequests(data?.data?.senders || []);
+      setLoading(() => false);
+
+      // const res = await fetch(
+      //   `${process.env.REACT_APP_BACKEND_URL}/api/v1/friendRequests/receivedAll`,
+      //   {
+      //     method: "POST",
+      //     credentials: "include",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       updatedAccessToken,
+      //       updatedRefreshToken,
+      //     }),
+      //   }
+      // );
+      // const data = await res.json();
+      // setIncomingRequests(data?.data?.senders || []);
     } catch (error) {
       console.error("Initialization Error:", error);
     } finally {
-      setLoading(false);
+      setLoading(()=>false);
     }
   };
 

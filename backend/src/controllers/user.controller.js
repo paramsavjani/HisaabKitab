@@ -357,9 +357,7 @@ const searchUser = asyncHandler(async (req, res) => {
 const userInfo = asyncHandler(async (req, res) => {
   const username = req.params.username;
 
-  const user = await User.findOne({ username })
-    .select("username email name profilePicture fcmToken")
-    .lean();
+  const user = await UserDAL.findByUsername(username)
 
   if (!user) {
     return res.status(410).json({
@@ -368,9 +366,7 @@ const userInfo = asyncHandler(async (req, res) => {
     });
   }
 
-  const totalFriends = await Friend.find({
-    $or: [{ userId: user._id }, { friendId: user._id }],
-  }).countDocuments();
+  const totalFriends = await FriendDAL.findByUsers(user._id, user._id);
 
   const accessToken =
     req.body.accessToken ||
@@ -394,19 +390,8 @@ const userInfo = asyncHandler(async (req, res) => {
     const targetUserId = user._id;
 
     const [friendship, request] = await Promise.all([
-      Friend.findOne({
-        $or: [
-          { userId: userId, friendId: targetUserId },
-          { userId: targetUserId, friendId: userId },
-        ],
-      }),
-      Request.findOne({
-        $or: [
-          { sender: userId, receiver: targetUserId },
-          { sender: targetUserId, receiver: userId },
-        ],
-        status: "pending",
-      }),
+      FriendDAL.findByUsers(userId, targetUserId),
+      RequestDAL.findByUsers(userId, targetUserId),
     ]);
 
     return res.status(200).json({

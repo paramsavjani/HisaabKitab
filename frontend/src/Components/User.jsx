@@ -20,7 +20,7 @@ const User = () => {
     setActiveFriends,
     activeFriends,
   } = useContext(UserContext);
-  const { id } = useParams();
+  const { username } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFriend, setIsFriend] = useState(false);
@@ -36,7 +36,7 @@ const User = () => {
     const fetchUser = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/get/${id}`,
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/get/${username}`,
           {
             method: "POST",
             credentials: "include",
@@ -72,7 +72,7 @@ const User = () => {
     setLoading(true);
 
     fetchUser();
-  }, [id]);
+  }, [username]);
 
   useEffect(() => {
     const isIncomingRequest = incomingRequests.find(

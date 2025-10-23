@@ -64,7 +64,7 @@ const router = createBrowserRouter(
       <Route path="search" element={<Search />} />
       <Route path="*" element={<NotFound />} />
       <Route path="incoming-requests" element={<IncomingRequests />} />
-      <Route path="users/:id" element={<User />} />
+      <Route path="users/:username" element={<User />} />
       <Route path="transactions/:chatId" element={<Transactions />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="split-expense" element={<SplitExpense />} />
