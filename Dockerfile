@@ -3,7 +3,7 @@ FROM node:23-alpine AS frontend-build
 WORKDIR /app
 COPY frontend ./frontend
 WORKDIR /app/frontend
-ENV REACT_APP_BACKEND_URL=https://hisaabkitab.duckdns.org
+ENV REACT_APP_BACKEND_URL=https://hisaabkitab.paramsavjani.in
 RUN npm install  && npm run build
 
 
